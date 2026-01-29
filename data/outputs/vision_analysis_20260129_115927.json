@@ -1,0 +1,199 @@
+{
+  "screen_type": "home",
+  "components": [
+    {
+      "type": "icon",
+      "text": "Search",
+      "position": "top",
+      "color": "dark gray",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "TEMU",
+      "position": "top",
+      "color": "orange",
+      "size": "large"
+    },
+    {
+      "type": "icon_group",
+      "text": "Network, Wi-Fi, Battery",
+      "position": "top",
+      "color": "black",
+      "size": "small"
+    },
+    {
+      "type": "label_with_icon",
+      "text": "Safe payment | Security privacy | Purchase protection",
+      "position": "top",
+      "color": "dark gray text on light gray background",
+      "size": "small"
+    },
+    {
+      "type": "banner",
+      "text": "Free shipping Ends in 20:26:18",
+      "position": "top",
+      "color": "dark gray text on light beige/orange background",
+      "size": "medium"
+    },
+    {
+      "type": "banner",
+      "text": "30% off On first 3 orders",
+      "position": "top",
+      "color": "dark gray text on light orange background",
+      "size": "medium"
+    },
+    {
+      "type": "review_card",
+      "text": "D***S ★★★★★ material is great. was my first time ordering fro...",
+      "position": "middle",
+      "color": "black text on white background",
+      "size": "medium"
+    },
+    {
+      "type": "section_header",
+      "text": "New user gift",
+      "position": "middle",
+      "color": "black",
+      "size": "medium"
+    },
+    {
+      "type": "image_card",
+      "text": "30% OFF SITEWIDE",
+      "position": "middle",
+      "color": "orange/red banner on product image",
+      "size": "large"
+    },
+    {
+      "type": "button",
+      "text": "GET ALL",
+      "position": "middle",
+      "color": "white text on orange background",
+      "size": "small"
+    },
+    {
+      "type": "product_card",
+      "text": "$0.90 $6.99",
+      "position": "middle",
+      "color": "black (new price), light gray (old price)",
+      "size": "small"
+    },
+    {
+      "type": "product_card",
+      "text": "$0.43 $12.99",
+      "position": "middle",
+      "color": "black (new price), light gray (old price)",
+      "size": "small"
+    },
+    {
+      "type": "section_header",
+      "text": "Lightning deals",
+      "position": "middle",
+      "color": "black",
+      "size": "medium"
+    },
+    {
+      "type": "countdown_timer",
+      "text": "Ends in 20:26:18",
+      "position": "middle",
+      "color": "black text on dark gray/black background for numbers",
+      "size": "small"
+    },
+    {
+      "type": "product_card",
+      "text": "$33.98 3 sold",
+      "position": "middle",
+      "color": "black",
+      "size": "small"
+    },
+    {
+      "type": "product_card",
+      "text": "$17.89 56 sold",
+      "position": "middle",
+      "color": "black",
+      "size": "small"
+    },
+    {
+      "type": "product_card",
+      "text": "$0.48 3,849 sold",
+      "position": "middle",
+      "color": "black",
+      "size": "small"
+    },
+    {
+      "type": "banner",
+      "text": "Christmas",
+      "position": "bottom",
+      "color": "red and gold",
+      "size": "large"
+    },
+    {
+      "type": "navigation_item",
+      "text": "Home",
+      "position": "bottom",
+      "color": "black",
+      "size": "small"
+    },
+    {
+      "type": "navigation_item",
+      "text": "Categories",
+      "position": "bottom",
+      "color": "black",
+      "size": "small"
+    },
+    {
+      "type": "navigation_item",
+      "text": "You",
+      "position": "bottom",
+      "color": "black",
+      "size": "small"
+    },
+    {
+      "type": "navigation_item",
+      "text": "Cart | Free shipping",
+      "position": "bottom",
+      "color": "black text, green progress bar",
+      "size": "small"
+    }
+  ],
+  "layout_structure": "The screen features a fixed top navigation bar and a fixed bottom navigation bar. The main content area in between is vertically scrollable, organized into distinct sections with horizontal carousels for product listings. Sections are delineated by headers, banners, or card layouts.",
+  "color_scheme": {
+    "primary_colors": [
+      "orange",
+      "black",
+      "dark gray",
+      "red"
+    ],
+    "background": "white",
+    "text_colors": [
+      "black",
+      "dark gray",
+      "orange",
+      "white",
+      "light gray",
+      "green"
+    ]
+  },
+  "typography": {
+    "heading_sizes": "The app name 'TEMU' is large and prominent. Section headers like 'New user gift' and 'Lightning deals' are medium-sized and bold. Other headings like 'Free shipping' are medium.",
+    "body_text_size": "Most body text, product descriptions, prices, and navigation labels are small to medium. Secondary information like 'sold' counts or old prices are smaller and often in a lighter color."
+  },
+  "spacing_and_density": {
+    "overall_density": "comfortable",
+    "element_spacing": "Elements are well-spaced within their respective containers and sections, providing clear visual separation. There's adequate padding around text and icons. Horizontal product carousels are somewhat dense but maintain readability."
+  },
+  "accessibility_observations": [
+    "Small font sizes for secondary information (e.g., old prices, 'sold' counts, security bar details) might be hard to read for users with visual impairments.",
+    "Color contrast generally appears good for primary text on white backgrounds, but some lighter gray text might have lower contrast.",
+    "The countdown timer numbers use black text on a very dark background, which could be challenging in certain lighting conditions."
+  ],
+  "notable_patterns": [
+    "Standard e-commerce home screen with a focus on promotions and product discovery.",
+    "Sectioned content for different deal types ('New user gift', 'Lightning deals').",
+    "Horizontal scrolling carousels for product listings.",
+    "Urgency marketing with countdown timers (Free shipping, Lightning deals, Cart timer).",
+    "Social proof indicators ('X sold' on product cards).",
+    "Persistency through top and bottom navigation bars.",
+    "Security reassurance with a dedicated 'Safe payment' bar."
+  ]
+}
