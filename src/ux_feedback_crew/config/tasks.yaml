@@ -78,10 +78,13 @@ create_wireframe:
     - Have proper spacing and typography
     - Be interactive and exportable as HTML
     - Show clear visual improvements
+    - Do NOT generate a generic product page
+    - Focus on fixing the specific UX violations identified in the report while keeping the identity of the original app intact
     
     Generate complete, production-ready HTML/CSS code.
   expected_output: >
-    A complete HTML wireframe file saved to disk, showing the improved design with all feedback implemented. Return the file path of the generated wireframe.
+    A complete HTML wireframe file saved to disk, showing the improved design with all feedback implemented. Return 
+    the file path of the generated wireframe.
   agent: wireframe_designer
   context:
     - analyze_ui

@@ -13,9 +13,12 @@ def run_evaluation_pipeline(image_path: str):
     result = crew_instance.evaluation_crew().kickoff(inputs=inputs)
     return result.raw
 
-def run_wireframe_pipeline(evaluation_report: str):
-    # This input key must match what your wireframe_designer expects in tasks.yaml
-    inputs = {'feedback_report': evaluation_report} 
+def run_wireframe_pipeline(evaluation_report: str, original_analysis: str):
+    # Pass both pieces of information so the agent knows the original structure
+    inputs = {
+        'feedback': evaluation_report,
+        'original_layout': original_analysis 
+    } 
     crew_instance = UxFeedbackCrew()
     result = crew_instance.wireframe_crew().kickoff(inputs=inputs)
     return result.raw
