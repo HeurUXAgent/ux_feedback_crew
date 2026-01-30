@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Mobile UI Wireframe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* Mobile Container Simulation */
+        .mobile-frame {
+            width: 375px;
+            height: 812px;
+            background-color: var(--bg-body);
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 8px solid #111;
+            border-radius: 40px;
+        }
+
+        /* Hide Scrollbar */
+        .mobile-frame::-webkit-scrollbar {
+            width: 0px;
+        }
+
+        /* Header Component */
+        header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px 20px 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .profile-pic {
+            width: 36px;
+            height: 36px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        /* Search Improvement */
+        .search-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f1f5f9;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .search-bar:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Category Chips Improvement */
+        .categories {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .chip {
+            white-space: nowrap;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Hero / Featured Card */
+        .featured-section {
+            padding: 10px 20px;
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            border-radius: var(--radius);
+            padding: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .hero-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            max-width: 70%;
+        }
+
+        .hero-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* Main Feed Grid */
+        .feed {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 120px;
+            background: #e2e8f0;
+        }
+
+        .card-content {
+            padding: 12px;
+        }
+
+        .card-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .add-btn {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation Reachability Improvement */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 12px 24px 28px 24px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+        }
+
+        /* SVGs for icons */
+        .icon {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+        <!-- Header -->
+        <header>
+            <div class="header-top">
+                <div class="logo">LUXE.</div>
+                <div class="profile-pic">
+                    <svg viewBox="0 0 24 24" fill="#64748b"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+            </div>
+            <div class="search-container">
+                <span class="search-icon">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </span>
+                <input type="text" class="search-bar" placeholder="Search collections...">
+            </div>
+        </header>
+
+        <!-- Category Horizontal Scroll -->
+        <div class="categories">
+            <div class="chip active">All Items</div>
+            <div class="chip">Trending</div>
+            <div class="chip">New Arrival</div>
+            <div class="chip">Premium</div>
+            <div class="chip">Offers</div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="featured-section">
+            <div class="hero-card">
+                <h2>New Summer Collection</h2>
+                <p>Get up to 40% off on all premium items this week.</p>
+                <button class="btn-white">Shop Now</button>
+            </div>
+        </div>
+
+        <!-- Product Feed -->
+        <div class="feed">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-img" style="background: #dfe7fd;"></div>
+                <div class="card-content">
+                    <div class="card-tag">Minimalist</div>
+                    <div class="card-title">Arc Chair</div>
+                    <div class="card-footer">
+                        <span class="price">$129</span>
+                        <button class="add-btn">+</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-img" style="background: #f0f4ff;"></div>
+                <div class="card-content">
+                    <div class="card-tag">Premium</div>
+                    <div class="card-title">Velvet Sofa</div>
+                    <div class="card-footer">
+                        <span class="price">$450</span>
+                        <button class="add-btn">+</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-img" style="background: #faedcd;"></div>
+                <div class="card-content">
+                    <div class="card-tag">Natural</div>
+                    <div class="card-title">Oak Table</div>
+                    <div class="card-footer">
+                        <span class="price">$210</span>
+                        <button class="add-btn">+</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="card">
+                <div class="card-img" style="background: #e9edc9;"></div>
+                <div class="card-content">
+                    <div class="card-tag">Lighting</div>
+                    <div class="card-title">Brass Lamp</div>
+                    <div class="card-footer">
+                        <span class="price">$85</span>
+                        <button class="add-btn">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacing for bottom nav -->
+        <div style="height: 80px;"></div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Discover</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+</body>
+</html>

@@ -4,11 +4,11 @@ import uuid
 import os
 import json
 from pathlib import Path
+# Import from your pipeline bridge
 from src.ux_feedback_crew.crew_pipeline import (
     run_evaluation_pipeline,
     run_wireframe_pipeline
 )
-
 
 app = FastAPI()
 
@@ -27,26 +27,27 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 @app.post("/evaluate-ui/")
 async def evaluate_ui(file: UploadFile = File(...)):
     try:
-        # 1. Save upload
         job_id = str(uuid.uuid4())
-        filename = f"{job_id}.png"
-        upload_path = UPLOAD_DIR / filename
+        upload_path = UPLOAD_DIR / f"{job_id}.png"
 
         with open(upload_path, "wb") as f:
             f.write(await file.read())
 
-        # 2. Run Phase 1 Crew via the pipeline
-        evaluation_result = run_evaluation_pipeline(str(upload_path))
+        # 1. Run Pipeline: Get BOTH the structured analysis and the feedback
+        analysis_json, feedback_report = run_evaluation_pipeline(str(upload_path))
 
-        # 3. Save evaluation report as JSON for Phase 2 context
+        # 2. Save BOTH so Phase 2 has the original layout map
+        output_data = {
+            "report": feedback_report,
+            "original_analysis": analysis_json
+        }
+        
         output_path = OUTPUT_DIR / f"{job_id}_evaluation.json"
         with open(output_path, "w") as f:
-            json.dump({"report": evaluation_result}, f, indent=2)
+            json.dump(output_data, f, indent=2)
 
-        return {
-            "evaluation_id": job_id,
-            "evaluation": evaluation_result
-        }
+        return {"evaluation_id": job_id, "evaluation": feedback_report}
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -54,17 +55,18 @@ async def evaluate_ui(file: UploadFile = File(...)):
 async def generate_wireframe(evaluation_id: str):
     try:
         evaluation_path = OUTPUT_DIR / f"{evaluation_id}_evaluation.json"
-        
         if not evaluation_path.exists():
-            raise HTTPException(status_code=404, detail="Evaluation not found")
+            raise HTTPException(status_code=404, detail="Evaluation ID not found")
 
         with open(evaluation_path) as f:
-            evaluation_data = json.load(f)
+            data = json.load(f)
 
-        # 2. Run Phase 2 Crew
-        # We pass the report from the JSON into the wireframe pipeline
-        result = run_wireframe_pipeline(evaluation_data['report'])
+        # 3. Pass both bits of data to keep the Dialog App identity
+        result = run_wireframe_pipeline(
+            data.get('report', ""), 
+            data.get('original_analysis', "")
+        )
 
         return {"wireframe_output": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Pipeline Error: {str(e)}")
