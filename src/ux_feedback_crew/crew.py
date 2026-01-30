@@ -60,7 +60,7 @@ class UxFeedbackCrew():
     def wireframe_designer(self) -> Agent:
         return Agent(
             config=self.agents_config['wireframe_designer'],
-            llm=self.gemini_preview_llm, # 2. Assign the LLM here
+            llm=self.gemini_llm, # 2. Assign the LLM here
             tools=[create_wireframe],
             verbose=True
         )
@@ -90,17 +90,26 @@ class UxFeedbackCrew():
             config=self.tasks_config['create_wireframe'],
         )
     
+    @crew
+    def full_flow_crew(self) -> Crew:
+        """The Complete FYP Pipeline: Analysis -> Heuristics -> Feedback -> Wireframe"""
+        return Crew(
+            agents=[
+                self.vision_analyst(), 
+                self.heuristic_evaluator(), 
+                self.feedback_specialist(), 
+                self.wireframe_designer()
+            ],
+            tasks=[
+                self.analyze_ui(), 
+                self.evaluate_heuristics(), 
+                self.generate_feedback(), 
+                self.create_wireframe()
+            ],
+            process=Process.sequential,
+            verbose=True
+        )
     
-    # @crew
-    # def crew(self) -> Crew:
-    #     """Creates the UX Feedback Crew"""
-    #     return Crew(
-    #         agents=self.agents,
-    #         tasks=self.tasks,
-    #         process=Process.sequential,
-    #         verbose=True,
-    #         max_iter=1   
-    #     )
     @crew
     def evaluation_crew(self) -> Crew:
         """Phase 1: Analysis, Heuristics, and Feedback"""

@@ -77,4 +77,4 @@ Make it look professional and implement all suggested improvements.
     except Exception as e:
         print(f"⚠ Could not auto-open browser: {e}")
     
-    return f"Wireframe generated and saved to: {output_path}"
+    return html_code
