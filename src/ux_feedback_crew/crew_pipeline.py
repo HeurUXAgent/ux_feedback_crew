@@ -25,12 +25,10 @@ def run_full_ux_pipeline(image_path: str):
     inputs = {'screenshot_path': image_path}
     crew_obj = UxFeedbackCrew()
     
-    # Kicks off your crew (ensure you added 'full_flow_crew' to crew.py as discussed)
+    # Kicks off the crew (added 'full_flow_crew' to crew.py)
     result = crew_obj.full_flow_crew().kickoff(inputs=inputs)
     
     # Accessing results using the singular 'tasks_output' list
-    # [2] = Feedback Specialist's Report
-    # [3] = Wireframe Designer's Design
     report = str(result.tasks_output[2].raw)
     wireframe = str(result.tasks_output[3].raw)
     

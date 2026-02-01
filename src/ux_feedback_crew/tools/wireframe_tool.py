@@ -28,24 +28,77 @@ def create_wireframe(vision_analysis: str, feedback_result: str) -> str:
     client = genai.Client(api_key=api_key)
     
     prompt = f"""
-Create an improved mobile UI wireframe in HTML/CSS.
+You are an expert UI/UX designer. Create an IMPROVED mobile UI wireframe in HTML/CSS based on the original design analysis and feedback.
 
-## ORIGINAL DESIGN:
-{vision_analysis}
+## ORIGINAL DESIGN ANALYSIS
 
-## IMPROVEMENTS TO IMPLEMENT:
-{feedback_result}
+**Screen Type:** {screen_type}
 
-## REQUIREMENTS:
+**Components:**
+{json.dumps(components[:10], indent=2)}
 
-Create a COMPLETE HTML file with:
-1. Mobile-first design (375px width)
-2. All feedback improvements implemented
-3. Clean, modern styling
-4. Proper spacing and typography
+**Color Scheme:**
+{json.dumps(color_scheme, indent=2)}
 
-Return ONLY the complete HTML code between ```html and ```.
-Make it look professional and implement all suggested improvements.
+## FEEDBACK TO IMPLEMENT
+
+**Feedback Items:**
+{json.dumps(feedback_items, indent=2)}
+
+**Wireframe Instructions:**
+{json.dumps(wireframe_instructions, indent=2)}
+
+## YOUR TASK
+
+Create a COMPLETE, IMPROVED mobile UI wireframe as a single HTML file with embedded CSS.
+
+**Requirements:**
+
+1. **Mobile-first design** (max-width: 375px, scale up for display)
+2. **Implement ALL feedback suggestions:**
+   - Fix color contrast issues
+   - Adjust typography sizes
+   - Improve spacing and layout
+   - Add missing UI elements (loading indicators, labels, etc.)
+   - Fix inconsistencies
+
+3. **Use modern CSS:**
+   - Flexbox/Grid for layout
+   - Proper spacing (padding, margins)
+   - Mobile-friendly touch targets (min 44px)
+   - Smooth transitions and hover states
+
+4. **Include annotations:**
+   - Add small labels showing what was improved
+   - Use a subtle annotation style (small text, muted color)
+
+5. **Make it realistic but clean:**
+   - Use actual UI components (buttons, cards, inputs)
+   - Include icons (use emoji or Unicode symbols)
+   - Proper visual hierarchy
+
+## OUTPUT FORMAT
+
+Return ONLY the HTML code inside a single code block, like this:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Mobile UI Wireframe</title>
+    <style>
+        /* Your CSS here */
+    </style>
+</head>
+<body>
+    <!-- Your improved UI here -->
+</body>
+</html>
+```
+
+Create a complete, functional wireframe that clearly shows the improvements.
+Make it look professional and polished.
 """
     
     response = client.models.generate_content(
