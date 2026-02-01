@@ -1,0 +1,40 @@
+{
+  "feedback_items": [
+    {
+      "id": 1,
+      "title": "Implement visual feedback for interactive cards and loading states",
+      "priority": "medium",
+      "why_it_matters": "Users need immediate visual confirmation that their tap has been registered, preventing uncertainty or repeated taps. Without feedback, the app can feel unresponsive or broken during transitions or data loading, leading to user frustration.",
+      "what_to_do": [
+        "Add a ripple effect or subtle highlight animation when any of the category or action cards ('Redeem', 'Rate Us', 'MATHS', 'GK', 'SCIENCE') are tapped.",
+        "For transitions that involve data loading after a card tap (e.g., when entering a quiz category), display a clear loading indicator (spinner or progress bar) until the next screen content is fully ready."
+      ],
+      "wireframe_changes": "Add an interactive tap animation (e.g., ripple or fade) to all interactive cards. Introduce a temporary loading overlay or spinner during content fetching after card selection."
+    },
+    {
+      "id": 2,
+      "title": "Enhance color contrast for 'Beginner' text and select icons",
+      "priority": "low",
+      "why_it_matters": "Insufficient contrast makes text and icons difficult to read for users with visual impairments, and can also be challenging for all users in bright lighting conditions or on lower-quality screens. This violates basic accessibility standards and creates an inconsistent user experience regarding readability.",
+      "what_to_do": [
+        "Adjust the text color of the 'Beginner' labels (currently light gray) to a darker shade that provides a minimum contrast ratio of 4.5:1 against all parts of their respective gradient backgrounds.",
+        "Change the color of the 'gift box' and 'star outline' icons (currently black) to a color that offers better contrast against their gradient card backgrounds. Consider using white with a subtle shadow, or a brighter accent color.",
+        "As an alternative, add a subtle, semi-transparent dark background shape directly behind these specific text labels and icons to ensure legibility without drastically changing their original colors."
+      ],
+      "wireframe_changes": "Update 'Beginner' label text color from 'light gray' to a darker, more contrasting color (e.g., a specific dark gray or a white with strong shadow/outline). Update 'gift box' and 'star outline' icon colors from 'black' to a color with better contrast against their gradients (e.g., white or a complementary vibrant color)."
+    }
+  ],
+  "quick_wins": [
+    {
+      "change": "Adjust the color of 'Beginner' labels and the 'gift box' and 'star outline' icons to improve contrast on their gradient backgrounds.",
+      "impact": "Significantly improves readability and accessibility for users with visual impairments, enhancing overall UI clarity and adherence to design standards.",
+      "effort": "Low (likely a few color code changes in styling files)"
+    }
+  ],
+  "summary": {
+    "total_issues": 2,
+    "high": 0,
+    "medium": 1,
+    "low": 1
+  }
+}

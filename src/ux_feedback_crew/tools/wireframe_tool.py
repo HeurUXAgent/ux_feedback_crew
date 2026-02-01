@@ -70,11 +70,11 @@ Make it look professional and implement all suggested improvements.
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_code)
     
-    # Automatically open the HTML file in the default browser
-    try:
-        webbrowser.open(f'file://{output_path.absolute()}')
-        print(f"✓ Wireframe opened in browser: {output_path}")
-    except Exception as e:
-        print(f"⚠ Could not auto-open browser: {e}")
+    # # Automatically open the HTML file in the default browser
+    # try:
+    #     webbrowser.open(f'file://{output_path.absolute()}')
+    #     print(f"✓ Wireframe opened in browser: {output_path}")
+    # except Exception as e:
+    #     print(f"⚠ Could not auto-open browser: {e}")
     
     return html_code

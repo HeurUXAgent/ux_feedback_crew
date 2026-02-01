@@ -1,0 +1,247 @@
+{
+  "screen_type": "home",
+  "components": [
+    {
+      "type": "icon",
+      "text": "",
+      "position": "top-left",
+      "color": "white",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Quiz Pool",
+      "position": "top-left",
+      "color": "white",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "Play Quiz Earn Money",
+      "position": "top-left",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": "",
+      "position": "top-right",
+      "color": "red and gold",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "27",
+      "position": "top-right",
+      "color": "red",
+      "size": "small"
+    },
+    {
+      "type": "card",
+      "text": "",
+      "position": "middle-top-left",
+      "color": "purple gradient",
+      "size": "medium"
+    },
+    {
+      "type": "icon",
+      "text": "(gift box)",
+      "position": "middle-top-left",
+      "color": "black",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Redeem",
+      "position": "middle-top-left",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "card",
+      "text": "",
+      "position": "middle-top-right",
+      "color": "blue gradient",
+      "size": "medium"
+    },
+    {
+      "type": "icon",
+      "text": "(star outline)",
+      "position": "middle-top-right",
+      "color": "black",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Rate Us",
+      "position": "middle-top-right",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "card",
+      "text": "",
+      "position": "middle",
+      "color": "purple/pink gradient",
+      "size": "large"
+    },
+    {
+      "type": "image",
+      "text": "(math symbols, open book)",
+      "position": "middle-left",
+      "color": "multicolor",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "MATHS",
+      "position": "middle-left",
+      "color": "white",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "Beginner",
+      "position": "middle-left",
+      "color": "light gray",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "QUIZ",
+      "position": "middle-right",
+      "color": "white on red background",
+      "size": "small"
+    },
+    {
+      "type": "card",
+      "text": "",
+      "position": "middle-bottom",
+      "color": "blue gradient",
+      "size": "large"
+    },
+    {
+      "type": "image",
+      "text": "(person at computer)",
+      "position": "middle-bottom-left",
+      "color": "multicolor",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "GK",
+      "position": "middle-bottom-left",
+      "color": "white",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "Beginner",
+      "position": "middle-bottom-left",
+      "color": "light gray",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "QUIZ",
+      "position": "middle-bottom-right",
+      "color": "white on red background",
+      "size": "small"
+    },
+    {
+      "type": "card",
+      "text": "",
+      "position": "bottom-middle",
+      "color": "red/orange gradient",
+      "size": "large"
+    },
+    {
+      "type": "image",
+      "text": "(beaker, atoms)",
+      "position": "bottom-middle-left",
+      "color": "multicolor",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "SCIENCE",
+      "position": "bottom-middle-left",
+      "color": "white",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "Beginner",
+      "position": "bottom-middle-left",
+      "color": "light gray",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "QUIZ",
+      "position": "bottom-middle-right",
+      "color": "white on red background",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": "(square - recent apps)",
+      "position": "bottom",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": "(circle - home)",
+      "position": "bottom",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": "(triangle - back)",
+      "position": "bottom",
+      "color": "white",
+      "size": "small"
+    }
+  ],
+  "layout_structure": "The screen features a top app bar, followed by a grid of two smaller action cards, and then a vertical stack of three larger category cards. The main content area is scrollable (implied by stacking of cards). A standard Android system navigation bar is present at the very bottom.",
+  "color_scheme": {
+    "primary_colors": [
+      "#2AF5C0" (teal app bar),
+      "#9747FF" (purple gradient start for Redeem/MATHS),
+      "#E8A3FF" (purple gradient end for Redeem/MATHS),
+      "#4793FF" (blue gradient start for Rate Us/GK),
+      "#A3E5FF" (blue gradient end for Rate Us/GK),
+      "#FF4747" (red gradient start for SCIENCE, and accent),
+      "#FFAD47" (orange gradient end for SCIENCE)
+    ],
+    "background": "white (for content area), dark blue/purple gradient (device wallpaper visible outside app content)",
+    "text_colors": [
+      "white",
+      "dark gray/black",
+      "red",
+      "light gray"
+    ]
+  },
+  "typography": {
+    "heading_sizes": "Large for the app title ('Quiz Pool') and category titles ('MATHS', 'GK', 'SCIENCE'). Medium for action card labels ('Redeem', 'Rate Us').",
+    "body_text_size": "Small for the app subtitle ('Play Quiz Earn Money'), numerical display ('27'), and difficulty labels ('Beginner')."
+  },
+  "spacing_and_density": {
+    "overall_density": "Comfortable. Elements have sufficient padding and margin, preventing a cramped feel and allowing easy interaction.",
+    "element_spacing": "Consistent vertical spacing between the app bar and the top row of cards, and between subsequent category cards. There is also consistent horizontal spacing between the two top action cards. Padding within cards around their content is ample."
+  },
+  "accessibility_observations": [
+    "The 'Beginner' text, rendered in light gray on various gradient backgrounds (e.g., light gray on purple/pink, light gray on blue), may have insufficient contrast for users with certain visual impairments.",
+    "The black icons (gift box, star outline) on gradient backgrounds might also suffer from low contrast against lighter parts of their respective gradients.",
+    "The text size for 'Play Quiz Earn Money' and the '27' score is quite small, potentially making it hard to read for users with low vision or on smaller screens."
+  ],
+  "notable_patterns": [
+    "Card-based UI: Extensive use of cards to encapsulate and visually separate different categories and actions, enhancing content organization.",
+    "Gradient backgrounds: Applied to the app bar and all interactive cards, contributing to a vibrant and modern aesthetic.",
+    "Hamburger menu: A standard navigation pattern used for accessing additional menu options or user profiles.",
+    "Illustrative icons and images: Each category card features a unique, thematic illustration, improving visual appeal and intuitive understanding of content.",
+    "Gamification element: Display of points/currency ('27') as a common pattern in quiz or game applications to incentivize engagement."
+  ]
+}
