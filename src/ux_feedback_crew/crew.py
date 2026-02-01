@@ -23,10 +23,10 @@ class UxFeedbackCrew():
             api_key=os.getenv("GEMINI_API_KEY")
         )
 
-        self.gemini_preview_llm = LLM(
-            model="gemini/gemini-3-flash-preview", 
-            api_key=os.getenv("GEMINI_API_KEY")
-        )
+        # self.gemini_preview_llm = LLM(
+        #     model="gemini/gemini-3-flash-preview", 
+        #     api_key=os.getenv("GEMINI_API_KEY")
+        # )
 
     @agent
     def vision_analyst(self) -> Agent:
