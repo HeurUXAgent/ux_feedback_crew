@@ -90,22 +90,22 @@ Return ONLY the JSON.
     result_text = result_text.strip()
     
     # Save to JSON file
-    output_dir = Path("data/outputs")
-    output_dir.mkdir(exist_ok=True, parents=True)
+    # output_dir = Path("data/outputs")
+    # output_dir.mkdir(exist_ok=True, parents=True)
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = output_dir / f"heuristic_evaluation_{timestamp}.json"
+    # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # output_path = output_dir / f"heuristic_evaluation_{timestamp}.json"
     
-    try:
-        # Parse to validate JSON and pretty print
-        json_data = json.loads(result_text)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, indent=2, ensure_ascii=False)
-        print(f"✓ Heuristic evaluation saved to: {output_path}")
-    except json.JSONDecodeError as e:
-        print(f"⚠ JSON validation error: {e}")
-        # Save raw text anyway
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(result_text)
+    # try:
+    #     # Parse to validate JSON and pretty print
+    #     json_data = json.loads(result_text)
+    #     with open(output_path, 'w', encoding='utf-8') as f:
+    #         json.dump(json_data, f, indent=2, ensure_ascii=False)
+    #     print(f"✓ Heuristic evaluation saved to: {output_path}")
+    # except json.JSONDecodeError as e:
+    #     print(f"⚠ JSON validation error: {e}")
+    #     # Save raw text anyway
+    #     with open(output_path, 'w', encoding='utf-8') as f:
+    #         f.write(result_text)
     
     return result_text

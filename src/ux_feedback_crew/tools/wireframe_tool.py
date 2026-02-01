@@ -1,7 +1,6 @@
 from crewai.tools import tool
 from google import genai
 import os
-import webbrowser
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
@@ -11,7 +10,6 @@ from dotenv import load_dotenv
 def create_wireframe(vision_analysis: str, feedback_result: str) -> str:
     """
     Generates improved UI wireframes in HTML/CSS based on feedback.
-    Creates interactive, exportable designs showing improvements.
     
     Args:
         vision_analysis: JSON string of vision analysis
@@ -40,16 +38,18 @@ Create an improved mobile UI wireframe in HTML/CSS.
 
 Create a COMPLETE HTML file with:
 1. Mobile-first design (375px width)
-2. All feedback improvements implemented
-3. Clean, modern styling
-4. Proper spacing and typography
+2. Do NOT allow layouts wider than 375px
+3. Simulate a real mobile device frame
+4. All feedback improvements implemented
+5. Clean, modern styling
+6. Proper spacing and typography
 
 Return ONLY the complete HTML code between ```html and ```.
 Make it look professional and implement all suggested improvements.
 """
     
     response = client.models.generate_content(
-        model='gemini-3-flash-preview',
+        model='gemini-2.5-flash',
         contents=prompt
     )
     

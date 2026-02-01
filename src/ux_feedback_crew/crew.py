@@ -33,8 +33,8 @@ class UxFeedbackCrew():
         return Agent(
             config=self.agents_config['vision_analyst'],
             tools=[analyze_ui_screenshot],
-            llm=self.gemini_llm, 
             verbose=True,   
+            llm=self.gemini_llm,
             allow_delegation=False # Prevent it from asking other agents for help
         )
     
@@ -43,7 +43,7 @@ class UxFeedbackCrew():
         return Agent(
             config=self.agents_config['heuristic_evaluator'],
             tools=[evaluate_heuristics],
-            llm=self.gemini_llm, # 2. Assign the LLM here
+            llm=self.gemini_llm,
             verbose=True
         )
     
@@ -51,8 +51,8 @@ class UxFeedbackCrew():
     def feedback_specialist(self) -> Agent:
         return Agent(
             config=self.agents_config['feedback_specialist'],
-            llm=self.gemini_llm, # 2. Assign the LLM here
             tools=[generate_feedback],
+            llm=self.gemini_llm,
             verbose=True
         )
     
@@ -60,9 +60,10 @@ class UxFeedbackCrew():
     def wireframe_designer(self) -> Agent:
         return Agent(
             config=self.agents_config['wireframe_designer'],
-            llm=self.gemini_llm, # 2. Assign the LLM here
             tools=[create_wireframe],
-            verbose=True
+            llm=self.gemini_llm,
+            verbose=True,
+            allow_delegation=False
         )
     
     # Task names MUST match the YAML keys
@@ -110,22 +111,22 @@ class UxFeedbackCrew():
             verbose=True
         )
     
-    @crew
-    def evaluation_crew(self) -> Crew:
-        """Phase 1: Analysis, Heuristics, and Feedback"""
-        return Crew(
-            agents=[self.vision_analyst(), self.heuristic_evaluator(), self.feedback_specialist()],
-            tasks=[self.analyze_ui(), self.evaluate_heuristics(), self.generate_feedback()],
-            process=Process.sequential,
-            verbose=True
-        )
+    # @crew
+    # def evaluation_crew(self) -> Crew:
+    #     """Phase 1: Analysis, Heuristics, and Feedback"""
+    #     return Crew(
+    #         agents=[self.vision_analyst(), self.heuristic_evaluator(), self.feedback_specialist()],
+    #         tasks=[self.analyze_ui(), self.evaluate_heuristics(), self.generate_feedback()],
+    #         process=Process.sequential,
+    #         verbose=True
+    #     )
 
-    @crew
-    def wireframe_crew(self) -> Crew:
-        """Phase 2: Triggered by Flutter 'Generate Wireframe' button"""
-        return Crew(
-            agents=[self.wireframe_designer()],
-            tasks=[self.create_wireframe()],
-            process=Process.sequential,
-            verbose=True
-        )
+    # @crew
+    # def wireframe_crew(self) -> Crew:
+    #     """Phase 2: Triggered by Flutter 'Generate Wireframe' button"""
+    #     return Crew(
+    #         agents=[self.wireframe_designer()],
+    #         tasks=[self.create_wireframe()],
+    #         process=Process.sequential,
+    #         verbose=True
+    #     )

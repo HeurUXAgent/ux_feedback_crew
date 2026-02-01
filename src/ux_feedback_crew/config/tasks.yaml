@@ -14,13 +14,16 @@ analyze_ui:
     Provide detailed, structured analysis that will be used
     for heuristic evaluation.
   expected_output: >
-    A comprehensive JSON analysis containing all UI components, layout information, color scheme, typography details, spacing observations, and identified patterns.
+    A comprehensive JSON analysis containing all UI components, layout information, color scheme, typography details, spacing 
+    observations, and identified patterns.
   agent: vision_analyst
+  # max_iterations: 1
 
 evaluate_heuristics:
   description: >
-    Using the vision analysis from the previous task, evaluate this mobile UI against Nielsen's 10 Usability Heuristics and mobile-specific UX guidelines.
-    
+    Using the vision analysis from the previous task, evaluate this mobile UI against Nielsen's 10 Usability Heuristics, WCAG2 color 
+    guidelines and mobile-specific UX guidelines.
+
     For each violation found:
     - Identify which heuristic is violated
     - Assign severity (critical/high/medium/low)
@@ -36,6 +39,7 @@ evaluate_heuristics:
   agent: heuristic_evaluator
   context:
     - analyze_ui
+  # max_iterations: 1 
 
 generate_feedback:
   description: >
@@ -59,25 +63,17 @@ generate_feedback:
     - analyze_ui
     - evaluate_heuristics
   output_file: app/data/outputs/feedback.md
+  # max_iterations: 1 
 
 create_wireframe:
   description: >
-    Create an improved mobile UI wireframe that implements all the feedback suggestions while maintaining the original design intent.
-    
-    The wireframe should:
-    - Be mobile-first (375px width, responsive)
-    - Implement ALL suggested improvements
-    - Use clean, modern styling
-    - Have proper spacing and typography
-    - Be interactive and exportable as HTML
-    - Show clear visual improvements
-    - Do NOT generate a generic product page
-    - Focus on fixing the specific UX violations identified in the report while keeping the identity of the original app intact
-    
-    Generate complete, production-ready HTML/CSS code.
+    Use the create_wireframe tool to generate the wireframe.
+    You MUST NOT generate HTML yourself.
+    Call the tool exactly once and return its output verbatim.
   expected_output: >
     A complete HTML wireframe file showing the improved design with all feedback implemented and CSS code for the improved wireframe.
   agent: wireframe_designer
   context:
     - analyze_ui
     - generate_feedback
+  # max_iterations: 1 
