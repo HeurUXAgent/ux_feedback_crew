@@ -11,7 +11,6 @@ import json
 # Load environment variables at the top
 load_dotenv()
 
-
 @tool("analyze_ui_screenshot")
 def analyze_ui_screenshot(image_path: str) -> str:
     """
@@ -115,3 +114,97 @@ Return ONLY valid JSON with this structure:
             f.write(result_text)
     
     return result_text
+
+
+# @tool("analyze_ui_screenshot")
+# def analyze_ui_screenshot(image_path: str) -> str:
+#     """
+#     Prepares a mobile UI screenshot for analysis by the agent.
+#     Returns the image path and analysis instructions for the agent's LLM.
+
+#     Args:
+#         image_path: Path to the mobile UI screenshot to analyze
+
+#     Returns:
+#         Structured prompt with image path for agent to analyze
+#     """
+    
+#     # Validate image exists
+#     img_path = Path(image_path)
+#     if not img_path.exists():
+#         raise FileNotFoundError(f"Image not found: {image_path}")
+    
+#     # Load image to get metadata
+#     img = Image.open(image_path)
+    
+#     # Prepare analysis prompt for the agent
+#     analysis_prompt = f"""
+# TASK: You are a UI/UX analysis expert. Analyze this mobile app screenshot and extract detailed information.
+
+# Provide your response ONLY as valid JSON with this exact structure:
+
+# {
+#   "screen_type": "login/home/profile/list/etc",
+#   "components": [
+#     {
+#       "type": "button/text_input/image/label/icon/etc",
+#       "text": "visible text if any",
+#       "position": "top/middle/bottom/top-left/etc",
+#       "color": "describe color",
+#       "size": "small/medium/large",
+#       "style": "primary/secondary/text/outlined/etc"
+#     }
+#   ],
+#   "layout_structure": "describe overall layout",
+#   "color_scheme": {
+#     "primary_colors": ["list of main colors"],
+#     "background": "background color",
+#     "text_colors": ["list of text colors"]
+#   },
+#   "typography": {
+#     "heading_sizes": "describe heading sizes",
+#     "body_text_size": "describe body text size",
+#     "font_weights": "describe font weights used"
+#   },
+#   "spacing_and_density": {
+#     "overall_density": "tight/comfortable/spacious",
+#     "padding": "describe padding",
+#     "element_spacing": "describe spacing between elements"
+#   },
+#   "interactive_elements": [
+#     {
+#       "element": "describe element",
+#       "action": "what it likely does",
+#       "visibility": "how easy to find/use"
+#     }
+#   ],
+#   "visual_hierarchy": "describe how eye flows through the screen",
+#   "accessibility_observations": ["list any obvious accessibility issues"],
+#   "notable_patterns": ["list UI patterns used"]
+# }
+
+# Be specific and detailed. Return ONLY the JSON, no additional text.
+# """
+    
+#     # Save metadata for reference
+#     output_dir = Path("data/outputs")
+#     output_dir.mkdir(exist_ok=True, parents=True)
+    
+#     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+#     metadata_path = output_dir / f"vision_metadata_{timestamp}.json"
+    
+#     metadata = {
+#         "image_path": str(img_path.absolute()),
+#         "image_size": img.size,
+#         "image_format": img.format,
+#         "timestamp": timestamp
+#     }
+    
+#     with open(metadata_path, 'w', encoding='utf-8') as f:
+#         json.dump(metadata, f, indent=2)
+    
+#     print(f"✓ Image loaded: {image_path}")
+#     print(f"✓ Metadata saved: {metadata_path}")
+    
+#     # Return the prompt for the agent to process
+#     return analysis_prompt

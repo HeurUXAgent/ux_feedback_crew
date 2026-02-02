@@ -1,0 +1,351 @@
+{
+  "screen_type": "dashboard",
+  "components": [
+    {
+      "type": "label",
+      "text": "10:09",
+      "position": "top",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "53%",
+      "position": "top",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top",
+      "color": "white",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "011XXXXXXX",
+      "position": "top",
+      "color": "white",
+      "size": "medium"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "tab",
+      "text": "Internet",
+      "position": "top",
+      "color": "yellow text on green background",
+      "size": "medium"
+    },
+    {
+      "type": "tab",
+      "text": "PEO TV",
+      "position": "top",
+      "color": "white text on dark blue background",
+      "size": "medium"
+    },
+    {
+      "type": "tab",
+      "text": "Voice",
+      "position": "top",
+      "color": "white text on dark blue background",
+      "size": "medium"
+    },
+    {
+      "type": "tab",
+      "text": "Mobile",
+      "position": "top",
+      "color": "white text on dark blue background",
+      "size": "medium"
+    },
+    {
+      "type": "tab",
+      "text": "Promo",
+      "position": "top",
+      "color": "white text on dark blue background",
+      "size": "medium"
+    },
+    {
+      "type": "image",
+      "text": "SLTMOBITEL The Connection",
+      "position": "middle",
+      "color": "blue background with white/green text",
+      "size": "large"
+    },
+    {
+      "type": "label",
+      "text": "WEB FAMILY XTRA",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Status Normal",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "Loyalty Data 7.8GB",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "medium"
+    },
+    {
+      "type": "button",
+      "text": "Package Upgrade",
+      "position": "middle",
+      "color": "purple background with white text",
+      "size": "medium"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "middle",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "DATA Remaining",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Standard",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "54.0GB",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Free",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "small"
+    },
+    {
+      "type": "label",
+      "text": "95.00GB",
+      "position": "middle",
+      "color": "dark purple",
+      "size": "medium"
+    },
+    {
+      "type": "button",
+      "text": "More",
+      "position": "middle",
+      "color": "dark blue background with white text",
+      "size": "medium"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "middle",
+      "color": "white",
+      "size": "small"
+    },
+    {
+      "type": "button",
+      "text": "SLT Go",
+      "position": "middle",
+      "color": "gray background with dark blue accent and black text",
+      "size": "medium"
+    },
+    {
+      "type": "button",
+      "text": "Data Add-on",
+      "position": "middle",
+      "color": "gray background with green accent and black text",
+      "size": "medium"
+    },
+    {
+      "type": "button",
+      "text": "Extra GB",
+      "position": "middle",
+      "color": "gray background with cyan accent and black text",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Total Payable",
+      "position": "middle",
+      "color": "black",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "Rs. 6,977.25",
+      "position": "middle",
+      "color": "black",
+      "size": "large"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "middle",
+      "color": "dark purple",
+      "size": "small"
+    },
+    {
+      "type": "button",
+      "text": "Pay",
+      "position": "middle",
+      "color": "dark blue background with white text",
+      "size": "medium"
+    },
+    {
+      "type": "label",
+      "text": "VALUE ADDED SERVICES",
+      "position": "bottom",
+      "color": "black",
+      "size": "medium"
+    },
+    {
+      "type": "grid_item",
+      "text": "Storage",
+      "position": "bottom",
+      "color": "blue square icon with black text",
+      "size": "small"
+    },
+    {
+      "type": "grid_item",
+      "text": "slt go",
+      "position": "bottom",
+      "color": "blue square icon with black text",
+      "size": "small"
+    },
+    {
+      "type": "grid_item",
+      "text": "PEO TV GO",
+      "position": "bottom",
+      "color": "blue square icon with black text",
+      "size": "small"
+    },
+    {
+      "type": "grid_item",
+      "text": "Kaspersky",
+      "position": "bottom",
+      "color": "green square icon with black text",
+      "size": "small"
+    },
+    {
+      "type": "button",
+      "text": "Digital Life",
+      "position": "bottom",
+      "color": "white icon and text with cyan accent",
+      "size": "small"
+    },
+    {
+      "type": "button",
+      "text": "Hot Devices",
+      "position": "bottom",
+      "color": "white icon and text",
+      "size": "small"
+    },
+    {
+      "type": "button",
+      "text": "New",
+      "position": "bottom",
+      "color": "white icon and text",
+      "size": "small"
+    },
+    {
+      "type": "button",
+      "text": "Bill",
+      "position": "bottom",
+      "color": "white icon and text",
+      "size": "small"
+    },
+    {
+      "type": "button",
+      "text": "Complaints",
+      "position": "bottom",
+      "color": "white icon and text",
+      "size": "small"
+    }
+  ],
+  "layout_structure": "The screen features a fixed top status bar and header, a scrollable main content area, and a fixed bottom navigation bar. The header contains account details and quick action icons. Below the header is a horizontal, scrollable tab-like navigation. The main content area begins with a prominent hero banner, followed by two-column information cards. Further down, there are horizontally arranged pill-shaped buttons and a section for payment details with a large 'Pay' button. The screen concludes with a horizontal scrollable grid of 'Value Added Services' items.",
+  "color_scheme": {
+    "primary_colors": [
+      "#1A237E",
+      "#2E3A87",
+      "#4CAF50",
+      "#03A9F4",
+      "#FDD835",
+      "#673AB7"
+    ],
+    "background": "white/light gray (main content), dark blue (header, bottom nav), light purple (info cards)",
+    "text_colors": [
+      "white",
+      "black",
+      "dark purple",
+      "yellow"
+    ]
+  },
+  "typography": {
+    "heading_sizes": "Headings like 'WEB FAMILY XTRA', 'DATA Remaining', 'VALUE ADDED SERVICES' are medium. The total payable amount 'Rs. 6,977.25' is large and prominent.",
+    "body_text_size": "Body text such as 'Status Normal', 'Standard', 'Free' is small to medium. Button labels and navigation labels are generally small to medium."
+  },
+  "spacing_and_density": {
+    "overall_density": "comfortable",
+    "element_spacing": "Elements are well-spaced, particularly within the card layouts and between major sections, providing a comfortable visual flow. Horizontal spacing in the top tab navigation and bottom navigation bar is consistent. The segmented pill buttons also have adequate horizontal spacing."
+  },
+  "accessibility_observations": [
+    "The contrast between the yellow 'Internet' text and the bright green background might be insufficient for some users with visual impairments.",
+    "The contrast of dark purple text on the light purple card background could be low for some text elements, especially the smaller 'Status Normal' or 'Standard' labels.",
+    "Some interactive elements, like the notification and grid icons in the top header, appear relatively small and might be challenging for users with motor impairments to accurately tap."
+  ],
+  "notable_patterns": [
+    "Dashboard/Summary Layout: Provides an overview of account status and usage.",
+    "Card UI: Used for grouping related information (e.g., data usage, package details).",
+    "Horizontal Scrollable Navigation: Featured for top-level categories and 'Value Added Services'.",
+    "Bottom Navigation Bar: Standard pattern for primary application navigation.",
+    "Segmented Control/Pill Buttons: Offers distinct, actionable choices in a compact horizontal arrangement."
+  ]
+}
