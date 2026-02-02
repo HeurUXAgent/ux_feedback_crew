@@ -32,25 +32,13 @@ You are an expert UI/UX designer. Create an IMPROVED mobile UI wireframe in HTML
 
 ## ORIGINAL DESIGN ANALYSIS
 
-**Screen Type:** {screen_type}
-
-**Components:**
-{json.dumps(components[:10], indent=2)}
-
-**Color Scheme:**
-{json.dumps(color_scheme, indent=2)}
-
-## FEEDBACK TO IMPLEMENT
-
-**Feedback Items:**
-{json.dumps(feedback_items, indent=2)}
-
-**Wireframe Instructions:**
-{json.dumps(wireframe_instructions, indent=2)}
-
-## YOUR TASK
-
 Create a COMPLETE, IMPROVED mobile UI wireframe as a single HTML file with embedded CSS.
+
+## ORIGINAL DESIGN:
+{vision_analysis}
+
+## IMPROVEMENTS TO IMPLEMENT:
+{feedback_result}
 
 **Requirements:**
 
@@ -80,7 +68,6 @@ Create a COMPLETE, IMPROVED mobile UI wireframe as a single HTML file with embed
 ## OUTPUT FORMAT
 
 Return ONLY the HTML code inside a single code block, like this:
-```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -95,7 +82,6 @@ Return ONLY the HTML code inside a single code block, like this:
     <!-- Your improved UI here -->
 </body>
 </html>
-```
 
 Create a complete, functional wireframe that clearly shows the improvements.
 Make it look professional and polished.
