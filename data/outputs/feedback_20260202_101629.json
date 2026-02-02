@@ -1,0 +1,78 @@
+{
+  "feedback_items": [
+    {
+      "id": 1,
+      "title": "Implement Loading Indicators for Asynchronous Content",
+      "priority": "medium",
+      "why_it_matters": "Users need clear cues when the app is fetching data to prevent uncertainty and impatient actions like repeatedly tapping or leaving the app. Lack of loading states can lead to users feeling the app is slow or unresponsive.",
+      "what_to_do": [
+        "Display a loading spinner or a skeleton screen within the category list area (where MATHS, GK, SCIENCE cards appear) while quiz categories are being fetched from the server.",
+        "Ensure the loading state is visually distinct and temporary, transitioning smoothly to the actual content."
+      ],
+      "wireframe_changes": "Show a placeholder/skeleton UI for the list of category cards (MATHS, GK, SCIENCE) during data loading, instead of empty space or old content."
+    },
+    {
+      "id": 2,
+      "title": "Provide Visual Feedback for All User Interactions",
+      "priority": "medium",
+      "why_it_matters": "Immediate visual feedback confirms to the user that their tap or interaction has been registered by the system. This improves perceived responsiveness, reduces frustration, and prevents accidental double-taps.",
+      "what_to_do": [
+        "Implement a visual tap state (e.g., a ripple effect, subtle background color change, or elevation change) for all tappable cards: 'Redeem', 'Rate Us', and all quiz category cards (MATHS, GK, SCIENCE).",
+        "Consider displaying brief, dismissible toast or snackbar messages for non-critical successful actions (e.g., 'Rated successfully!' after tapping 'Rate Us')."
+      ],
+      "wireframe_changes": "Indicate tap states (e.g., a ripple overlay on tap) on all interactive cards. Optionally, show a temporary toast/snackbar message positioned at the bottom of the screen for non-critical success messages."
+    },
+    {
+      "id": 3,
+      "title": "Implement Confirmation for 'Redeem' Action",
+      "priority": "high",
+      "why_it_matters": "The 'Redeem' action likely has significant, potentially irreversible consequences (e.g., affecting real-world currency or points). Without a clear confirmation and a 'cancel' option, users risk making accidental mistakes, leading to frustration, financial loss, and distrust in the app. This addresses both error prevention and user control.",
+      "what_to_do": [
+        "Before processing the 'Redeem' action, present a clear confirmation dialog to the user.",
+        "The dialog should explicitly state the consequences of redemption (e.g., 'Are you sure you want to redeem 27 points? This action cannot be undone.').",
+        "Include distinct 'Confirm' and 'Cancel' buttons within the dialog, allowing the user to review and either proceed or abort the action."
+      ],
+      "wireframe_changes": "Add a modal confirmation dialog that appears after tapping the 'Redeem' card, detailing the action and providing clear 'Confirm' and 'Cancel' buttons."
+    },
+    {
+      "id": 4,
+      "title": "Improve Accessibility: Enhance Contrast & Text Size",
+      "priority": "high",
+      "why_it_matters": "Poor contrast ratios make text and icons unreadable for users with visual impairments and difficult for anyone in bright conditions. Small font sizes strain the eyes and hinder readability for many users. Adhering to accessibility standards makes the app inclusive and usable for a wider audience.",
+      "what_to_do": [
+        "Review and adjust the background colors or text/icon colors on the 'Redeem' (purple gradient) and 'Rate Us' (blue gradient) cards to ensure a minimum WCAG AA contrast ratio (e.g., 4.5:1) for the black icons and text. This may involve using lighter icon/text colors (e.g., white) or darker gradient shades.",
+        "Increase the font size of all 'Beginner' labels within the quiz category cards (MATHS, GK, SCIENCE) to improve overall readability for all users."
+      ],
+      "wireframe_changes": "Update the color of the icons and text on the 'Redeem' and 'Rate Us' cards (e.g., change to white or a color with sufficient contrast). Visually increase the font size of all 'Beginner' labels in category cards."
+    },
+    {
+      "id": 5,
+      "title": "Integrate Status Bar Visuals with App Bar Theme",
+      "priority": "low",
+      "why_it_matters": "A subtle visual disconnect between the system status bar and the app's primary app bar can detract from the overall polish and cohesiveness of the user interface. Seamless integration creates a more professional and immersive experience.",
+      "what_to_do": [
+        "Ensure the status bar's background (especially for notched areas) either matches the app bar's teal/cyan color or is transparent, allowing the app bar to extend visually behind it.",
+        "Confirm that the status bar icons and text (e.g., time, battery, signal) remain clearly visible and legible against the app bar's background (they are currently black on a white background, which might become problematic on a dark teal background without adjustment)."
+      ],
+      "wireframe_changes": "Show the status bar background color seamlessly matching the app bar's teal/cyan color, with status bar icons/text in white for optimal contrast."
+    }
+  ],
+  "quick_wins": [
+    {
+      "change": "Implement ripple effects for all tappable cards (Redeem, Rate Us, and quiz category cards).",
+      "impact": "Immediately improves perceived responsiveness and user confidence with minimal development effort, making interactions feel more tangible.",
+      "effort": "5 minutes"
+    },
+    {
+      "change": "Increase the font size of all 'Beginner' labels within the quiz category cards.",
+      "impact": "Directly improves readability for a broader user base, addressing a key accessibility concern and enhancing the user experience for all.",
+      "effort": "15 minutes"
+    }
+  ],
+  "summary": {
+    "total_issues": 5,
+    "high": 2,
+    "medium": 2,
+    "low": 1
+  }
+}

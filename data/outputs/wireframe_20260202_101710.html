@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Pool - Mobile UI Wireframe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300,400,500,700&display=swap" rel="stylesheet">
+    <style>
+        /* General Reset & Body Styling */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af); /* Dark blue/purple gradient for device background */
+            color: #333;
+            overflow: hidden; /* Prevent body scroll if frame is taller than viewport */
+        }
+
+        /* Mobile Device Frame Simulation */
+        .mobile-frame {
+            max-width: 375px; /* Adhering to the 375px width requirement */
+            width: 100%;
+            height: 812px; /* Standard iPhone X height for simulation */
+            background-color: #fff;
+            border-radius: 40px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3), 0 0 0 10px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Simulate notch */
+        .mobile-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 28px;
+            background-color: #000;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+            z-index: 100;
+        }
+
+        /* Screen Content Wrapper */
+        .screen-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Ensure only content area scrolls */
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px; /* Standard status bar height for notch devices */
+            background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+            z-index: 99; /* Below notch */
+            position: relative;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05); /* Subtle separation */
+        }
+
+        .status-bar .time {
+            font-weight: 700;
+        }
+
+        .status-bar .icons span {
+            margin-left: 8px;
+        }
+
+        /* App Bar */
+        .app-bar {
+            background: linear-gradient(to right, #00BCD4, #00ACC1); /* Teal/Cyan background */
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .app-bar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .app-bar .icon.menu-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .app-bar .icon.menu-icon::before {
+            content: '☰'; /* Hamburger menu icon */
+        }
+
+        .app-bar-text .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            line-height: 1;
+        }
+
+        .app-bar-text .app-subtitle {
+            font-size: 13px; /* Slightly increased for readability from original 'small' */
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .app-bar-right {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 5px 10px;
+        }
+
+        .app-bar .icon.money-icon {
+            font-size: 18px;
+            margin-right: 5px;
+        }
+        .app-bar .icon.money-icon::before {
+            content: '💰'; /* Money bag icon */
+            filter: drop-shadow(0 0 1px rgba(0,0,0,0.2)); /* Slight shadow for emoji visibility */
+        }
+
+        .app-bar .money-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFF; /* Improved contrast: changed from red to white */
+        }
+
+        /* Main Content Area */
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f7f9fc; /* Light background for content */
+            overflow-y: auto; /* Enable scrolling for content */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        /* Top Cards Grid */
+        .top-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            border-radius: 18px;
+            padding: 20px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-height: 130px; /* Consistent height for grid cards */
+            transition: transform 0.2s ease;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card .icon {
+            font-size: 48px; /* Large icon size */
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        /* Improvement: All card text/icons are white for better contrast */
+        .card .card-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        /* Specific card styles */
+        .redeem-card {
+            background: linear-gradient(135deg, #8e2de2, #4a00e0); /* Purple gradient */
+        }
+        .redeem-card .icon::before {
+            content: '💼'; /* Briefcase icon for Redeem */
+        }
+
+        .rate-us-card {
+            background: linear-gradient(135deg, #4facfe, #00f2fe); /* Blue gradient */
+        }
+        .rate-us-card .icon::before {
+            content: '⭐'; /* Star icon for Rate Us */
+        }
+
+        /* Category List Cards */
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .category-card {
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 15px;
+            min-height: 100px; /* Adjusted height for category cards */
+            align-items: center;
+        }
+
+        .category-card .category-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2); /* Placeholder for image */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin-right: 15px;
+            flex-shrink: 0; /* Prevent image from shrinking */
+        }
+
+        .category-card .category-text {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .category-card .category-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: #fff;
+        }
+
+        .category-card .category-subtitle {
+            font-size: 14px; /* Improvement: Increased font size for 'Beginner' for better readability */
+            font-weight: 400;
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        /* Specific category card styles */
+        .category-card.maths {
+            background: linear-gradient(135deg, #fc6767, #ec008c); /* Purple/Pink gradient */
+        }
+        .category-card.maths .category-image::before {
+            content: '📚'; /* Book icon for Maths */
+        }
+
+        .category-card.gk {
+            background: linear-gradient(135deg, #43cea2, #185a9d); /* Blue gradient (different from rate us) */
+        }
+        .category-card.gk .category-image::before {
+            content: '🌍'; /* Globe icon for GK */
+        }
+
+        .category-card.science {
+            background: linear-gradient(135deg, #f7971e, #ff6b6b); /* Orange/Red gradient */
+        }
+        .category-card.science .category-image::before {
+            content: '🔬'; /* Microscope/Flask icon for Science */
+        }
+
+        /* Added an extra category for scroll demo */
+        .category-card.history {
+            background: linear-gradient(135deg, #5D4157, #A8CABA); /* Earthy gradient for History */
+        }
+        .category-card.history .category-image::before {
+            content: '📜'; /* Scroll icon for History */
+        }
+
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            height: 65px; /* Slightly taller for comfort */
+            background-color: #212121; /* Dark background */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            color: #fff;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            bottom: 0;
+            z-index: 95;
+            padding-bottom: env(safe-area-inset-bottom); /* For iPhone X safe area */
+        }
+
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .bottom-nav .nav-item:first-child { /* Active item */
+            color: #00BCD4; /* Highlight active item */
+        }
+
+        .bottom-nav .nav-item .icon {
+            font-size: 24px;
+            margin-bottom: 3px;
+        }
+
+        .bottom-nav .nav-item .icon.home-icon::before {
+            content: '🏠';
+        }
+        .bottom-nav .nav-item .icon.leaderboard-icon::before {
+            content: '🏆';
+        }
+        .bottom-nav .nav-item .icon.profile-icon::before {
+            content: '👤';
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        <div class="screen-content">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="time">9:41</span>
+                <div class="icons">
+                    <span>📶</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+
+            <!-- App Bar -->
+            <header class="app-bar">
+                <div class="app-bar-left">
+                    <span class="icon menu-icon"></span>
+                    <div class="app-bar-text">
+                        <h1 class="app-title">Quiz Pool</h1>
+                        <p class="app-subtitle">Play Quiz Earn Money</p>
+                    </div>
+                </div>
+                <div class="app-bar-right">
+                    <span class="icon money-icon"></span>
+                    <span class="money-amount">27</span>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="content-area">
+                <!-- Top Cards Grid -->
+                <section class="top-cards-grid">
+                    <div class="card redeem-card">
+                        <span class="icon redeem-icon"></span>
+                        <span class="card-label">Redeem</span>
+                    </div>
+                    <div class="card rate-us-card">
+                        <span class="icon rate-us-icon"></span>
+                        <span class="card-label">Rate Us</span>
+                    </div>
+                </section>
+
+                <!-- Category List -->
+                <section class="category-list">
+                    <div class="card category-card maths">
+                        <div class="category-image"></div>
+                        <div class="category-text">
+                            <h2 class="category-title">MATHS</h2>
+                            <p class="category-subtitle">Beginner</p>
+                        </div>
+                    </div>
+                    <div class="card category-card gk">
+                        <div class="category-image"></div>
+                        <div class="category-text">
+                            <h2 class="category-title">GK</h2>
+                            <p class="category-subtitle">Beginner</p>
+                        </div>
+                    </div>
+                    <div class="card category-card science">
+                        <div class="category-image"></div>
+                        <div class="category-text">
+                            <h2 class="category-title">SCIENCE</h2>
+                            <p class="category-subtitle">Beginner</p>
+                        </div>
+                    </div>
+                    <div class="card category-card history">
+                        <div class="category-image"></div>
+                        <div class="category-text">
+                            <h2 class="category-title">HISTORY</h2>
+                            <p class="category-subtitle">Beginner</p>
+                        </div>
+                    </div>
+                    <!-- Added an extra card to demonstrate scrolling -->
+                    <div class="card category-card gk">
+                        <div class="category-image"></div>
+                        <div class="category-text">
+                            <h2 class="category-title">ANIMALS</h2>
+                            <p class="category-subtitle">Beginner</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Bottom Navigation Bar -->
+            <nav class="bottom-nav">
+                <div class="nav-item">
+                    <span class="icon home-icon"></span>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item">
+                    <span class="icon leaderboard-icon"></span>
+                    <span>Leaderboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="icon profile-icon"></span>
+                    <span>Profile</span>
+                </div>
+            </nav>
+        </div>
+    </div>
+</body>
+</html>
