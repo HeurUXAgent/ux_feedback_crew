@@ -15,3 +15,4 @@ def run_full_ux_pipeline(image_path: str):
     wireframe = str(result.tasks_output[3].raw)
     
     return report, wireframe
+

@@ -1,83 +1,87 @@
 analyze_ui:
   description: >
-    Analyze the mobile UI screenshot at {screenshot_path}.
+    Analyze the mobile UI screenshot at {screenshot_path} using the analyze_ui_screenshot tool.
     
-    Extract comprehensive information including:
-    - All UI components (buttons, inputs, images, text, icons)
+    Call the tool with the screenshot path and review its output.
+    Structure the analysis cleanly and ensure all key information is captured:
+    - Screen type and purpose
+    - All UI components with their properties  
     - Layout structure and visual hierarchy
-    - Color scheme and palette
-    - Typography details (sizes, weights, styles)
-    - Spacing and density
-    - Notable patterns and conventions
-    - Any accessibility concerns
+    - Color scheme details
+    - Typography observations
+    - Spacing and density assessment
+    - Accessibility concerns
+    - Notable design patterns
     
-    Provide detailed, structured analysis that will be used
-    for heuristic evaluation.
+    Return the analysis as valid JSON.
+    
   expected_output: >
-    A comprehensive JSON analysis containing all UI components, layout information, color scheme, typography details, spacing observations, and identified patterns.
+    Valid JSON containing comprehensive UI analysis with components, layout, colors, 
+    typography, spacing, accessibility observations, and design patterns.
   agent: vision_analyst
 
 evaluate_heuristics:
   description: >
-    Using the vision analysis from the previous task, evaluate this mobile UI against Nielsen's 10 Usability Heuristics and mobile-specific UX guidelines.
+    Using the UI analysis from the previous task, call the evaluate_heuristics tool
+    to evaluate this interface against Nielsen's 10 Usability Heuristics.
     
-    For each violation found:
-    - Identify which heuristic is violated
-    - Assign severity (critical/high/medium/low)
-    - Describe the specific issue clearly
-    - List affected UI components
-    - Provide improvement suggestions
+    The tool will analyze violations and return structured results.
+    Review the tool's output and ensure it includes:
+    - All violations with severity levels
+    - Affected components for each issue
+    - Improvement suggestions
+    - Identified strengths
+    - Overall UX score (0-100)
+    - Severity breakdown
     
-    Also identify what the UI does well (strengths). Calculate an overall UX score (0-10).
+    Return the evaluation as valid JSON.
+    
   expected_output: >
-    A structured JSON evaluation containing all violations with
-    severity levels, affected components, improvement suggestions,
-    identified strengths, and an overall UX score.
+    Valid JSON evaluation with violations array, strengths array, ux_score, 
+    total_violations count, severity_breakdown, and summary.
   agent: heuristic_evaluator
-  context:
-    - analyze_ui
 
 generate_feedback:
   description: >
-    Transform the heuristic violations into developer-friendly, actionable feedback using both the vision analysis and heuristic evaluation.
+    Transform the heuristic violations into developer-ready feedback by calling 
+    the generate_feedback tool.
     
-    For each issue:
-    - Create an action-oriented title
-    - Explain why it matters to users
-    - Provide step-by-step implementation guidance
-    - Describe visual changes needed for wireframes
-    - Assign priority based on impact vs effort
+    Pass both the vision analysis and heuristic evaluation to the tool.
+    The tool will generate actionable feedback with:
+    - Action-oriented titles
+    - Priority levels (P0-P3)
+    - User impact explanations
+    - Implementation steps
+    - Wireframe instructions
+    - Effort estimates
+    - Quick wins identification
     
-    Also identify:
-    - Quick wins (easy fixes with big impact)
-    - Priority order for all fixes
-    - Estimated effort for each change
+    Review the tool's output and return as valid JSON.
+    
   expected_output: >
-    Developer-friendly feedback in JSON format with actionable items, priorities, quick wins, wireframe instructions, and implementation guidance.
+    Valid JSON with feedback_items array, quick_wins array, summary object with 
+    counts and effort estimates, and implementation_order array.
   agent: feedback_specialist
-  context:
-    - analyze_ui
-    - evaluate_heuristics
-  output_file: app/data/outputs/feedback.md
 
 create_wireframe:
   description: >
-    Create an improved mobile UI wireframe that implements all the feedback suggestions while maintaining the original design intent.
+    Create an improved mobile UI wireframe by calling the create_wireframe tool.
     
-    The wireframe should:
-    - Be mobile-first (375px width, responsive)
-    - Implement ALL suggested improvements
-    - Use clean, modern styling
-    - Have proper spacing and typography
-    - Be interactive and exportable as HTML
-    - Show clear visual improvements
-    - Do NOT generate a generic product page
-    - Focus on fixing the specific UX violations identified in the report while keeping the identity of the original app intact
+    Pass the vision analysis and feedback to the tool.
+    The tool will generate HTML/CSS showing improvements.
     
-    Generate complete, production-ready HTML/CSS code.
+    Requirements the tool will implement:
+    - Mobile-first design (375px width)
+    - ALL P0, P1, P2 feedback items implemented
+    - Modern, clean styling
+    - Proper spacing and typography
+    - Interactive elements
+    - Code comments showing improvements
+    - Maintains original app's identity
+    
+    Return the complete HTML code.
+    
   expected_output: >
-    A complete HTML wireframe file showing the improved design with all feedback implemented and CSS code for the improved wireframe.
+    Complete HTML file with inline CSS implementing all feedback suggestions,
+    with comments explaining each improvement.
   agent: wireframe_designer
-  context:
-    - analyze_ui
-    - generate_feedback

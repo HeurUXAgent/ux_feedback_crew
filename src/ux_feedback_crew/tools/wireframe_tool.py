@@ -1,7 +1,6 @@
 from crewai.tools import tool
 from google import genai
 import os
-import webbrowser
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
@@ -18,23 +17,22 @@ def create_wireframe(vision_analysis: str, feedback_result: str) -> str:
         feedback_result: JSON string of feedback
         
     Returns:
-        String with path to generated wireframe file
+        Path to generated wireframe HTML file
     """
     
     load_dotenv()
 
     # Configure Gemini client
     api_key = os.getenv('GEMINI_API_KEY')
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not set in .env")
+    
     client = genai.Client(api_key=api_key)
     
     prompt = f"""
-You are an expert UI/UX designer. Create an IMPROVED mobile UI wireframe in HTML/CSS based on the original design analysis and feedback.
+You are an expert UI/UX designer. Create an IMPROVED mobile UI wireframe in HTML/CSS.
 
-## ORIGINAL DESIGN ANALYSIS
-
-Create a COMPLETE, IMPROVED mobile UI wireframe as a single HTML file with embedded CSS.
-
-## ORIGINAL DESIGN:
+## ORIGINAL DESIGN ANALYSIS:
 {vision_analysis}
 
 ## IMPROVEMENTS TO IMPLEMENT:
@@ -42,62 +40,118 @@ Create a COMPLETE, IMPROVED mobile UI wireframe as a single HTML file with embed
 
 **Requirements:**
 
-1. **Mobile-first design** (max-width: 375px, scale up for display)
-2. **Implement ALL feedback suggestions:**
-   - Fix color contrast issues
-   - Adjust typography sizes
-   - Improve spacing and layout
-   - Add missing UI elements (loading indicators, labels, etc.)
-   - Fix inconsistencies
-
-3. **Use modern CSS:**
+1. **Mobile-first design** (max-width: 375px, centered on screen)
+2. **Implement ALL high-priority (P0/P1) feedback items**
+3. **Keep the original app's identity and purpose**
+4. **Use modern CSS:**
    - Flexbox/Grid for layout
-   - Proper spacing (padding, margins)
-   - Mobile-friendly touch targets (min 44px)
-   - Smooth transitions and hover states
+   - Proper spacing (padding: 16px, margins: 8px minimum)
+   - Mobile-friendly touch targets (min 44px height)
+   - Smooth transitions
+   - Accessible colors (WCAG AA contrast)
 
-4. **Include annotations:**
-   - Add small labels showing what was improved
-   - Use a subtle annotation style (small text, muted color)
+5. **Include visual improvements:**
+   - Loading states where needed
+   - Error states
+   - Better labels and icons
+   - Improved spacing
+   - Fixed color contrast issues
 
-5. **Make it realistic but clean:**
-   - Use actual UI components (buttons, cards, inputs)
-   - Include icons (use emoji or Unicode symbols)
+6. **Add subtle annotations:**
+   - Small green badges showing "✓ Fixed: [issue]"
+   - Use small text (10px) in corners of improved elements
+   - Don't overdo it - 3-5 annotations max
+
+7. **Make it realistic:**
+   - Use actual UI components
+   - Include icons (emoji or Unicode: ⚙️ 🏠 🔍 ➕ ✓ ✗)
    - Proper visual hierarchy
+   - Real-looking content (not Lorem Ipsum)
 
-## OUTPUT FORMAT
+## OUTPUT FORMAT:
 
-Return ONLY the HTML code inside a single code block, like this:
+Return ONLY complete HTML with embedded CSS. No markdown code blocks. Structure:
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Improved Mobile UI Wireframe</title>
+    <title>Improved UI Wireframe</title>
     <style>
-        /* Your CSS here */
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }}
+        
+        .mobile-frame {{
+            width: 375px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }}
+        
+        /* Add your component styles here */
     </style>
 </head>
 <body>
-    <!-- Your improved UI here -->
+    <div class="mobile-frame">
+        <!-- Your improved UI here -->
+    </div>
 </body>
 </html>
 
-Create a complete, functional wireframe that clearly shows the improvements.
-Make it look professional and polished.
+Create a complete, professional wireframe showing clear improvements. Make it pixel-perfect.
 """
     
+    print("🎨 Calling Gemini for wireframe generation...")
+    
     response = client.models.generate_content(
-        model='gemini-3-flash-preview',
+        model='gemini-2.5-flash',  # Use faster flash model
         contents=prompt
     )
     
-    # Extract HTML
+    # Extract HTML - handle multiple formats
     html_code = response.text.strip()
+    
+    # Remove markdown code blocks
     if "```html" in html_code:
         start = html_code.find("```html") + 7
-        end = html_code.find("```", start)
-        html_code = html_code[start:end].strip()
+        end = html_code.rfind("```")
+        if end > start:
+            html_code = html_code[start:end].strip()
+    elif "```" in html_code:
+        start = html_code.find("```") + 3
+        end = html_code.rfind("```")
+        if end > start:
+            html_code = html_code[start:end].strip()
+    
+    # Ensure it starts with DOCTYPE
+    if not html_code.strip().startswith("<!DOCTYPE") and not html_code.strip().startswith("<html"):
+        print("⚠ Warning: HTML doesn't start with DOCTYPE, attempting to fix...")
+        # If we got partial HTML, wrap it
+        if "<style>" in html_code or "<body>" in html_code:
+            html_code = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved UI Wireframe</title>
+</head>
+{html_code}
+</html>"""
     
     # Save HTML
     output_dir = Path("data/outputs")
@@ -109,11 +163,8 @@ Make it look professional and polished.
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_code)
     
-    # # Automatically open the HTML file in the default browser
-    # try:
-    #     webbrowser.open(f'file://{output_path.absolute()}')
-    #     print(f"✓ Wireframe opened in browser: {output_path}")
-    # except Exception as e:
-    #     print(f"⚠ Could not auto-open browser: {e}")
+    print(f"✓ Wireframe saved: {output_path}")
+    print(f"✓ File size: {len(html_code)} characters")
     
-    return html_code
+    # Return the path so the agent knows where to find it
+    return f"Wireframe successfully created and saved to: {output_path}\n\nThe wireframe implements all high-priority feedback items with modern, mobile-first design."

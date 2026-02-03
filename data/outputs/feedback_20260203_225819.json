@@ -1,0 +1,162 @@
+{
+  "feedback_items": [
+    {
+      "id": 1,
+      "title": "Clarify 'X' icon functionality in post header or replace with 'More Options'",
+      "priority": "P1",
+      "why_it_matters": "Users may accidentally hide content permanently, leading to frustration and perceived lack of control over their feed.",
+      "implementation_steps": [
+        "Replace the current 'X' (close/hide) icon with a standard '...' (ellipsis) icon to signify 'More Options' for the post.",
+        "On tap, display a modal bottom sheet (for mobile apps like Flutter/React Native) or a context menu/popover (for web) containing clearly labeled actions such as 'Hide Post', 'Report Post', 'Save Post', 'Turn on notifications for this post', etc.",
+        "If 'Hide Post' is selected, trigger the hide action and immediately display a temporary `Snackbar` (Android/Flutter) or `Toast` (iOS/Web) at the bottom of the screen with a clear 'Post hidden. [Undo]' message, visible for approximately 5 seconds.",
+        "Implement the 'Undo' functionality within the `Snackbar`/`Toast` to revert the hide action if tapped by the user within the timeout period."
+      ],
+      "wireframe_instructions": "Show the '...' icon in the post header. Then, illustrate a modal bottom sheet (mobile) or popover (web) appearing on tap, listing several action options. Also, depict a `Snackbar` message with an 'Undo' button after a post has been hidden.",
+      "effort_estimate": "medium",
+      "related_heuristic": "User control and freedom",
+      "affected_components": [
+        "icon (closes or hides the post)"
+      ],
+      "technical_notes": "For Flutter, consider `showModalBottomSheet` or `showDialog` for the options menu. Use `ScaffoldMessenger.of(context).showSnackBar` for the undo toast. For web, utilize a custom dropdown component or a library's Popover and manage the toast's visibility and undo logic with JavaScript."
+    },
+    {
+      "id": 2,
+      "title": "Ensure 'See More' button is fully visible and tappable",
+      "priority": "P1",
+      "why_it_matters": "Users struggle to fully read post content or interact with the 'See More' button, leading to a fragmented content experience and potential accessibility issues.",
+      "implementation_steps": [
+        "Adjust the layout constraints (e.g., parent container width, `maxLines` for text) to guarantee sufficient horizontal space for the entire 'See More' button ('તવ').",
+        "Verify that the button is not clipped or partially obscured across different screen sizes, orientations, and system font scales.",
+        "Ensure adequate padding around the `TextButton` or equivalent component to maintain a minimum touch target of 48x48dp, even if the visual text is smaller, to prevent mis-taps."
+      ],
+      "wireframe_instructions": "Depict the main post text truncated with the 'See More' button ('તવ') clearly and entirely visible below it, with sufficient padding on all sides, particularly on the right.",
+      "effort_estimate": "quick-win",
+      "related_heuristic": "Consistency and standards",
+      "affected_components": [
+        "label (main text content of the post)",
+        "button (expands truncated post text to 'See More')"
+      ],
+      "technical_notes": "For Flutter, check `Row`, `Column`, `Expanded`, and `Text` `maxLines` and `overflow` properties. Ensure the `TextButton` or `InkWell`'s parent `Container` or `SizedBox` provides enough width. For web (CSS), check `overflow` properties on parent elements and ensure enough `padding-right` or `margin-right` for the button's container. Consider `white-space: nowrap` for the button text itself if it breaks."
+    },
+    {
+      "id": 3,
+      "title": "Display reaction counts and make emojis clearly interactive",
+      "priority": "P2",
+      "why_it_matters": "Users might miss opportunities to engage with posts or misunderstand the purpose of displayed emojis due to a lack of clear visual cues for interaction.",
+      "implementation_steps": [
+        "Fetch and display numerical counts for each reaction type (e.g., '🫡 5', '❤️ 10') adjacent to their respective emoji icon.",
+        "Wrap the entire reaction area (emojis + counts) in a clearly tappable component (e.g., `GestureDetector` or `InkWell` in Flutter, an interactive `div` with `onClick` for web).",
+        "Implement a clear visual feedback mechanism on tap or hover, such as a subtle background highlight, a slight scaling animation, or a change in text color, to indicate interactivity.",
+        "On tap, either navigate to a detailed view showing who reacted, or open a reaction picker for the user to add their own reaction."
+      ],
+      "wireframe_instructions": "Show the reaction emojis (e.g., 🫡, ❤️) each followed by a numerical count (e.g., '🫡 5', '❤️ 10'). Indicate that this entire area is interactive.",
+      "effort_estimate": "small",
+      "related_heuristic": "Recognition rather than recall",
+      "affected_components": [
+        "emoji (reaction emoji 🫡)",
+        "emoji (reaction emoji ❤️)"
+      ],
+      "technical_notes": "For Flutter, use a `Row` containing `Text` widgets for emojis and counts, all wrapped in an `InkWell` or `GestureDetector` to handle taps. For web, use a flex container (`div` with `display: flex`) for the emojis and counts, applying `cursor: pointer` and appropriate `:hover` and `:active` CSS styles."
+    },
+    {
+      "id": 4,
+      "title": "Re-evaluate spacing and visual weight of top-right header icons",
+      "priority": "P2",
+      "why_it_matters": "The dense clustering of interactive icons can overwhelm users, increasing cognitive load and hindering quick scanning for specific actions.",
+      "implementation_steps": [
+        "Increase the horizontal margin or padding between the 'create post/story', 'search', and 'Messenger' icons in the top-right header.",
+        "Ensure each icon has a minimum touch target area of 48x48dp to improve tap accuracy, even if the visual icon size is smaller. This may involve adding transparent padding around the icon.",
+        "Consider slightly reducing the visual weight (e.g., stroke thickness, color saturation) of less critical icons to subtly differentiate primary actions if space remains a concern, without sacrificing discoverability."
+      ],
+      "wireframe_instructions": "Illustrate the top-right header with the 'create post/story', 'search', and 'Messenger' icons having increased and consistent spacing between them, ensuring no visual overlap with badges.",
+      "effort_estimate": "quick-win",
+      "related_heuristic": "Aesthetic and minimalist design",
+      "affected_components": [
+        "icon (navigates to create new post/story)",
+        "icon (opens search functionality)",
+        "icon (opens Messenger application/messages)",
+        "badge (displays unread message count)"
+      ],
+      "technical_notes": "For Flutter, add `SizedBox(width: [spacing])` widgets between `IconButton`s within the `AppBar`'s `actions` list. For web (CSS), apply `margin-right` or use the `gap` property within a flex container (`display: flex; justify-content: flex-end; align-items: center; gap: [spacing];`)."
+    },
+    {
+      "id": 5,
+      "title": "Implement clear loading indicators for asynchronous actions",
+      "priority": "P2",
+      "why_it_matters": "Users experience anxiety and uncertainty, wonder if their input was received, or may mistakenly perform actions multiple times due to a lack of system feedback.",
+      "implementation_steps": [
+        "**Post Creation (e.g., 'What's on your mind?'):** When a user initiates a post submission, show a `CircularProgressIndicator` directly within the submit button or a `LinearProgressIndicator` at the top of the screen. Disable the button during loading.",
+        "**Content Loading (e.g., feed refresh, 'load more'):** At the bottom of the feed, implement a `CircularProgressIndicator` or a skeleton loader when more posts are being fetched. For pull-to-refresh, use a standard platform-specific refresh indicator.",
+        "**Navigation to Creation Flow (e.g., tap 'create post/story' icon):** If opening the camera/gallery or a new creation screen involves a noticeable delay, display a temporary full-screen overlay with a spinner or a skeleton UI for the upcoming screen content.",
+        "For all successful submissions or actions, provide brief, positive feedback (e.g., `Snackbar` 'Post published!', a temporary checkmark icon, or a 'Submitted!' toast)."
+      ],
+      "wireframe_instructions": "Show three scenarios: 1) A submit button (e.g., 'Post') with a spinner inside while loading. 2) The bottom of the feed showing a loading spinner as new content loads. 3) A placeholder/skeleton screen or full-screen spinner when navigating to a new feature that requires data fetch (like opening a camera/gallery for post creation).",
+      "effort_estimate": "medium",
+      "related_heuristic": "Visibility of system status",
+      "affected_components": [
+        "text_input ('What's on your mind?')",
+        "icon (navigates to create new post/story)",
+        "list_item (represents a single feed post, for 'load more' scenarios)"
+      ],
+      "technical_notes": "Requires robust state management for loading states (e.g., `isLoading` boolean, `loadingProgress` value). For Flutter, use `AnimatedSwitcher` to swap between content and `CircularProgressIndicator`, or packages like `shimmer` for skeleton loaders. For web, manage loading states via React/Vue/Angular state or DOM manipulation, using CSS animations for spinners and skeleton loaders."
+    },
+    {
+      "id": 6,
+      "title": "Remove redundant profile picture from post image",
+      "priority": "P3",
+      "why_it_matters": "Unnecessary visual clutter and information duplication detract from a clean aesthetic and can cause minor visual distraction without adding new value.",
+      "implementation_steps": [
+        "Locate the component responsible for rendering the small profile picture overlaid on the main post image (typically positioned in the bottom-right corner).",
+        "Remove this component from the post card's layout structure.",
+        "Verify that its removal does not affect any other functional aspects of the post or related interactions (e.g., tapping the main image)."
+      ],
+      "wireframe_instructions": "Show the main post image without any small, circular profile picture overlaid in its bottom-right corner. The author's profile picture in the header is sufficient.",
+      "effort_estimate": "quick-win",
+      "related_heuristic": "Aesthetic and minimalist design",
+      "affected_components": [
+        "image (redundant profile picture of post author inside image)"
+      ],
+      "technical_notes": "For Flutter, remove the `Positioned` widget containing the `CircleAvatar` from the `Stack` that displays the main post image. For web (CSS), remove the `img` element or `div` with a background image that uses `position: absolute` or similar positioning within the main image container."
+    }
+  ],
+  "quick_wins": [
+    {
+      "id": 2,
+      "title": "Ensure 'See More' button is fully visible and tappable",
+      "impact": "Users can fully read posts and easily expand content, improving the reading experience and accessibility.",
+      "effort": "quick-win",
+      "priority": "P1"
+    },
+    {
+      "id": 4,
+      "title": "Re-evaluate spacing and visual weight of top-right header icons",
+      "impact": "Reduces visual overwhelm and makes primary actions easier to identify and tap, improving usability.",
+      "effort": "quick-win",
+      "priority": "P2"
+    }
+  ],
+  "summary": {
+    "total_issues": 6,
+    "by_priority": {
+      "P0": 0,
+      "P1": 2,
+      "P2": 3,
+      "P3": 1
+    },
+    "by_effort": {
+      "quick-win": 3,
+      "small": 1,
+      "medium": 2,
+      "large": 0
+    },
+    "estimated_total_effort": "12-24 hours"
+  },
+  "implementation_order": [
+    "1. **High Priority Quick Win**: Ensure 'See More' button is fully visible and tappable (ID: 2). *Addresses a critical content accessibility and consistency issue swiftly.*",
+    "2. **High Priority**: Clarify 'X' icon functionality or replace with 'More Options' (ID: 1). *Crucial for user control and preventing accidental, irreversible actions.*",
+    "3. **Medium Priority Quick Win**: Re-evaluate spacing and visual weight of top-right header icons (ID: 4). *Improves header clarity and tap targets with minimal effort.*",
+    "4. **Medium Priority - Small Effort**: Display reaction counts and make emojis clearly interactive (ID: 3). *Boosts engagement and clarifies interaction patterns.*",
+    "5. **Medium Priority - Medium Effort**: Implement clear loading indicators for asynchronous actions (ID: 5). *Enhances system status visibility across several key user flows, reducing user uncertainty.*",
+    "6. **Low Priority Quick Win**: Remove redundant profile picture from post image (ID: 6). *Aesthetic refinement that removes clutter with negligible effort.*"
+  ]
+}

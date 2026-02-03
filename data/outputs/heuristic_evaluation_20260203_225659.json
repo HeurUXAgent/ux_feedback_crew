@@ -1,0 +1,174 @@
+{
+  "violations": [
+    {
+      "heuristic_id": 3,
+      "heuristic_name": "User control and freedom",
+      "severity": "high",
+      "issue": "The 'X' icon in the post header has an ambiguous function ('closes or hides the post'). If it hides the post, there is no clear 'undo' mechanism or easy way for the user to retrieve the hidden content, leading to a loss of control and potential frustration from irreversible actions.",
+      "affected_components": [
+        "icon (closes or hides the post)"
+      ],
+      "suggestions": [
+        "Replace the 'X' icon with a '...' (more options) icon. Tapping it should open a menu with clear, labeled actions such as 'Hide post', 'Report post', or 'Save post'.",
+        "If 'Hide post' is selected, offer a temporary 'Undo' toast/snackbar at the bottom of the screen, allowing users to quickly revert the action."
+      ],
+      "user_impact": "Users may accidentally hide content permanently, leading to frustration and perceived lack of control over their feed."
+    },
+    {
+      "heuristic_id": 4,
+      "heuristic_name": "Consistency and standards",
+      "severity": "high",
+      "issue": "The main post text is truncated, and the 'තව' (See More) button is partially cut off. This creates an inconsistent visual experience, hinders readability, and may make the interactive element difficult to tap or recognize, especially for users relying on visual cues.",
+      "affected_components": [
+        "label (main text content of the post)",
+        "button (expands truncated post text to 'See More')"
+      ],
+      "suggestions": [
+        "Ensure sufficient padding and space for the truncated text and the 'See More' button so it is fully visible and clearly indicates its interactive nature.",
+        "Adjust layout constraints or component sizing to prevent the button from being cut off."
+      ],
+      "user_impact": "Users may struggle to read the full post or interact with the 'See More' button, leading to a fragmented content experience and potential accessibility issues."
+    },
+    {
+      "heuristic_id": 6,
+      "heuristic_name": "Recognition rather than recall",
+      "severity": "medium",
+      "issue": "The reaction emojis (🥺, ❤️) below the post author lack explicit counts or clear visual affordance to indicate if they are interactive (e.g., clickable to see who reacted, or to add a reaction). Users might recognize them as reaction types but not how to interact with them on this specific element.",
+      "affected_components": [
+        "emoji (reaction emoji 🥺)",
+        "emoji (reaction emoji ❤️)"
+      ],
+      "suggestions": [
+        "Add a numerical count next to each emoji (e.g., '🥺 5', '❤️ 10') to indicate total reactions and imply interactivity.",
+        "Make the reaction area clearly tappable to view detailed reactions or to add a new reaction, aligning with common social media patterns."
+      ],
+      "user_impact": "Users might miss opportunities to engage with posts or misunderstand the purpose of the displayed emojis, relying on recall rather than clear visual cues."
+    },
+    {
+      "heuristic_id": 8,
+      "heuristic_name": "Aesthetic and minimalist design",
+      "severity": "medium",
+      "issue": "The top-right header area contains three distinct action icons (create post/story, search, Messenger) and a badge. While functional, this density on a small mobile screen can contribute to a visually busy interface and potential information overload, particularly for new users.",
+      "affected_components": [
+        "icon (navigates to create new post/story)",
+        "icon (opens search functionality)",
+        "icon (opens Messenger application/messages)",
+        "badge (displays unread message count)"
+      ],
+      "suggestions": [
+        "Consider grouping less frequently used actions under a single 'More' icon if screen real estate becomes a significant issue, or re-evaluating the visual weight and spacing of these elements to reduce perceived clutter.",
+        "Ensure clear visual hierarchy so primary actions stand out despite the density."
+      ],
+      "user_impact": "Users might feel overwhelmed by the number of interactive elements, potentially increasing cognitive load and hindering quick scanning for specific actions."
+    },
+    {
+      "heuristic_id": 1,
+      "heuristic_name": "Visibility of system status",
+      "severity": "medium",
+      "issue": "The UI description does not explicitly mention feedback mechanisms (e.g., loading spinners, progress indicators) for common actions such as initiating a new post, submitting a post, or loading more content in the feed. This can leave users unsure if their action has been registered or if the system is processing their request, leading to uncertainty and potential repeat actions.",
+      "affected_components": [
+        "text_input ('What's on your mind?')",
+        "icon (navigates to create new post/story)",
+        "list_item (represents a single feed post, for 'load more' scenarios)"
+      ],
+      "suggestions": [
+        "Implement clear loading indicators (e.g., spinners on buttons, skeleton screens for content areas, progress bars) for all actions that involve a noticeable delay.",
+        "Provide temporary toast messages for successful submissions or actions."
+      ],
+      "user_impact": "Users may experience anxiety or uncertainty, wonder if their input was received, or mistakenly perform actions multiple times."
+    },
+    {
+      "heuristic_id": 8,
+      "heuristic_name": "Aesthetic and minimalist design",
+      "severity": "low",
+      "issue": "A redundant profile picture of the post author is displayed within the main post image (bottom right), duplicating information already present in the post header. This adds minor visual clutter without enhancing functionality or clarity and can be visually distracting.",
+      "affected_components": [
+        "image (redundant profile picture of post author inside image)"
+      ],
+      "suggestions": [
+        "Remove the redundant profile picture from the main image. The author's identity is sufficiently communicated by their profile picture and name in the post header.",
+        "If a secondary profile picture is intended for interaction, ensure it has a clear functional purpose and consistent placement."
+      ],
+      "user_impact": "Minor visual distraction and unnecessary repetition, which can slightly detract from the overall clean aesthetic."
+    }
+  ],
+  "strengths": [
+    {
+      "heuristic_id": 4,
+      "heuristic_name": "Consistency and standards",
+      "observation": "The use of a persistent bottom navigation bar with clear icons and text labels aligns with common mobile patterns and platform conventions, making navigation intuitive and consistent across the app. The active 'Home' icon/label is clearly indicated by its blue color.",
+      "components": [
+        "footer",
+        "icon (navigates to home feed)",
+        "label (Home)",
+        "icon (Reels section)",
+        "label (Reels)",
+        "icon (Friends section)",
+        "label (Friends)",
+        "icon (Marketplace section)",
+        "label (Marketplace)",
+        "icon (Notifications section)",
+        "label (Notifications)",
+        "icon (main menu/more options)",
+        "label (Menu)"
+      ]
+    },
+    {
+      "heuristic_id": 6,
+      "heuristic_name": "Recognition rather than recall",
+      "observation": "Clear and familiar iconography and labels are used for primary navigation and input fields, such as the placeholder text 'What's on your mind?' and descriptive bottom navigation labels. This minimizes the user's memory load and aids immediate recognition of functions.",
+      "components": [
+        "text_input ('What's on your mind?')",
+        "label (Home)",
+        "label (Reels)",
+        "label (Friends)",
+        "label (Marketplace)",
+        "label (Notifications)",
+        "label (Menu)"
+      ]
+    },
+    {
+      "heuristic_id": 1,
+      "heuristic_name": "Visibility of system status",
+      "observation": "Prominent notification badges (e.g., '9+' for Messenger, '1' for Friends, '2' for Notifications) effectively communicate unread activity and new information, keeping users informed about system status and relevant updates at a glance.",
+      "components": [
+        "badge (displays unread message count)",
+        "badge (displays new friend request/activity count)",
+        "badge (displays unread notifications count)"
+      ]
+    },
+    {
+      "heuristic_id": 8,
+      "heuristic_name": "Aesthetic and minimalist design",
+      "observation": "The overall layout features balanced whitespace and comfortable density, effectively separating distinct content blocks (header, stories, feed posts) and improving readability. The use of card layouts for stories and feed posts helps organize information clearly.",
+      "components": [
+        "layout_structure",
+        "spacing_and_density",
+        "card ('Create story')",
+        "card (displays a user's story)",
+        "list_item (represents a single feed post)"
+      ]
+    },
+    {
+      "heuristic_id": 4,
+      "heuristic_name": "Consistency and standards",
+      "observation": "Consistent branding with Facebook's primary blue color for interactive elements and the app logo provides a cohesive and recognizable experience. The visual hierarchy uses varying font sizes, weights, and colors effectively to guide user attention and maintain brand identity.",
+      "components": [
+        "label ('facebook')",
+        "color_scheme",
+        "icon (navigates to home feed)",
+        "label (Home)",
+        "button ('තව')"
+      ]
+    }
+  ],
+  "ux_score": 88,
+  "total_violations": 6,
+  "severity_breakdown": {
+    "critical": 0,
+    "high": 2,
+    "medium": 3,
+    "low": 1
+  },
+  "summary": "The UI demonstrates a mature design leveraging established social media patterns, contributing to a high level of familiarity and ease of use for existing users. Its strengths lie in intuitive navigation, effective use of notification badges for status visibility, and a generally well-organized layout with consistent branding. However, several key areas for improvement exist, including resolving ambiguities in icon functionality, ensuring full visibility of interactive elements (like truncated text buttons), providing better feedback for system processes, and optimizing visual minimalism by removing redundant elements. Addressing these issues would significantly enhance user control, clarity, and overall polish, particularly for critical interaction flows and new user adoption."
+}

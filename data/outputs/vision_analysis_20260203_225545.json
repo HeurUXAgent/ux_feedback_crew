@@ -1,0 +1,471 @@
+{
+  "screen_type": "home_feed",
+  "app_category": "social_media",
+  "components": [
+    {
+      "type": "label",
+      "text": "21:05",
+      "position": "top-left",
+      "color": "#000000",
+      "size": "small",
+      "function": "displays current time"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top-right",
+      "color": "#000000",
+      "size": "small",
+      "function": "indicates cellular signal strength"
+    },
+    {
+      "type": "label",
+      "text": "4G",
+      "position": "top-right",
+      "color": "#000000",
+      "size": "small",
+      "function": "indicates network type"
+    },
+    {
+      "type": "icon",
+      "text": "42",
+      "position": "top-right",
+      "color": "#000000",
+      "size": "small",
+      "function": "displays battery percentage within battery icon"
+    },
+    {
+      "type": "label",
+      "text": "facebook",
+      "position": "top-left",
+      "color": "#1877F2",
+      "size": "large",
+      "function": "app branding/logo"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top-right",
+      "color": "#000000",
+      "size": "medium",
+      "function": "navigates to create new post/story"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top-right",
+      "color": "#000000",
+      "size": "medium",
+      "function": "opens search functionality"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "top-right",
+      "color": "#000000",
+      "size": "medium",
+      "function": "opens Messenger application/messages"
+    },
+    {
+      "type": "badge",
+      "text": "9+",
+      "position": "top-right",
+      "color": "#FF0000",
+      "size": "small",
+      "function": "displays unread message count"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "middle-left",
+      "color": null,
+      "size": "small",
+      "function": "user's profile picture"
+    },
+    {
+      "type": "text_input",
+      "text": "What's on your mind?",
+      "position": "middle-left",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "prompts user to create a text post"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "middle-right",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "opens photo/video gallery for post creation"
+    },
+    {
+      "type": "card",
+      "text": "Create story",
+      "position": "middle",
+      "color": "#FFFFFF",
+      "size": "medium",
+      "function": "initiates creation of a new story"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "inside_create_story_card_top_left",
+      "color": null,
+      "size": "extra_small",
+      "function": "user's profile picture for story creation"
+    },
+    {
+      "type": "button",
+      "text": "+",
+      "position": "inside_create_story_card_middle",
+      "color": "#1877F2",
+      "size": "medium",
+      "function": "button to create a new story"
+    },
+    {
+      "type": "card",
+      "text": "Harindu Samarasinghe",
+      "position": "middle",
+      "color": null,
+      "size": "medium",
+      "function": "displays a user's story"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "inside_story_card_top_left",
+      "color": null,
+      "size": "extra_small",
+      "function": "profile picture of story author Harindu Samarasinghe"
+    },
+    {
+      "type": "card",
+      "text": "Prabhath Madhusanka",
+      "position": "middle",
+      "color": null,
+      "size": "medium",
+      "function": "displays a user's story"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "inside_story_card_top_left",
+      "color": null,
+      "size": "extra_small",
+      "function": "profile picture of story author Prabhath Madhusanka"
+    },
+    {
+      "type": "card",
+      "text": "Anuda Pasandul",
+      "position": "middle",
+      "color": null,
+      "size": "medium",
+      "function": "displays a user's story"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "inside_story_card_top_left",
+      "color": null,
+      "size": "extra_small",
+      "function": "profile picture of story author Anuda Pasandul"
+    },
+    {
+      "type": "list_item",
+      "text": null,
+      "position": "middle",
+      "color": "#FFFFFF",
+      "size": "large",
+      "function": "represents a single feed post"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "post_header_left",
+      "color": null,
+      "size": "small",
+      "function": "profile picture of post author Babuku"
+    },
+    {
+      "type": "label",
+      "text": "Babuku - බබුකු",
+      "position": "post_header_left",
+      "color": "#000000",
+      "size": "medium",
+      "function": "displays name of post author"
+    },
+    {
+      "type": "label",
+      "text": "5h",
+      "position": "post_header_left",
+      "color": "#65676B",
+      "size": "small",
+      "function": "time since post was published"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "post_header_left",
+      "color": "#65676B",
+      "size": "small",
+      "function": "indicates post privacy setting (globe icon)"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "post_header_right",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "opens options menu for the post"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "post_header_right",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "closes or hides the post"
+    },
+    {
+      "type": "emoji",
+      "text": "🥺",
+      "position": "post_content_below_author",
+      "color": "#FFD700",
+      "size": "small",
+      "function": "reaction emoji to the post"
+    },
+    {
+      "type": "emoji",
+      "text": "❤️",
+      "position": "post_content_below_author",
+      "color": "#FF0000",
+      "size": "small",
+      "function": "reaction emoji to the post"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "post_content_main",
+      "color": null,
+      "size": "large",
+      "function": "main image content of the post"
+    },
+    {
+      "type": "image",
+      "text": null,
+      "position": "bottom_right_of_post_image",
+      "color": null,
+      "size": "extra_small",
+      "function": "redundant profile picture of post author inside image"
+    },
+    {
+      "type": "label",
+      "text": "නිරීඳක් නම් ම||ය ගිය සැමියාගේ කමීසය වසර අටක් නිස්සේ නිවසේ සාලයේ එල්ලා තැබූවාය. ඇය කිසිදා එය ගලවා ගත්තේ නැත.ඇය නිතරම එහි සාක්කුවේ මුදල් තැබූවාය.",
+      "position": "post_content_below_image",
+      "color": "#000000",
+      "size": "medium",
+      "function": "main text content of the post (truncated)"
+    },
+    {
+      "type": "button",
+      "text": "තව",
+      "position": "post_content_below_text_right",
+      "color": "#1877F2",
+      "size": "medium",
+      "function": "expands truncated post text to 'See More'"
+    },
+    {
+      "type": "footer",
+      "text": null,
+      "position": "bottom",
+      "color": "#FFFFFF",
+      "size": "large",
+      "function": "main navigation bar"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "bottom_nav_left",
+      "color": "#1877F2",
+      "size": "medium",
+      "function": "navigates to home feed"
+    },
+    {
+      "type": "label",
+      "text": "Home",
+      "position": "bottom_nav_left",
+      "color": "#1877F2",
+      "size": "small",
+      "function": "label for Home navigation"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "navigates to Reels section"
+    },
+    {
+      "type": "label",
+      "text": "Reels",
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "small",
+      "function": "label for Reels navigation"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "navigates to Friends section"
+    },
+    {
+      "type": "badge",
+      "text": "1",
+      "position": "top_right_of_friends_icon",
+      "color": "#FF0000",
+      "size": "extra_small",
+      "function": "displays new friend request/activity count"
+    },
+    {
+      "type": "label",
+      "text": "Friends",
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "small",
+      "function": "label for Friends navigation"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "navigates to Marketplace section"
+    },
+    {
+      "type": "label",
+      "text": "Marketplace",
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "small",
+      "function": "label for Marketplace navigation"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "navigates to Notifications section"
+    },
+    {
+      "type": "badge",
+      "text": "2",
+      "position": "top_right_of_notifications_icon",
+      "color": "#FF0000",
+      "size": "extra_small",
+      "function": "displays unread notifications count"
+    },
+    {
+      "type": "label",
+      "text": "Notifications",
+      "position": "bottom_nav_center",
+      "color": "#65676B",
+      "size": "small",
+      "function": "label for Notifications navigation"
+    },
+    {
+      "type": "icon",
+      "text": null,
+      "position": "bottom_nav_right",
+      "color": "#65676B",
+      "size": "medium",
+      "function": "opens the main menu/more options"
+    },
+    {
+      "type": "label",
+      "text": "Menu",
+      "position": "bottom_nav_right",
+      "color": "#65676B",
+      "size": "small",
+      "function": "label for Menu navigation"
+    }
+  ],
+  "layout_structure": {
+    "type": "single-column_with_horizontal_scroll",
+    "sections": [
+      "system_bar",
+      "header",
+      "create_post_area",
+      "stories_section",
+      "feed_post",
+      "footer"
+    ],
+    "visual_hierarchy": "The Facebook logo and the main feed post image draw attention first due to their size and central placement. Notification badges also stand out immediately due to their red color. The header and bottom navigation provide a clear structure, while the stories section acts as a distinct horizontal scrolling sub-section."
+  },
+  "color_scheme": {
+    "primary_colors": [
+      "#1877F2"
+    ],
+    "background": "#FFFFFF",
+    "text_colors": [
+      "#000000",
+      "#65676B"
+    ],
+    "accent_colors": [
+      "#FF0000",
+      "#FFD700"
+    ]
+  },
+  "typography": {
+    "heading_sizes": "facebook logo (approx 24-28px, bold), user names in stories/posts (approx 16-18px, bold/regular)",
+    "body_text_size": "Main post text (approx 14-16px, regular), 'What's on your mind?' (approx 14px, regular), bottom navigation labels (approx 12-14px, regular)",
+    "font_weights": [
+      "bold",
+      "regular",
+      "light"
+    ],
+    "text_hierarchy": "Established by varying font sizes and weights (e.g., large bold for brand, medium bold for user names, regular for body text, smaller grey for secondary information) and color (blue for primary actions/links, black for main content, grey for secondary details)."
+  },
+  "spacing_and_density": {
+    "overall_density": "comfortable",
+    "element_spacing": "medium gaps between main sections (header, stories, feed), small gaps within components (icon-label pairs), generous spacing between story cards.",
+    "padding": "Generous padding around story cards and the main feed post content, medium padding in the header and footer.",
+    "whitespace_usage": "Balanced, effectively separating distinct content blocks and improving overall readability."
+  },
+  "accessibility_observations": [
+    "Good contrast for black and grey text on white backgrounds.",
+    "Touch target sizes for icons (header, bottom navigation) appear adequate.",
+    "Bottom navigation icons have clear text labels, aiding comprehension.",
+    "The truncated post text 'තව' might be challenging for users with visual impairments if not properly expanded or announced by screen readers.",
+    "Redundant profile picture within the post image might be confusing for screen reader users if not handled correctly."
+  ],
+  "notable_patterns": [
+    "Bottom Navigation Bar (persistent navigation)",
+    "Stories/Status format (horizontal scrolling content cards)",
+    "Card Layout (for individual feed posts)",
+    "Notification Badges (numeric indicators for new activity)",
+    "Placeholder Text in Text Input ('What's on your mind?')",
+    "Profile Picture Avatars (for users/authors)"
+  ],
+  "strengths": [
+    "Familiar and intuitive interface for existing Facebook users.",
+    "Clear visual hierarchy helps users quickly scan and understand content.",
+    "Consistent use of Facebook's brand blue for interactive elements and branding.",
+    "Prominent notification badges ensure users are aware of new activity.",
+    "Bottom navigation provides easy access to core app sections with one-hand use.",
+    "The stories section is visually engaging and accessible.",
+    "Post elements (author, time, content, reactions) are well-organized within the card."
+  ],
+  "initial_concerns": [
+    "Potential for information overload given the number of elements on screen.",
+    "The truncation of the post text ('තව' is cut off) may not be ideal, especially for longer texts or certain languages.",
+    "Redundant profile picture in the bottom right of the main image is visually distracting and serves no clear functional purpose.",
+    "The purpose of the 'X' icon in the post header is not immediately clear (close post? hide post? report?).",
+    "The two reaction emojis below the author info do not have a count, so it's unclear if they are clickable, or just indicating existing reactions."
+  ]
+}
