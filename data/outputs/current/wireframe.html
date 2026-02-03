@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Reservation - Improved UI</title>
+    <style>
+        :root {
+            --primary-bg: #2D0B2E;
+            --input-bg: #4A234B;
+            --accent-gold: #D4AF37;
+            --accent-gold-dark: #B8860B;
+            --text-white: #FFFFFF;
+            --text-placeholder: #F5F5F5; /* Improved: Higher contrast for accessibility */
+            --text-dark: #2E1C00;
+            --error-red: #FF5252;
+            --success-green: #4CAF50;
+            --annotation-color: #A080A0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #1a051a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Mobile Container (max-width 375px) */
+        .app-shell {
+            width: 100%;
+            max-width: 375px;
+            height: 812px;
+            background-color: var(--primary-bg);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 8px solid #000;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-white);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-icons span {
+            margin-left: 4px;
+        }
+
+        /* App Bar */
+        .app-bar {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .app-bar h1 {
+            color: var(--accent-gold);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--accent-gold);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Form Content */
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            padding-bottom: 100px;
+        }
+
+        .annotation {
+            font-size: 9px;
+            color: var(--annotation-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .label-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        label {
+            color: var(--text-white);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .help-icon {
+            font-size: 14px;
+            color: var(--annotation-color);
+            cursor: pointer;
+        }
+
+        /* Input Styles */
+        .input-container {
+            position: relative;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-white);
+            font-size: 15px;
+            transition: all 0.2s ease;
+            outline: none;
+            min-height: 48px; /* Touch target size */
+        }
+
+        input::placeholder {
+            color: var(--text-placeholder);
+            opacity: 0.8;
+        }
+
+        input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        /* Error States */
+        .field-error input {
+            border-color: var(--error-red);
+        }
+
+        .error-message {
+            color: var(--error-red);
+            font-size: 11px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Two Column Layout */
+        .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Chips for efficiency */
+        .chip-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .chip {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chip.active {
+            background: var(--accent-gold);
+            color: var(--text-dark);
+        }
+
+        /* Sticky Footer Button */
+        .footer-action {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, var(--primary-bg) 80%, transparent);
+        }
+
+        .primary-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+            border: none;
+            border-radius: 14px;
+            padding: 16px;
+            color: var(--text-dark);
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        .primary-btn:active {
+            transform: scale(0.98);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-top: 3px solid var(--text-dark);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Toast */
+        .toast {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            right: 20px;
+            background: var(--success-green);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+            z-index: 100;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-indicator {
+            width: 120px;
+            height: 5px;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.3;
+        }
+
+        /* Scrollbar styling */
+        .content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .content::-webkit-scrollbar-thumb {
+            background: var(--input-bg);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <span>📶</span>
+                <span>📶</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- App Bar -->
+        <div class="app-bar">
+            <button class="icon-btn">←</button>
+            <h1>Hotel Reservation</h1>
+            <button class="icon-btn" title="Help">ⓘ</button>
+        </div>
+
+        <!-- Toast Notification (Real-time feedback) -->
+        <div class="toast">
+            <span>✓</span>
+            <span>Draft saved automatically</span>
+        </div>
+
+        <div class="content">
+            <!-- Hotel Selection -->
+            <div class="form-group">
+                <span class="annotation">[Improve: Added contextual help + recent suggestions]</span>
+                <div class="label-row">
+                    <label>Hotels</label>
+                    <span class="help-icon" title="Choose from our partner luxury resorts">ⓘ</span>
+                </div>
+                <div class="input-container">
+                    <select>
+                        <option value="" disabled selected>Select a Hotel</option>
+                        <option>The Grand Plaza Resort</option>
+                        <option>Midnight Rose Boutique</option>
+                        <option>Celestial Suites</option>
+                    </select>
+                </div>
+                <div class="chip-group">
+                    <span class="annotation">Recent:</span>
+                    <button class="chip">The Grand Plaza</button>
+                    <button class="chip">Celestial Suites</button>
+                </div>
+            </div>
+
+            <!-- Date Selection with Validation State -->
+            <div class="grid-row">
+                <div class="form-group">
+                    <label>Check-in</label>
+                    <div class="input-container">
+                        <input type="date" value="2023-11-24">
+                    </div>
+                </div>
+                <div class="form-group field-error">
+                    <span class="annotation">[Improve: Inline error handling]</span>
+                    <label>Check-out</label>
+                    <div class="input-container">
+                        <input type="date" value="2023-11-23">
+                    </div>
+                    <p class="error-message">Must be after check-in</p>
+                </div>
+            </div>
+
+            <!-- Room Type -->
+            <div class="form-group">
+                <span class="annotation">[Improve: Quick-select chips for efficiency]</span>
+                <label>Room Type</label>
+                <div class="chip-group">
+                    <button class="chip active">Single Room</button>
+                    <button class="chip">Double Room</button>
+                    <button class="chip">Luxury Suite</button>
+                    <button class="chip">Penthouse</button>
+                </div>
+            </div>
+
+            <!-- Additional Requests -->
+            <div class="form-group">
+                <span class="annotation">[Improve: Higher contrast placeholder text]</span>
+                <label>Additional Requests</label>
+                <textarea rows="3" placeholder="e.g. High floor, extra pillows, early check-in..."></textarea>
+            </div>
+        </div>
+
+        <!-- Bottom Action -->
+        <div class="footer-action">
+            <span class="annotation" style="text-align: center; display: block; margin-bottom: 8px;">[Improve: Loading state + High contrast button text]</span>
+            <button class="primary-btn">
+                <div class="spinner"></div>
+                Sending Request...
+            </button>
+            <div class="nav-bar">
+                <div class="nav-indicator"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

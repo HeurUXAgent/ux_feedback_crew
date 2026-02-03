@@ -1,311 +1,172 @@
-from crewai.tools import tool
+import os
 import json
+import re
+import io
 from pathlib import Path
-from datetime import datetime
-
+from dotenv import load_dotenv
+from google import genai
+from PIL import Image
 from crewai.tools import tool
-from pathlib import Path
-from datetime import datetime
-import json
 
+load_dotenv()
+
+OUTPUT_DIR = Path("data/outputs/current")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# --- HELPER METHODS ---
+
+def _extract_json(text: str) -> dict:
+    """
+    Extract the first valid JSON object from model output.
+    Cleans markdown code blocks and whitespace.
+    """
+    text = text.strip()
+
+    # 1. Remove markdown code fences if they exist
+    # This regex looks for ```json ... ``` or just ``` ... ```
+    if "```" in text:
+        match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
+        if match:
+            text = match.group(1).strip()
+
+    # 2. Try to parse the cleaned text directly
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # 3. If direct parse fails, try to find the first '{' and last '}'
+        # This helps if there is stray conversational text before or after the JSON
+        match = re.search(r"(\{[\s\S]*\})", text)
+        if match:
+            try:
+                return json.loads(match.group(1))
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Found JSON-like string but could not parse: {e}")
+        
+    raise ValueError("No valid JSON found in model output")
+
+
+def convert_feedback_to_markdown(feedback_data: dict) -> str:
+    """
+    Converts the structured JSON feedback into a clean Markdown report.
+    """
+    md = "# 📋 UX Feedback Report\n\n---\n\n"
+
+    if "summary" in feedback_data:
+        s = feedback_data["summary"]
+        md += f"## 📊 Summary\n"
+        md += f"- **Total Issues:** {s.get('total_issues', 0)}\n"
+        md += f"- **High Priority:** {s.get('high', 0)}\n"
+        md += f"- **Medium Priority:** {s.get('medium', 0)}\n"
+        md += f"- **Low Priority:** {s.get('low', 0)}\n"
+        md += f"- **Estimated Effort:** {s.get('estimated_total_effort', 'N/A')}\n\n---\n\n"
+
+    if feedback_data.get("quick_wins"):
+        md += "## ⚡ Quick Wins\n\n"
+        for w in feedback_data["quick_wins"]:
+            md += f"- **{w.get('change', 'N/A')}** — {w.get('impact', 'N/A')} (Effort: {w.get('effort', 'N/A')})\n"
+        md += "\n---\n\n"
+
+    md += "## 🔧 Detailed Recommendations\n\n"
+    for item in feedback_data.get("feedback_items", []):
+        md += f"### {item.get('title', 'Recommendation')}\n"
+        md += f"**Priority:** {item.get('priority', 'N/A')} | **Effort:** {item.get('effort_estimate', 'N/A')}\n\n"
+        md += f"**Why it matters:**\n{item.get('why_it_matters', 'N/A')}\n\n"
+        md += "**Implementation Steps:**\n"
+        steps = item.get('what_to_do', [])
+        if isinstance(steps, list):
+            for step in steps:
+                md += f"- {step}\n"
+        else:
+            md += f"- {steps}\n"
+        md += f"\n**Wireframe changes:** {item.get('wireframe_changes', 'N/A')}\n\n---\n\n"
+
+    return md
+
+# --- CREWAI TOOLS ---
 
 @tool("generate_feedback")
 def generate_feedback(vision_analysis: str, heuristic_evaluation: str) -> str:
     """
-    Prepares developer-friendly feedback generation prompt for the agent.
-    The agent will process this and return JSON feedback.
-    
-    Args:
-        vision_analysis: JSON string of vision analysis
-        heuristic_evaluation: JSON string of heuristic evaluation
-        
-    Returns:
-        Structured prompt for agent to generate actionable feedback
-    """
-    
-    feedback_prompt = f"""
-TASK: Transform UX violations into developer-friendly, actionable feedback
+    Convert UX violations into developer-friendly feedback JSON and save report.
 
-## VISION ANALYSIS:
+    Args:
+        vision_analysis: JSON string from vision tool.
+        heuristic_evaluation: JSON string from heuristic tool.
+
+    Returns:
+        JSON string containing structured feedback recommendations.
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not set")
+
+    client = genai.Client(api_key=api_key)
+
+    prompt = f"""
+TASK: Convert UX violations into developer-friendly feedback.
+
+VISION ANALYSIS:
 {vision_analysis}
 
-## HEURISTIC EVALUATION:
+HEURISTIC EVALUATION:
 {heuristic_evaluation}
 
-## FEEDBACK GENERATION INSTRUCTIONS:
-
-Convert each violation into clear, actionable feedback that developers can implement.
-
-For each issue, create feedback that includes:
-1. **Action-oriented title** - What to do (e.g., "Add loading spinner to submit button")
-2. **Priority** - Based on severity and user impact
-3. **Why it matters** - User impact in simple terms
-4. **What to do** - Step-by-step implementation guide
-5. **Wireframe changes** - Visual changes to make
-6. **Effort estimate** - Time/complexity estimate
-
-Also identify **QUICK WINS** - easy changes with high impact.
-
-## OUTPUT FORMAT:
-
-Return ONLY valid JSON:
-
+Return ONLY valid JSON in this structure:
 {{
   "feedback_items": [
     {{
-      "id": 1,
-      "title": "Add loading indicator to login button",
-      "priority": "high",
-      "why_it_matters": "Users don't know if their tap registered or if the app is processing. This causes repeated taps and frustration.",
-      "what_to_do": [
-        "Add a CircularProgressIndicator widget to the button when tapped",
-        "Disable the button while loading to prevent multiple submissions",
-        "Show success/error state after completion"
-      ],
-      "wireframe_changes": "Show button in three states: default, loading (with spinner), and success/error",
-      "effort_estimate": "Small (30 minutes)",
-      "related_heuristic": "Visibility of system status"
+      "title": "...",
+      "priority": "high|medium|low",
+      "effort_estimate": "...",
+      "why_it_matters": "...",
+      "what_to_do": ["step 1", "step 2"],
+      "wireframe_changes": "..."
     }}
   ],
   "quick_wins": [
     {{
-      "change": "Increase button touch targets to 48dp minimum",
-      "impact": "Easier tapping, fewer accidental misses",
-      "effort": "10 minutes",
-      "priority": "high"
+      "change": "...",
+      "impact": "...",
+      "effort": "..."
     }}
   ],
   "summary": {{
-    "total_issues": 8,
-    "high": 3,
-    "medium": 3,
-    "low": 2,
-    "estimated_total_effort": "4-6 hours"
+    "total_issues": 10,
+    "high": 2,
+    "medium": 5,
+    "low": 3,
+    "estimated_total_effort": "Medium"
   }},
-  "implementation_order": [
-    "1. Fix high-priority accessibility issues (contrast, touch targets)",
-    "2. Add loading/feedback indicators",
-    "3. Improve error handling and messages",
-    "4. Refine visual polish and spacing"
-  ]
+  "implementation_order": ["..."]
 }}
-
-## WRITING GUIDELINES:
-- Use developer-friendly language (mention Flutter widgets, CSS properties, etc.)
-- Be specific and concrete
-- Explain WHY changes matter (user impact + business value)
-- Provide realistic effort estimates
-- Think about mobile constraints (screen size, touch, performance)
-- Prioritize based on: user impact × ease of implementation
-
-Generate comprehensive, actionable feedback now.
 """
-    
-    print("✓ Feedback generation prompt prepared")
-    
-    return feedback_prompt
 
-
-@tool("save_feedback_report")
-def save_feedback_report(feedback_json: str) -> str:
-    """
-    Saves the feedback report to both JSON and Markdown formats.
-    Call this tool after generating feedback to persist the results.
+    # 1. Generate content
+    response = client.models.generate_content(
+        model="gemini-2.0-flash", # Note: Changed to 2.0 unless you have specific access to a 2.5/3.0 preview
+        contents=prompt
+    )
     
-    Args:
-        feedback_json: JSON string containing the feedback data
-        
-    Returns:
-        Confirmation message with file paths
-    """
+    raw_text = response.text.strip()
     
-    output_dir = Path("data/outputs")
-    output_dir.mkdir(exist_ok=True, parents=True)
-    
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
+    # 2. Extract and parse using the helper above
     try:
-        # Parse and validate JSON
-        feedback_data = json.loads(feedback_json)
-        
-        # Save JSON version
-        json_path = output_dir / f"feedback_{timestamp}.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(feedback_data, f, indent=2, ensure_ascii=False)
-        
-        # Convert to Markdown
-        md_path = output_dir / f"feedback_{timestamp}.md"
-        markdown_content = convert_feedback_to_markdown(feedback_data, timestamp)
-        with open(md_path, 'w', encoding='utf-8') as f:
-            f.write(markdown_content)
-        
-        print(f"✓ Feedback JSON saved to: {json_path}")
-        print(f"✓ Feedback Markdown saved to: {md_path}")
-        
-        return f"""Feedback report saved successfully:
-- JSON: {json_path}
-- Markdown: {md_path}
+        parsed_data = _extract_json(raw_text)
+    except Exception as e:
+        print(f"❌ Error parsing feedback JSON: {e}")
+        return f"Error: Could not parse JSON. Raw output: {raw_text[:200]}"
 
-The markdown report is ready for developers to review."""
-        
-    except json.JSONDecodeError as e:
-        print(f"⚠ JSON parsing error: {e}")
-        
-        # Save as raw text if JSON is invalid
-        txt_path = output_dir / f"feedback_{timestamp}.txt"
-        with open(txt_path, 'w', encoding='utf-8') as f:
-            f.write(feedback_json)
-        
-        return f"⚠ Could not parse JSON. Feedback saved as text: {txt_path}"
+    # 3. Save the files
+    json_path = OUTPUT_DIR / "feedback.json"
+    md_path = OUTPUT_DIR / "feedback.md"
 
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(parsed_data, f, indent=2, ensure_ascii=False)
 
-def convert_feedback_to_markdown(feedback_data: dict, timestamp: str) -> str:
-    """
-    Convert feedback JSON to beautifully formatted Markdown
-    
-    Args:
-        feedback_data: Dictionary containing feedback information
-        timestamp: Timestamp string for the report
-        
-    Returns:
-        Formatted markdown string
-    """
-    
-    md = f"""# 📋 UX Feedback Report
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(convert_feedback_to_markdown(parsed_data))
 
-**Generated:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}  
-**Report ID:** {timestamp}
+    print(f"✓ Feedback saved successfully → {json_path}, {md_path}")
 
----
-
-"""
-    
-    # Summary Section
-    if 'summary' in feedback_data:
-        summary = feedback_data['summary']
-        md += f"""## 📊 Summary
-
-| Metric | Count |
-|--------|-------|
-| **Total Issues** | {summary.get('total_issues', 0)} |
-| **High Priority** | 🔴 {summary.get('high', 0)} |
-| **Medium Priority** | 🟡 {summary.get('medium', 0)} |
-| **Low Priority** | 🟢 {summary.get('low', 0)} |
-| **Estimated Effort** | {summary.get('estimated_total_effort', 'N/A')} |
-
----
-
-"""
-    
-    # Implementation Order
-    if 'implementation_order' in feedback_data and feedback_data['implementation_order']:
-        md += f"""## 🎯 Recommended Implementation Order
-
-"""
-        for order_item in feedback_data['implementation_order']:
-            md += f"{order_item}\n"
-        md += "\n---\n\n"
-    
-    # Quick Wins Section
-    if 'quick_wins' in feedback_data and feedback_data['quick_wins']:
-        md += f"""## ⚡ Quick Wins
-
-These are easy changes that will have immediate positive impact:
-
-"""
-        for idx, win in enumerate(feedback_data['quick_wins'], 1):
-            priority_badge = {
-                'high': '🔴 HIGH',
-                'medium': '🟡 MEDIUM', 
-                'low': '🟢 LOW'
-            }.get(win.get('priority', 'low'), '⚪ UNKNOWN')
-            
-            md += f"""### {idx}. {win.get('change', 'Untitled')}
-
-**Priority:** {priority_badge}  
-**Effort:** ⏱️ {win.get('effort', 'N/A')}  
-**Impact:** {win.get('impact', 'N/A')}
-
-"""
-        md += "---\n\n"
-    
-    # Detailed Feedback Items
-    if 'feedback_items' in feedback_data and feedback_data['feedback_items']:
-        md += f"""## 📝 Detailed Feedback Items
-
-"""
-        for item in feedback_data['feedback_items']:
-            priority = item.get('priority', 'low').lower()
-            priority_emoji = {
-                'high': '🔴',
-                'medium': '🟡',
-                'low': '🟢'
-            }.get(priority, '⚪')
-            
-            priority_badge = {
-                'high': '🔴 **HIGH PRIORITY**',
-                'medium': '🟡 **MEDIUM PRIORITY**',
-                'low': '🟢 **LOW PRIORITY**'
-            }.get(priority, '⚪ UNKNOWN')
-            
-            md += f"""### {priority_emoji} {item.get('title', 'Untitled Issue')}
-
-**Priority:** {priority_badge}  
-"""
-            
-            if 'related_heuristic' in item:
-                md += f"**Related Heuristic:** {item['related_heuristic']}  \n"
-            
-            if 'effort_estimate' in item:
-                md += f"**Effort Estimate:** ⏱️ {item['effort_estimate']}  \n"
-            
-            md += "\n"
-            
-            # Why it matters
-            if 'why_it_matters' in item:
-                md += f"""#### 💡 Why It Matters
-
-{item['why_it_matters']}
-
-"""
-            
-            # What to do
-            if 'what_to_do' in item and item['what_to_do']:
-                md += f"""#### ✅ What To Do
-
-"""
-                for step_idx, step in enumerate(item['what_to_do'], 1):
-                    md += f"{step_idx}. {step}\n"
-                md += "\n"
-            
-            # Wireframe changes
-            if 'wireframe_changes' in item:
-                md += f"""#### 🎨 Wireframe Changes
-
-{item['wireframe_changes']}
-
-"""
-            
-            md += "---\n\n"
-    
-    # Footer
-    md += f"""
----
-
-## 📌 Notes
-
-- This report was automatically generated based on heuristic evaluation
-- Priorities are based on user impact and usability severity
-- Effort estimates are approximate and may vary based on your codebase
-- Focus on high-priority items first for maximum user experience improvement
-
-**Need help implementing these changes?** Refer to the wireframe for visual examples.
-
----
-
-*Generated by UX Feedback Crew v1.0*
-"""
-    
-    return md
-
-
+    # 4. Return for the next agent
+    return json.dumps(parsed_data)
