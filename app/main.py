@@ -5,8 +5,11 @@ import os
 import json
 from pathlib import Path
 import shutil
+from src.ws_manager import manager
+from fastapi import WebSocket, WebSocketDisconnect
+from starlette.concurrency import run_in_threadpool
 # Import from your pipeline bridge
-from src.ux_feedback_crew.crew_pipeline import run_full_ux_pipeline
+from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline
 # (
 #     run_evaluation_pipeline,
 #     run_wireframe_pipeline
@@ -44,19 +47,24 @@ def cleanup_files(*paths: Path):
         except Exception as e:
             print(f"Cleanup error: {e}")
 
-@app.post("/analyze-and-wireframe/")
-async def analyze_and_wireframe(background_tasks: BackgroundTasks,file: UploadFile = File(...)):
+@app.post("/analyze-and-wireframe/{client_id}")
+async def analyze_and_wireframe(background_tasks: BackgroundTasks,file: UploadFile = File(...), client_id: str = ""):
     try:
-        # 1. Save the Dialog app screenshot
         job_id = str(uuid.uuid4())
         upload_path = UPLOAD_DIR / f"{job_id}.png"
 
         with open(upload_path, "wb") as f:
             f.write(await file.read())
 
-        # 2. Run the Consolidated Pipeline (All 4 Agents)
+        await manager.send_progress(client_id, "Initializing Agents...", 0)
+
+        # Run the consolidated pipeline 
         # This returns the report and the wireframe in one execution
-        feedback_report, wireframe_output = run_full_ux_pipeline(str(upload_path))
+        feedback_report, wireframe_output = await run_in_threadpool(
+            run_full_ux_pipeline, 
+            str(upload_path), 
+            client_id
+        )
 
         # 3. Save everything to a single JSON for records
         final_data = {
@@ -74,8 +82,18 @@ async def analyze_and_wireframe(background_tasks: BackgroundTasks,file: UploadFi
 
         background_tasks.add_task(cleanup_files, upload_path, result_json_path)
 
-        # 4. Return everything to Flutter in one response
+        # Return everything to Flutter in one response
         return final_data
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"System Error: {str(e)}")
+    
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: str):
+    await manager.connect(client_id, websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(client_id)
+

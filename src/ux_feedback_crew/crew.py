@@ -1,5 +1,6 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+from src.ws_manager import safe_emit
 from .tools import (
     analyze_ui_screenshot,
     evaluate_heuristics,
@@ -11,6 +12,19 @@ from .tools import (
 class UxFeedbackCrew():
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
+
+
+    def __init__(self, client_id: str):
+        self.client_id = client_id
+
+    def step_callback(self, step_name: str, step_number: int):
+        def callback(_output):
+            safe_emit(
+                self.client_id,
+                f"Completed: {step_name}",
+                step_number
+            )
+        return callback
 
     @agent
     def vision_analyst(self) -> Agent:
@@ -50,19 +64,30 @@ class UxFeedbackCrew():
 
     @task
     def analyze_ui(self) -> Task:
-        return Task(config=self.tasks_config['analyze_ui'])
+        return Task(
+            config=self.tasks_config['analyze_ui'],
+            callback=self.step_callback("Vision Analysis", 1),
+            )
 
     @task
     def evaluate_heuristics(self) -> Task:
-        return Task(config=self.tasks_config['evaluate_heuristics'])
+        return Task(
+            config=self.tasks_config['evaluate_heuristics'],
+            callback=self.step_callback("Heuristic Evaluation", 2),
+        )
 
     @task
     def generate_feedback(self) -> Task:
-        return Task(config=self.tasks_config['generate_feedback'])
+        return Task(
+            config=self.tasks_config['generate_feedback'],
+            callback=self.step_callback("Feedback Generation", 3),
+        )
 
     @task
     def create_wireframe(self) -> Task:
-        return Task(config=self.tasks_config['create_wireframe'])
+        return Task(
+            config=self.tasks_config['create_wireframe'],
+            callback=self.step_callback("Wireframe Creation", 4),)
 
     @crew
     def full_flow_crew(self) -> Crew:
@@ -79,6 +104,18 @@ class UxFeedbackCrew():
                 self.generate_feedback(),
                 self.create_wireframe()
             ],
-            process=Process.sequential,   # 🔥 CRITICAL
+            process=Process.sequential, 
             verbose=True
         )
+    
+    # function to handle progress updates
+    def create_step_callback(client_id: str, step_name: str, step_number: int):
+        import asyncio
+        def callback(output):
+            # This runs when the task completes
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(
+                manager.send_progress(client_id, f"Finished: {step_name}", step_number)
+            )
+        return callback

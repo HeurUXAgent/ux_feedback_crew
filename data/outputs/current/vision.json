@@ -1,154 +1,302 @@
 {
-  "screen_type": "Form/Input Screen",
+  "screen_type": "Home/Discover Screen",
   "components": [
     {
-      "type": "Status Bar",
-      "content": "Time (3:25), Network, Battery, Wi-Fi, Security icon (shield), Brain icon (app specific)",
-      "style": "Dark background, white icons/text"
+      "name": "System Status Bar",
+      "type": "System UI",
+      "elements": [
+        {
+          "name": "Time",
+          "value": "9:41"
+        },
+        {
+          "name": "Dynamic Island",
+          "description": "iOS feature"
+        },
+        {
+          "name": "Connectivity Icons",
+          "value": "Cellular signal, Wi-Fi"
+        },
+        {
+          "name": "Battery Icon",
+          "value": "Full charge"
+        }
+      ]
     },
     {
+      "name": "Header Section",
       "type": "App Bar",
-      "content": {
-        "left_icon": "Back arrow",
-        "title": "Hotel Reservation",
-        "right_icon": null
+      "elements": [
+        {
+          "name": "User Profile Avatar",
+          "description": "Circular image of 'Annie January'"
+        },
+        {
+          "name": "User Name",
+          "value": "Annie January",
+          "typography_style": "Semi-bold, dark gray"
+        },
+        {
+          "name": "Account Status",
+          "value": "Basic account",
+          "typography_style": "Regular, medium gray"
+        },
+        {
+          "name": "Notification Icon",
+          "description": "Bell icon, outlined"
+        }
+      ]
+    },
+    {
+      "name": "Search/Location Bar",
+      "type": "Input Field",
+      "elements": [
+        {
+          "name": "Location Icon",
+          "description": "Green map pin icon"
+        },
+        {
+          "name": "Current Location",
+          "value": "Jombang, IDN",
+          "typography_style": "Regular, green"
+        },
+        {
+          "name": "Separator",
+          "description": "Vertical line"
+        },
+        {
+          "name": "Search Placeholder",
+          "value": "Search destnation,...",
+          "typography_style": "Regular, medium gray"
+        },
+        {
+          "name": "Search Icon",
+          "description": "Magnifying glass icon"
+        }
+      ]
+    },
+    {
+      "name": "Category Filters",
+      "type": "Horizontal Scrollable Chips",
+      "elements": [
+        {
+          "name": "Montain Chip",
+          "status": "Active",
+          "icon": "Sun/Mountain",
+          "label": "Montain",
+          "background_color": "Light gray"
+        },
+        {
+          "name": "Beach Chip",
+          "status": "Inactive",
+          "icon": "Beach",
+          "label": "Beach",
+          "background_color": "Transparent"
+        },
+        {
+          "name": "Urban Chip",
+          "status": "Inactive",
+          "icon": "Buildings",
+          "label": "Urban",
+          "background_color": "Transparent"
+        }
+      ]
+    },
+    {
+      "name": "Section Header",
+      "type": "Text with Action",
+      "elements": [
+        {
+          "name": "Section Title",
+          "value": "Popular near you",
+          "typography_style": "Semi-bold, dark gray",
+          "icon": "Fire emoji"
+        },
+        {
+          "name": "See More Button",
+          "value": "See more >",
+          "typography_style": "Regular, green"
+        }
+      ]
+    },
+    {
+      "name": "Destination Card",
+      "type": "Card (List Item)",
+      "instance_1": {
+        "elements": [
+          {
+            "name": "Image",
+            "description": "Scenic mountain landscape (Bromo Tengger Semeru)"
+          },
+          {
+            "name": "Title",
+            "value": "Bromo Tengger Semeru",
+            "typography_style": "Bold, dark gray"
+          },
+          {
+            "name": "Location Icon",
+            "description": "Map pin icon"
+          },
+          {
+            "name": "Location Text",
+            "value": "Probolinggo, East Java",
+            "typography_style": "Regular, medium gray"
+          },
+          {
+            "name": "Distance Icon",
+            "description": "Winding road/speed icon"
+          },
+          {
+            "name": "Distance Text",
+            "value": "14km",
+            "typography_style": "Regular, medium gray"
+          },
+          {
+            "name": "Price",
+            "value": "$12k/Trip",
+            "typography_style": "Regular, dark gray"
+          }
+        ]
       },
-      "style": "Dark purple background, gold text/icons, large title font"
+      "instance_2": {
+        "elements": [
+          {
+            "name": "Image",
+            "description": "Scenic mountain landscape (Gunung Andong Magelang)"
+          },
+          {
+            "name": "Title",
+            "value": "Gunung Andong Magelang",
+            "typography_style": "Bold, dark gray"
+          },
+          {
+            "name": "Location Icon",
+            "description": "Map pin icon"
+          },
+          {
+            "name": "Location Text",
+            "value": "Magelang, East Java",
+            "typography_style": "Regular, medium gray"
+          },
+          {
+            "name": "Distance Icon",
+            "description": "Winding road/speed icon"
+          },
+          {
+            "name": "Distance Text",
+            "value": "14km",
+            "typography_style": "Regular, medium gray"
+          },
+          {
+            "name": "Price",
+            "value": "$9k/Trip",
+            "typography_style": "Regular, dark gray"
+          }
+        ]
+      }
     },
     {
-      "type": "Section Label",
-      "content": "Hotels",
-      "style": "White text, bold, medium font size"
+      "name": "Bottom Navigation Bar",
+      "type": "Tab Bar",
+      "elements": [
+        {
+          "name": "Home Icon",
+          "status": "Active",
+          "icon": "House",
+          "background_color": "Green"
+        },
+        {
+          "name": "Map Icon",
+          "status": "Inactive",
+          "icon": "Map"
+        },
+        {
+          "name": "Bookmarks/Saved Icon",
+          "status": "Inactive",
+          "icon": "Stacked papers"
+        },
+        {
+          "name": "Calendar/Bookings Icon",
+          "status": "Inactive",
+          "icon": "Calendar"
+        },
+        {
+          "name": "Profile Icon",
+          "status": "Inactive",
+          "icon": "User"
+        }
+      ]
     },
     {
-      "type": "Dropdown Input Field",
-      "content": "Select a Hotel",
-      "placeholder": true,
-      "icon": "Down arrow",
-      "state": "default/unselected",
-      "style": "Rounded corners, dark purple background, light gray text"
-    },
-    {
-      "type": "Section Label",
-      "content": "Check-in Date",
-      "style": "White text, bold, medium font size"
-    },
-    {
-      "type": "Section Label",
-      "content": "Check-out Date",
-      "style": "White text, bold, medium font size"
-    },
-    {
-      "type": "Date Input Field",
-      "content": "Date",
-      "placeholder": true,
-      "icon": "Calendar",
-      "state": "default/unselected",
-      "style": "Rounded corners, dark purple background, light gray text"
-    },
-    {
-      "type": "Date Input Field",
-      "content": "Date",
-      "placeholder": true,
-      "icon": "Calendar",
-      "state": "default/unselected",
-      "style": "Rounded corners, dark purple background, light gray text"
-    },
-    {
-      "type": "Section Label",
-      "content": "Room Type",
-      "style": "White text, bold, medium font size"
-    },
-    {
-      "type": "Dropdown Input Field",
-      "content": "Single Room",
-      "placeholder": false,
-      "icon": "Down arrow",
-      "state": "selected",
-      "style": "Rounded corners, dark purple background, light gray text"
-    },
-    {
-      "type": "Section Label",
-      "content": "Additional Requests",
-      "style": "White text, bold, medium font size"
-    },
-    {
-      "type": "Text Area",
-      "content": "Additional Requests",
-      "placeholder": true,
-      "style": "Rounded corners, dark purple background, light gray text, multi-line capable"
-    },
-    {
-      "type": "Primary Button",
-      "content": "Send Request",
-      "style": "Full-width, rounded corners, gradient gold/yellow background, dark text, bold"
-    },
-    {
-      "type": "System Navigation Bar",
-      "content": "Gesture hint (horizontal white line)",
-      "style": "Black background"
+      "name": "Home Indicator",
+      "type": "System UI",
+      "description": "iOS gesture bar"
     }
   ],
-  "layout_structure": "The screen features a top app bar with a title and back navigation. Below the app bar, form fields are stacked vertically, grouped by their respective labels. Two date input fields are arranged horizontally side-by-side. A full-width primary action button is fixed at the bottom of the screen. The overall layout is clean, with generous vertical spacing between sections, following a single-column flow for most elements.",
+  "layout_structure": "The screen features a top-down vertical stacking layout. It starts with a fixed header (user profile, notifications) and a search/location bar. Below this is a horizontal scrollable row of category filter chips. The main content area consists of a vertically scrolling list of large, full-width destination cards. Each card has an image occupying the top portion and an overlayed text box at the bottom, containing the title, location, distance, and price. A fixed bottom navigation bar provides primary app navigation.",
   "color_scheme": {
-    "primary_background": "#2D0B2E (Deep Plum/Dark Purple)",
-    "input_background": "#4A234B (Slightly lighter Dark Purple)",
-    "text_labels": "#FFFFFF (White)",
-    "text_placeholders_input": "#E0E0E0 (Light Gray/Off-white)",
-    "accent_gold": "#D4AF37 (Gold/Yellow)",
-    "button_text": "#2E1C00 (Dark Brown/Black)",
-    "system_status_bar": "#000000 (Black)",
-    "system_navigation_bar": "#000000 (Black)"
+    "primary_background": "#FFFFFF (White)",
+    "primary_text": "#333333 (Dark Gray/Black)",
+    "secondary_text": "#888888 (Medium Gray)",
+    "accent_color": "#6B8E23 (Olive Green)",
+    "inactive_element_color": "#AAAAAA (Light Gray)",
+    "active_chip_background": "#F0F0F0 (Very Light Gray)",
+    "system_status_bar_text": "#000000 (Black)",
+    "card_image_dominance": "Natural tones (greens, browns, whites, blues)"
   },
   "typography": {
-    "font_family": "Sans-serif (consistent throughout, likely a single family)",
-    "header_title": {
-      "text": "Hotel Reservation",
-      "size": "Large",
-      "weight": "Bold",
-      "color": "Gold/Yellow"
-    },
-    "section_labels": {
-      "text": "Hotels, Check-in Date, etc.",
-      "size": "Medium",
-      "weight": "Bold",
-      "color": "White"
-    },
-    "input_text_placeholders": {
-      "text": "Select a Hotel, Date, etc.",
-      "size": "Regular",
-      "weight": "Regular",
-      "color": "Light Gray/Off-white"
-    },
-    "button_text": {
-      "text": "Send Request",
-      "size": "Medium/Large",
-      "weight": "Bold",
-      "color": "Dark Brown/Black"
-    }
+    "font_family": "Sans-serif (likely system default like San Francisco or similar modern sans-serif)",
+    "weights_used": [
+      {
+        "purpose": "Headings, User Name, Destination Titles",
+        "weight": "Bold/Semi-bold"
+      },
+      {
+        "purpose": "Body Text, Search Placeholder, Location Details, Price",
+        "weight": "Regular"
+      }
+    ],
+    "sizes_used": [
+      {
+        "purpose": "Destination Titles",
+        "size_category": "Large"
+      },
+      {
+        "purpose": "User Name, Section Titles",
+        "size_category": "Medium"
+      },
+      {
+        "purpose": "Account Status, Location/Distance, Category Names, 'See more'",
+        "size_category": "Small"
+      },
+      {
+        "purpose": "Price per trip",
+        "size_category": "Very Small"
+      }
+    ],
+    "color_for_hierarchy": "Darker shades for primary information, lighter grays for secondary details."
   },
   "spacing_and_density": {
-    "vertical_spacing": "Generous, clear separation between form sections and labels.",
-    "horizontal_spacing": "Consistent padding for content within the main container. Balanced spacing between horizontal elements (e.g., date inputs).",
-    "element_padding": "Ample internal padding within input fields, making them easy to tap and read.",
-    "corner_radius": "Consistent use of medium-sized rounded corners (e.g., ~8-12dp) on all input fields and the primary button.",
-    "density": "Low to medium density, prioritizing readability and tap target size over displaying maximum information at once, suitable for form input."
+    "vertical_spacing": "Generous padding between major sections (header, search, filters, content cards). Noticeable vertical margins between destination cards.",
+    "horizontal_padding": "Consistent and moderate padding on left and right edges, preventing elements from touching screen boundaries.",
+    "element_density": "Overall a relatively open layout, not overly dense. Elements within components (e.g., card text overlay) are compact but readable. Category chips have good internal padding.",
+    "touch_target_size": "Generally sufficient for interactive elements like buttons, chips, and navigation icons."
   },
   "accessibility_observations": [
-    "Good use of clear labels above each input field, which aids screen readers and overall comprehension.",
-    "Tap targets for input fields and the button appear to be sufficiently large for touch interaction.",
-    "High contrast between white text labels and the dark purple background. Gold text on dark purple also appears to have good contrast.",
-    "Potential contrast issue with light gray placeholder text on the dark purple input background, especially for users with low vision or in bright lighting conditions.",
-    "Icons (back, calendar, dropdown arrows) are distinct and convey their purpose clearly.",
-    "The primary button's dark text on a gradient gold background might need to be checked with a color contrast analyzer to ensure WCAG AA or AAA compliance, as gradients can sometimes complicate contrast calculations."
+    "Good contrast for primary text on white background. Secondary gray text appears readable.",
+    "Interactive elements (profile, notification, search, chips, bottom nav icons) generally have adequate touch target sizes.",
+    "Clear visual hierarchy established through varied font sizes, weights, and color usage.",
+    "Icons are mostly self-explanatory or accompanied by text labels (e.g., category chips, bottom nav icons, search bar icons).",
+    "Potential for improvement: Ensure images on destination cards have appropriate alt text for screen readers."
   ],
   "notable_patterns": [
-    "Standard mobile app bar with title and back navigation.",
-    "Vertical stacking form layout for sequential data input.",
-    "Two-column layout for related short input fields (Check-in/Check-out Date), optimizing screen space.",
-    "Dedicated icons for interactive input types (calendar for date picker, dropdown arrow for selection).",
-    "Prominent, full-width primary call-to-action button fixed at the bottom of the screen, common for form submission.",
-    "Consistent visual style (rounded corners, dark themed input fields) across all form elements.",
-    "Implicit dark mode design with a dark background and contrasting accent colors."
+    "Card-based UI for presenting discoverable content, a common pattern for lists of items with rich media.",
+    "Bottom navigation bar for primary global navigation.",
+    "Personalized header with user name and profile avatar, enhancing user engagement.",
+    "Combined search and filter functionality at the top for easy content discovery.",
+    "Use of accent color (green) to highlight active states and important actions.",
+    "Familiar iconography across the interface, aiding usability.",
+    "Implied horizontal scrolling for category filters, indicated by the number of visible chips and the general design pattern.",
+    "iOS-specific system UI elements (Dynamic Island, Home Indicator) indicate the target platform."
   ]
 }

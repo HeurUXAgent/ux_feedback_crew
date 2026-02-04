@@ -1,17 +1,15 @@
-import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))
-from src.ux_feedback_crew.crew import UxFeedbackCrew
+from ux_feedback_crew.crew import UxFeedbackCrew
 
-def run_full_ux_pipeline(image_path: str):
-    inputs = {'screenshot_path': image_path}
-    crew_obj = UxFeedbackCrew()
+def run_full_ux_pipeline(image_path: str, client_id: str):
+    inputs = {
+        "screenshot_path": image_path
+    }
+
+    crew_instance = UxFeedbackCrew(client_id)
+    crew = crew_instance.full_flow_crew()
+    result = crew.kickoff(inputs=inputs)
     
-    # Kicks off the crew (added 'full_flow_crew' to crew.py)
-    result = crew_obj.full_flow_crew().kickoff(inputs=inputs)
-    
-    # Accessing results using the singular 'tasks_output' list
     report = str(result.tasks_output[2].raw)
     wireframe = str(result.tasks_output[3].raw)
-    
+
     return report, wireframe
