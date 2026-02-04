@@ -9,16 +9,21 @@ from src.ws_manager import manager
 from fastapi import WebSocket, WebSocketDisconnect
 from starlette.concurrency import run_in_threadpool
 # Import from your pipeline bridge
-from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline
 # (
 #     run_evaluation_pipeline,
 #     run_wireframe_pipeline
 # )
+
+
 import sys
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(ROOT_DIR))
+SRC_DIR = ROOT_DIR / "src"
+sys.path.append(str(SRC_DIR))
+
+from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline
+
 
 
 app = FastAPI()
