@@ -22,18 +22,18 @@ def _extract_json(text: str) -> dict:
     """
     text = text.strip()
 
-    # 1. Remove markdown code fences if they exist
+    # removing markdown code fences if they exist
     # This regex looks for ```json ... ``` or just ``` ... ```
     if "```" in text:
         match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
         if match:
             text = match.group(1).strip()
 
-    # 2. Try to parse the cleaned text directly
+    #  Parse the cleaned text directly
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # 3. If direct parse fails, try to find the first '{' and last '}'
+        # If direct parse fails, try to find the first { and last }
         # This helps if there is stray conversational text before or after the JSON
         match = re.search(r"(\{[\s\S]*\})", text)
         if match:
@@ -82,7 +82,6 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
 
     return md
 
-# --- CREWAI TOOLS ---
 
 @tool("generate_feedback")
 def generate_feedback(vision_analysis: str, heuristic_evaluation: str) -> str:
@@ -141,7 +140,7 @@ Return ONLY valid JSON in this structure:
 }}
 """
 
-    # 1. Generate content
+    # Generate content
     response = client.models.generate_content(
         model="gemini-2.0-flash", # Note: Changed to 2.0 unless you have specific access to a 2.5/3.0 preview
         contents=prompt
@@ -149,14 +148,14 @@ Return ONLY valid JSON in this structure:
     
     raw_text = response.text.strip()
     
-    # 2. Extract and parse using the helper above
+    # Extract and parse using the helper above
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
         print(f"❌ Error parsing feedback JSON: {e}")
         return f"Error: Could not parse JSON. Raw output: {raw_text[:200]}"
 
-    # 3. Save the files
+    # Save the files
     json_path = OUTPUT_DIR / "feedback.json"
     md_path = OUTPUT_DIR / "feedback.md"
 
@@ -168,5 +167,5 @@ Return ONLY valid JSON in this structure:
 
     print(f"✓ Feedback saved successfully → {json_path}, {md_path}")
 
-    # 4. Return for the next agent
+    # Return for the next agent
     return json.dumps(parsed_data)

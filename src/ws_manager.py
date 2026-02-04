@@ -28,7 +28,7 @@ def safe_emit(client_id: str, message: str, step: int):
     Can be called from sync code safely
     """
     try:
-        # Try to get the existing loop from the main FastAPI thread
+        # get the existing loop from the main FastAPI thread
         loop = asyncio.get_event_loop()
         if loop.is_running():
             asyncio.run_coroutine_threadsafe(

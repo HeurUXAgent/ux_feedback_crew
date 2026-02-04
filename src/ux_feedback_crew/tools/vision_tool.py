@@ -20,7 +20,7 @@ def _extract_json(text: str) -> dict:
     """
     text = text.strip()
 
-    # Remove code fences if present
+    # Removing the code fences if present
     if "```" in text:
         text = re.split(r"```(?:json)?", text)[1].strip()
 

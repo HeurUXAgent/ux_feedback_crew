@@ -60,7 +60,8 @@ def evaluate_heuristics(vision_analysis: str) -> str:
         heuristics_list = []
 
     prompt = f"""
-TASK: Evaluate this mobile UI against Nielsen's 10 Usability Heuristics
+TASK: Evaluate this mobile UI against Nielsen's 10 Usability Heuristics and WCAG2 guidelines. 
+Identify specific violations and strengths, and provide an overall UX score (1-10).
 
 UI ANALYSIS:
 {vision_analysis}

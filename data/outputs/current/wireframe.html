@@ -3,504 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Discover Screen - Redesign</title>
+    <title>Quiz Pool Redesign - UI/UX Improvement</title>
     <style>
         :root {
-            --primary-green: #4F6D28; /* Improved contrast olive green */
-            --bg-white: #FFFFFF;
-            --bg-gray: #F7F8F9;
-            --text-dark: #1A1C1E;
-            --text-medium: #626A71;
-            --text-light: #9098A1;
-            --skeleton-color: #E1E4E8;
-            --accent-green-light: #E8F5E9;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow: 0 4px 12px rgba(0,0,0,0.05);
-            --transition: all 0.3s ease;
+            --primary-teal: #12b2b3;
+            --primary-dark: #0e8a8b;
+            --bg-light: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            
+            /* Simplified Gradient Palette */
+            --grad-purple: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --grad-blue: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            --grad-orange: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            
+            /* Accessibility */
+            --focus-ring: 3px solid #fbbf24;
+            --touch-target: 48px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            /* Dynamic Text Scaling Support */
+            font-size: 100%; 
         }
 
         body {
-            background-color: #f0f2f5;
+            background-color: #e2e8f0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            color: var(--text-dark);
+            padding: 20px;
         }
 
-        /* Mobile Container (375px) */
-        .app-container {
+        /* Mobile Container */
+        .iphone-frame {
             width: 100%;
             max-width: 375px;
+            background-color: var(--bg-light);
             height: 812px;
-            background-color: var(--bg-white);
+            border-radius: 40px;
             position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 8px solid #1e293b;
         }
 
-        /* Annotation Style */
+        /* Annotations Style */
         .annotation {
             font-size: 10px;
-            color: var(--primary-green);
-            font-style: italic;
-            background: var(--accent-green-light);
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
             padding: 2px 6px;
             border-radius: 4px;
             display: inline-block;
             margin-bottom: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
-        /* System UI */
+        /* Status Bar */
         .status-bar {
             height: 44px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 0 24px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .dynamic-island {
-            width: 110px;
-            height: 30px;
-            background: #000;
-            border-radius: 20px;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 10px;
-        }
-
-        /* Header */
-        .header {
-            padding: 16px 20px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-        }
-
-        .user-profile {
-            display: flex;
             align-items: center;
-            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        .avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #ddd url('https://i.pravatar.cc/100?u=annie') center/cover;
-            border: 2px solid var(--accent-green-light);
+        /* Header / App Bar */
+        header {
+            background-color: var(--primary-teal);
+            color: var(--white);
+            padding: 20px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
         }
 
-        .user-info h1 {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .user-info span {
-            font-size: 12px;
-            color: var(--text-medium);
-        }
-
-        .header-actions {
+        .header-top {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid #EEE;
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            min-width: var(--touch-target);
+            min-height: var(--touch-target);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            cursor: pointer;
-            background: white;
-            transition: var(--transition);
         }
+        
+        .menu-btn:focus-visible { outline: var(--focus-ring); }
 
-        .icon-btn:hover { background: var(--bg-gray); }
-
-        /* Search & Location */
-        .search-section {
-            padding: 0 20px 20px;
-        }
-
-        .search-bar {
-            background: var(--bg-gray);
-            border-radius: var(--radius-md);
-            height: 54px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            gap: 12px;
-            border: 1px solid transparent;
-            transition: var(--transition);
-        }
-
-        .search-bar:focus-within {
-            border-color: var(--primary-green);
-            background: white;
-            box-shadow: 0 0 0 4px var(--accent-green-light);
-        }
-
-        .location-group {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--primary-green);
-            font-weight: 600;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .divider {
-            width: 1px;
-            height: 24px;
-            background: #DDD;
-        }
-
-        .search-input {
-            border: none;
-            background: transparent;
-            font-size: 14px;
-            width: 100%;
-            outline: none;
-            color: var(--text-dark);
-        }
-
-        /* Category Chips */
-        .categories {
-            display: flex;
-            overflow-x: auto;
-            padding: 0 20px 24px;
-            gap: 12px;
-            scrollbar-width: none;
-        }
-
-        .categories::-webkit-scrollbar { display: none; }
-
-        .chip {
+        .wallet-pill {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 18px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            border: 1px solid #EEE;
-            cursor: pointer;
-            transition: var(--transition);
+            font-weight: bold;
         }
 
-        .chip.active {
-            background: var(--primary-green);
-            color: white;
-            border-color: var(--primary-green);
+        .header-content h1 {
+            font-size: 1.5rem;
+            margin-top: 10px;
         }
 
-        /* Section Header */
-        .section-header {
-            padding: 0 20px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .see-more {
-            color: var(--primary-green);
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        /* Content Area */
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 100px;
-        }
-
-        /* Skeleton States (Improvement) */
-        .skeleton-card {
-            margin: 0 20px 20px;
-            height: 240px;
-            background: var(--bg-gray);
-            border-radius: var(--radius-lg);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skeleton-card::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* Destination Cards */
-        .card {
-            margin: 0 20px 24px;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            position: relative;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .card:active { transform: scale(0.98); }
-
-        .card-img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .card-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 16px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            color: white;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .card-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .card-details {
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .header-content p {
+            font-size: 0.9rem;
             opacity: 0.9;
         }
 
-        .card-price {
-            text-align: right;
+        /* Action Cards Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 20px;
+            margin-top: -10px;
         }
 
-        .price-val {
-            font-size: 18px;
-            font-weight: 700;
-            color: #FFF;
-        }
-
-        /* Bottom Nav */
-        .nav-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 84px;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 10px 20px;
-            border-top: 1px solid #EEE;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.04);
-        }
-
-        .nav-item {
+        .action-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.1s ease, background 0.2s ease;
+            text-decoration: none;
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            color: var(--text-light);
-            text-decoration: none;
-            min-width: 44px; /* Touch target */
-            min-height: 44px;
+            justify-content: center;
+            min-height: 100px;
+        }
+
+        /* Interactive Feedback: Tap Effect */
+        .action-card:active {
+            transform: scale(0.96);
+            background: #f1f5f9;
+        }
+        
+        .action-card:focus-visible {
+            outline: var(--focus-ring);
+        }
+
+        .action-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        /* Category Cards */
+        .category-list {
+            padding: 0 20px 100px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .category-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            min-height: 110px;
+        }
+
+        .category-card:active {
+            transform: scale(0.98);
+            filter: brightness(0.9);
+        }
+
+        .category-card:focus-visible {
+            outline: var(--focus-ring);
+            outline-offset: 4px;
+        }
+
+        .category-info {
+            flex: 1;
+            z-index: 2;
+        }
+
+        .category-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .category-subtitle {
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.9;
+            background: rgba(0,0,0,0.15);
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+
+        .category-icon {
+            font-size: 50px;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        /* Footer Nav */
+        .nav-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 65px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .nav-item {
+            font-size: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            min-width: var(--touch-target);
+            min-height: var(--touch-target);
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
 
         .nav-item.active {
-            color: var(--primary-green);
+            color: var(--primary-teal);
         }
 
-        .nav-icon {
-            font-size: 22px;
-        }
+        /* Specific Gradients */
+        .bg-purple { background: var(--grad-purple); }
+        .bg-blue { background: var(--grad-blue); }
+        .bg-orange { background: var(--grad-orange); }
 
-        .nav-label {
-            font-size: 10px;
-            font-weight: 600;
+        /* Scrollbar Hide */
+        .iphone-frame::-webkit-scrollbar {
+            display: none;
         }
-
-        .home-indicator {
-            position: absolute;
-            bottom: 8px;
-            width: 134px;
-            height: 5px;
-            background: #000;
-            border-radius: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+    <div class="iphone-frame" role="main" aria-label="Quiz Pool Dashboard">
+        
         <!-- Status Bar -->
         <div class="status-bar">
-            <span>9:41</span>
-            <div class="dynamic-island"></div>
-            <div style="display:flex; gap: 5px;">
+            <span>2:20</span>
+            <div style="display:flex; gap: 6px;">
                 <span>📶</span>
                 <span>📶</span>
-                <span>🔋</span>
+                <span>55% 🔋</span>
             </div>
         </div>
 
-        <!-- Header -->
-        <header class="header">
-            <div class="user-profile">
-                <div class="avatar" aria-label="Annie January's Profile"></div>
-                <div class="user-info">
-                    <span class="annotation">Improvement: Text contrast & hierarchy</span><br>
-                    <h1>Annie January</h1>
-                    <span>⭐ Basic Account</span>
+        <!-- App Header -->
+        <header>
+            <div class="header-top">
+                <button class="menu-btn" aria-label="Open Menu">☰</button>
+                <div class="wallet-pill" aria-label="Wallet Balance: 27 dollars">
+                    <span>💰</span>
+                    <span>27</span>
                 </div>
             </div>
-            <div class="header-actions">
-                <!-- Improvement: Help/Documentation Access -->
-                <div class="icon-btn" title="Help & FAQ" aria-label="Help and FAQ">
-                    <span class="annotation" style="position:absolute; top:-15px; right:0; white-space:nowrap;">New: Help access</span>
-                    ❓
-                </div>
-                <div class="icon-btn" aria-label="Notifications">🔔</div>
+            <div class="header-content">
+                <div class="annotation">Imp: Standardized Typography & Spacing</div>
+                <h1>Quiz Pool</h1>
+                <p>Play Quiz Earn Money</p>
             </div>
         </header>
 
-        <!-- Search Section -->
-        <div class="search-section">
-            <div class="search-bar">
-                <div class="location-group">
-                    <span>📍</span>
-                    <span>Jombang, IDN</span>
+        <!-- Action Grid -->
+        <section class="action-grid">
+            <div>
+                <div class="annotation">Imp: Visual Feedback (Active State)</div>
+                <a href="#" class="action-card" role="button" tabindex="0">
+                    <span class="action-icon">🎁</span>
+                    <span style="font-weight:600">Redeem</span>
+                </a>
+            </div>
+            <div>
+                <div class="annotation">Imp: Standardized Icon Styles</div>
+                <a href="#" class="action-card" role="button" tabindex="0">
+                    <span class="action-icon">⭐</span>
+                    <span style="font-weight:600">Rate Us</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Category Section -->
+        <section class="category-list">
+            <div class="annotation">Imp: Improved Contrast & Dynamic Text Units</div>
+            
+            <!-- MATHS -->
+            <div class="category-card bg-purple" role="button" tabindex="0" aria-label="Maths Quiz - Beginner Level">
+                <div class="category-info">
+                    <h2 class="category-title">MATHS</h2>
+                    <span class="category-subtitle">Beginner</span>
                 </div>
-                <div class="divider"></div>
-                <input type="text" class="search-input" placeholder="Search destination,..." aria-label="Search destinations">
-                <span>🔍</span>
-            </div>
-        </div>
-
-        <!-- Filter Chips -->
-        <div class="categories">
-            <div class="chip active"><span>⛰️</span> Mountain</div>
-            <div class="chip"><span>🏖️</span> Beach</div>
-            <div class="chip"><span>🏙️</span> Urban</div>
-            <div class="chip"><span>⛺</span> Camping</div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="content">
-            <div class="section-header">
-                <h2 class="section-title">Popular near you 🔥</h2>
-                <a href="#" class="see-more">See more ›</a>
+                <div class="category-icon">📐</div>
             </div>
 
-            <!-- Improvement: Destination Card with High Contrast & Alt Text -->
-            <article class="card">
-                <img src="https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?auto=format&fit=crop&w=600&q=80" 
-                     alt="Bromo Tengger Semeru landscape with volcanoes and mist" class="card-img">
-                <div class="card-overlay">
-                    <div class="card-meta">
-                        <div>
-                            <h3 class="card-title">Bromo Tengger Semeru</h3>
-                            <div class="card-details">
-                                <span>📍 Probolinggo, East Java</span>
-                                <span>🛣️ 14km away</span>
-                            </div>
-                        </div>
-                        <div class="card-price">
-                            <span class="annotation">Improvement: Readability</span><br>
-                            <div class="price-val">$12k</div>
-                            <div style="font-size:10px; opacity:0.8">Per Trip</div>
-                        </div>
-                    </div>
+            <!-- GK -->
+            <div class="category-card bg-blue" role="button" tabindex="0" aria-label="General Knowledge Quiz - Beginner Level">
+                <div class="category-info">
+                    <h2 class="category-title">GK</h2>
+                    <span class="category-subtitle">Beginner</span>
                 </div>
-            </article>
-
-            <!-- Improvement: Skeleton Loading Indicator for dynamic content -->
-            <div class="section-header" style="margin-top: 10px;">
-                <h2 class="section-title">Recent Discoveries</h2>
-                <span class="annotation">New: Loading skeletons</span>
+                <div class="category-icon">🌍</div>
             </div>
-            <div class="skeleton-card" aria-hidden="true"></div>
-            <div class="skeleton-card" aria-hidden="true"></div>
-        </div>
+
+            <!-- SCIENCE -->
+            <div class="category-card bg-orange" role="button" tabindex="0" aria-label="Science Quiz - Beginner Level">
+                <div class="category-info">
+                    <h2 class="category-title">SCIENCE</h2>
+                    <span class="category-subtitle">Beginner</span>
+                </div>
+                <div class="category-icon">🔬</div>
+            </div>
+            
+            <div class="annotation">Imp: Simplified & Cohesive Gradient System</div>
+        </section>
 
         <!-- Navigation Bar -->
         <nav class="nav-bar">
-            <a href="#" class="nav-item active">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">Home</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">🗺️</span>
-                <span class="nav-label">Map</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">🔖</span>
-                <span class="nav-label">Saved</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">📅</span>
-                <span class="nav-label">Bookings</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Profile</span>
-            </a>
-            <div class="home-indicator"></div>
+            <div class="nav-item active" aria-label="Home">🏠</div>
+            <div class="nav-item" aria-label="Leaderboard">🏆</div>
+            <div class="nav-item" aria-label="Profile">👤</div>
+            <div class="nav-item" aria-label="Settings">⚙️</div>
         </nav>
+
+        <!-- Focus Indicator Instruction for Demo -->
+        <div style="position: absolute; bottom: 80px; width: 100%; text-align: center; pointer-events: none;">
+            <div class="annotation" style="background: rgba(0,0,0,0.7); color: white;">Try 'Tab' key to see Focus Indicators</div>
+        </div>
+
     </div>
 
+    <script>
+        // Adding simple interaction feedback script for accessibility/UX demo
+        document.querySelectorAll('.category-card, .action-card').forEach(item => {
+            item.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    item.click();
+                }
+            });
+            
+            item.addEventListener('click', () => {
+                // Simulating a load or action
+                console.log('Navigating to quiz...');
+            });
+        });
+    </script>
 </body>
 </html>

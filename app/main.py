@@ -71,7 +71,7 @@ async def analyze_and_wireframe(background_tasks: BackgroundTasks,file: UploadFi
             client_id
         )
 
-        # 3. Save everything to a single JSON for records
+        # Save everything to a single JSON for records
         final_data = {
             "evaluation_id": job_id,
             "feedback": feedback_report,

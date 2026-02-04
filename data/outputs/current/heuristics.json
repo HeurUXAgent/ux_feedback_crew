@@ -3,106 +3,125 @@
     {
       "heuristic_id": 1,
       "heuristic_name": "Visibility of system status",
-      "severity": "low",
-      "issue": "While active states for navigation and filters are visible, there's no indication of loading states or network activity for fetching content. If the 'Popular near you' section were loading, users would benefit from a spinner or skeleton loader.",
+      "severity": "medium",
+      "issue": "The UI description does not explicitly mention loading indicators or active feedback (e.g., press states, brief animations) when users tap on Action Cards or Category Cards. This can leave users uncertain if their action has registered or if the system is processing.",
       "affected_components": [
-        "Destination Card",
-        "Section Header (Popular near you)"
+        "Action Card (Redeem, Rate Us)",
+        "Category Card (MATHS, GK, SCIENCE)"
       ],
-      "improvement_suggestion": "Implement loading indicators (e.g., skeleton screens or spinners) for content areas while data is being fetched to keep the user informed.",
-      "user_impact": "Users might experience uncertainty about whether the app is working or if content is still loading, especially on slower connections, leading to impatience or repeated actions."
+      "improvement_suggestion": "Implement clear visual feedback for interactive elements upon tap, such as a subtle color change, a brief ripple effect, or a loading spinner when transitioning to a new screen or fetching content.",
+      "user_impact": "Users might experience uncertainty, repeated taps, or frustration if they don't immediately perceive that their interaction was successful, leading to a poorer user experience."
     },
     {
-      "heuristic_id": 10,
-      "heuristic_name": "Help and documentation",
+      "heuristic_id": 4,
+      "heuristic_name": "Consistency and standards",
       "severity": "low",
-      "issue": "No explicit help or documentation links (like an FAQ, 'How to use', or tooltips for complex features) are visible on the home screen.",
+      "issue": "There's an inconsistency in icon styling and coloring. Some icons are black outlines ('Redeem', 'Rate Us'), while others are illustrative and multi-colored ('MATHS', 'GK', 'SCIENCE' icons), and some are single-color functional icons with specific colors ('Money bag' in yellow, '27' in red). This creates a somewhat disparate visual language for icons.",
       "affected_components": [
-        "Overall UI"
+        "Redeem icon",
+        "Rate Us icon",
+        "Money bag with dollar signs icon",
+        "Category Card icons"
       ],
-      "improvement_suggestion": "Consider adding an easily accessible help section, perhaps within the profile screen (accessible via the bottom navigation bar), or contextual tooltips for less common features if any were present.",
-      "user_impact": "While the UI is largely intuitive, new or struggling users might not easily find assistance if they encounter an unfamiliar feature or problem."
+      "improvement_suggestion": "Establish a more consistent iconographic style guide across the application. This could involve using a consistent outline or filled style, and a more harmonized color palette for functional icons, perhaps tying into the app's primary accent colors.",
+      "user_impact": "Minor; it slightly detracts from the app's overall visual polish and might make the UI feel less cohesive, though it doesn't significantly hinder usability."
+    },
+    {
+      "heuristic_id": 8,
+      "heuristic_name": "Aesthetic and minimalist design",
+      "severity": "low",
+      "issue": "The extensive use of various strong gradient backgrounds (purple-pink, blue-light blue, red-orange for cards, plus a dark blue/purple system wallpaper gradient) on a single screen might make the UI feel visually busy rather than minimalist. While colorful, it risks overstimulation.",
+      "affected_components": [
+        "Action Card backgrounds",
+        "Category Card backgrounds",
+        "System background wallpaper"
+      ],
+      "improvement_suggestion": "Consider simplifying the color palette for gradients, perhaps by using fewer distinct gradient types, or by using more subtle gradients. Alternatively, allow the system background wallpaper to be a simpler solid color or a very subtle pattern to reduce visual noise.",
+      "user_impact": "Minor; some users might find the interface visually overwhelming or less 'clean,' which can detract from a sophisticated aesthetic, even if others find it engaging."
+    },
+    {
+      "heuristic_id": null,
+      "heuristic_name": "WCAG 2.1 - 1.4.4 Resize text / 1.4.10 Reflow",
+      "severity": "high",
+      "issue": "The 'accessibility_observations' explicitly state 'no visible indication of dynamic text scaling support.' This is a critical accessibility omission, meaning users who rely on increased system font sizes will not be able to adjust the text size within the application.",
+      "affected_components": [
+        "All text elements (app title, subtitle, card labels, category titles, category subtitles, points count)"
+      ],
+      "improvement_suggestion": "Ensure the application fully supports system-level dynamic text scaling, allowing users to adjust font sizes through their device's accessibility settings without breaking layout or readability.",
+      "user_impact": "Users with low vision or certain cognitive disabilities will be severely impacted, finding the app difficult or impossible to read and use, making the app inaccessible to a significant user group."
+    },
+    {
+      "heuristic_id": null,
+      "heuristic_name": "WCAG 2.1 - 2.4.3 Focus Order / 2.4.7 Focus Visible",
+      "severity": "medium",
+      "issue": "The UI description provides no information about keyboard navigation or visible focus indicators. For mobile apps, this is crucial for users who rely on assistive technologies like screen readers, switch access, or external keyboards.",
+      "affected_components": [
+        "All interactive components (Hamburger menu, Money bag, Redeem card, Rate Us card, Category Cards, System Navigation Bar)"
+      ],
+      "improvement_suggestion": "Ensure all interactive elements are focusable in a logical order (e.g., left-to-right, top-to-bottom) and provide clear visual focus indicators (e.g., a distinct border or highlight) when an element receives focus.",
+      "user_impact": "Users relying on keyboard navigation or assistive technologies will struggle to navigate the interface efficiently and understand which element is currently active, leading to frustration and potential inability to use the app."
     }
   ],
   "strengths": [
     {
-      "heuristic_id": 1,
-      "heuristic_name": "Visibility of system status",
-      "observation": "The UI clearly indicates the active state for the category filters (e.g., 'Montain' chip is distinct) and the current screen in the bottom navigation bar (Home icon is green). The system status bar also provides essential device information.",
-      "components": [
-        "System Status Bar",
-        "Category Filters",
-        "Bottom Navigation Bar"
-      ]
-    },
-    {
       "heuristic_id": 2,
       "heuristic_name": "Match between system and real world",
-      "observation": "The design uses familiar language ('Search destination,' 'Popular near you,' 'See more') and widely recognizable icons (map pin, magnifying glass, bell, house, user). The categories (Mountain, Beach, Urban) and destination details (location, distance, price) align with real-world travel concepts.",
+      "observation": "The UI uses familiar icons (hamburger menu, money bag, gift box, star) and clear, user-friendly language ('Quiz Pool', 'Redeem', 'MATHS', 'Beginner'). Illustrative category icons are descriptive and relatable to their content.",
       "components": [
-        "Header Section",
-        "Search/Location Bar",
-        "Category Filters",
-        "Section Header",
-        "Destination Card",
-        "Bottom Navigation Bar"
-      ]
-    },
-    {
-      "heuristic_id": 3,
-      "heuristic_name": "User control and freedom",
-      "observation": "The bottom navigation bar provides a clear 'emergency exit' to return to the Home screen or navigate to other primary sections. Filters allow users to easily change the content view. The overall navigation structure feels intuitive and reversible.",
-      "components": [
-        "Bottom Navigation Bar",
-        "Category Filters",
-        "Search/Location Bar"
+        "App Bar",
+        "Action Cards",
+        "Category Cards"
       ]
     },
     {
       "heuristic_id": 4,
       "heuristic_name": "Consistency and standards",
-      "observation": "The UI demonstrates high consistency in typography (bold for titles, regular for details, dark/medium gray for hierarchy), color usage (accent green, active states), icon style, and layout patterns (card-based content, fixed header/footer). It also adheres to iOS system UI standards (Dynamic Island, Home Indicator).",
+      "observation": "There is strong consistency in layout, spacing, and typography. Components maintain consistent vertical and horizontal margins/padding. The card-based UI is uniformly applied, and the typography hierarchy (large bold titles, smaller regular subtitles) is consistent.",
       "components": [
-        "Overall UI",
-        "Typography",
-        "Color Scheme",
-        "Layout Structure"
+        "Layout structure",
+        "Spacing and density",
+        "Typography"
       ]
     },
     {
       "heuristic_id": 6,
       "heuristic_name": "Recognition rather than recall",
-      "observation": "Key navigation options (bottom bar), filters, and search functionality are prominently visible on the screen. Destination cards immediately present all relevant information (image, title, location, distance, price), minimizing the need for users to recall details from previous interactions.",
+      "observation": "All essential actions and categories are prominently displayed and clearly labeled with both text and descriptive icons. This minimizes user memory load, allowing quick recognition of options and context.",
       "components": [
-        "Bottom Navigation Bar",
-        "Category Filters",
-        "Search/Location Bar",
-        "Destination Card"
-      ]
-    },
-    {
-      "heuristic_id": 7,
-      "heuristic_name": "Flexibility and efficiency of use",
-      "observation": "The search bar and category filters provide quick ways to narrow down content, catering to efficient browsing. The 'See more' button allows users to quickly expand a section, and the personalized header might offer shortcuts to account details.",
-      "components": [
-        "Search/Location Bar",
-        "Category Filters",
-        "Section Header",
-        "Header Section"
+        "App Bar",
+        "Action Cards",
+        "Category Cards"
       ]
     },
     {
       "heuristic_id": 8,
       "heuristic_name": "Aesthetic and minimalist design",
-      "observation": "The interface is clean and uncluttered, with generous use of white space that improves readability and visual comfort. Only essential information is presented on the screen, and a clear visual hierarchy is established through typography and layout, preventing information overload.",
+      "observation": "The UI exhibits a clear visual hierarchy with distinct groupings for information (App Bar, Action Cards, Category Cards). Good spacing and moderate density contribute to a generally clean and organized appearance, even with the colorful gradients.",
       "components": [
-        "Overall UI",
-        "Layout Structure",
-        "Spacing and Density",
+        "Overall layout",
+        "Spacing and density",
         "Typography"
+      ]
+    },
+    {
+      "heuristic_id": null,
+      "heuristic_name": "WCAG 2.1 - 1.4.3 Contrast (Minimum)",
+      "observation": "Good contrast is observed for primary text on the app bar (white text on teal) and for black text on white backgrounds (Action Card labels). The contrast for white text on gradient backgrounds is noted as 'appears acceptable' but requires verification.",
+      "components": [
+        "App Bar (title, subtitle)",
+        "Action Card labels"
+      ]
+    },
+    {
+      "heuristic_id": null,
+      "heuristic_name": "WCAG 2.1 - 2.5.5 Target Size",
+      "observation": "The card-based layout naturally provides large and distinct tap targets for all interactive elements (Action Cards, Category Cards), significantly improving usability for users with motor impairments and all general users.",
+      "components": [
+        "Action Cards",
+        "Category Cards"
       ]
     }
   ],
-  "overall_score": 8.5,
-  "summary": "This mobile UI demonstrates a strong adherence to Nielsen's Usability Heuristics, particularly excelling in consistency, recognition over recall, and aesthetic design. The use of familiar language, recognizable icons, and a clear visual hierarchy makes the app intuitive and easy to navigate for discovering travel destinations. Active states for interactive elements keep users informed of their current position and selections. While the screen doesn't explicitly show mechanisms for error prevention or recovery, this is common for a static home/discovery view. Minor areas for improvement include explicitly showing loading states for dynamic content and ensuring help documentation is easily accessible within the application. Overall, it's a well-designed interface that prioritizes user experience for its intended purpose."
+  "overall_score": 7.0,
+  "summary": "This mobile UI for 'Quiz Pool' presents a visually engaging and well-structured dashboard. It scores highly on clarity, consistency in layout, and the intuitive recognition of actions and content, largely thanks to its card-based design, clear labeling, and recognizable icons. The large tap targets are a significant strength for overall usability and accessibility. However, the UI has notable shortcomings, particularly in feedback mechanisms, which can leave users uncertain about system status. While colorful, the combination of multiple strong gradients and inconsistent icon styling slightly diminishes its minimalist aesthetic. More critically, the stated lack of dynamic text scaling support and unaddressed keyboard focus management are serious accessibility barriers that would prevent users with visual or motor impairments from effectively using the application, significantly impacting WCAG compliance and the overall UX score. Addressing these accessibility gaps and refining visual feedback would elevate the user experience considerably."
 }

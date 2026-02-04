@@ -1,302 +1,141 @@
 {
-  "screen_type": "Home/Discover Screen",
+  "screen_type": "Dashboard / Home Screen",
   "components": [
     {
-      "name": "System Status Bar",
-      "type": "System UI",
-      "elements": [
-        {
-          "name": "Time",
-          "value": "9:41"
-        },
-        {
-          "name": "Dynamic Island",
-          "description": "iOS feature"
-        },
-        {
-          "name": "Connectivity Icons",
-          "value": "Cellular signal, Wi-Fi"
-        },
-        {
-          "name": "Battery Icon",
-          "value": "Full charge"
-        }
-      ]
+      "type": "Status Bar",
+      "content": "Time (2:20), Network signal, WiFi, Battery (55%)",
+      "position": "Top"
     },
     {
-      "name": "Header Section",
-      "type": "App Bar",
-      "elements": [
-        {
-          "name": "User Profile Avatar",
-          "description": "Circular image of 'Annie January'"
-        },
-        {
-          "name": "User Name",
-          "value": "Annie January",
-          "typography_style": "Semi-bold, dark gray"
-        },
-        {
-          "name": "Account Status",
-          "value": "Basic account",
-          "typography_style": "Regular, medium gray"
-        },
-        {
-          "name": "Notification Icon",
-          "description": "Bell icon, outlined"
+      "type": "App Bar / Header",
+      "content": {
+        "left_icon": "Hamburger menu (three horizontal lines)",
+        "title": "Quiz Pool",
+        "subtitle": "Play Quiz Earn Money",
+        "right_element": {
+          "icon": "Money bag with dollar signs",
+          "text": "27"
         }
-      ]
-    },
-    {
-      "name": "Search/Location Bar",
-      "type": "Input Field",
-      "elements": [
-        {
-          "name": "Location Icon",
-          "description": "Green map pin icon"
-        },
-        {
-          "name": "Current Location",
-          "value": "Jombang, IDN",
-          "typography_style": "Regular, green"
-        },
-        {
-          "name": "Separator",
-          "description": "Vertical line"
-        },
-        {
-          "name": "Search Placeholder",
-          "value": "Search destnation,...",
-          "typography_style": "Regular, medium gray"
-        },
-        {
-          "name": "Search Icon",
-          "description": "Magnifying glass icon"
-        }
-      ]
-    },
-    {
-      "name": "Category Filters",
-      "type": "Horizontal Scrollable Chips",
-      "elements": [
-        {
-          "name": "Montain Chip",
-          "status": "Active",
-          "icon": "Sun/Mountain",
-          "label": "Montain",
-          "background_color": "Light gray"
-        },
-        {
-          "name": "Beach Chip",
-          "status": "Inactive",
-          "icon": "Beach",
-          "label": "Beach",
-          "background_color": "Transparent"
-        },
-        {
-          "name": "Urban Chip",
-          "status": "Inactive",
-          "icon": "Buildings",
-          "label": "Urban",
-          "background_color": "Transparent"
-        }
-      ]
-    },
-    {
-      "name": "Section Header",
-      "type": "Text with Action",
-      "elements": [
-        {
-          "name": "Section Title",
-          "value": "Popular near you",
-          "typography_style": "Semi-bold, dark gray",
-          "icon": "Fire emoji"
-        },
-        {
-          "name": "See More Button",
-          "value": "See more >",
-          "typography_style": "Regular, green"
-        }
-      ]
-    },
-    {
-      "name": "Destination Card",
-      "type": "Card (List Item)",
-      "instance_1": {
-        "elements": [
-          {
-            "name": "Image",
-            "description": "Scenic mountain landscape (Bromo Tengger Semeru)"
-          },
-          {
-            "name": "Title",
-            "value": "Bromo Tengger Semeru",
-            "typography_style": "Bold, dark gray"
-          },
-          {
-            "name": "Location Icon",
-            "description": "Map pin icon"
-          },
-          {
-            "name": "Location Text",
-            "value": "Probolinggo, East Java",
-            "typography_style": "Regular, medium gray"
-          },
-          {
-            "name": "Distance Icon",
-            "description": "Winding road/speed icon"
-          },
-          {
-            "name": "Distance Text",
-            "value": "14km",
-            "typography_style": "Regular, medium gray"
-          },
-          {
-            "name": "Price",
-            "value": "$12k/Trip",
-            "typography_style": "Regular, dark gray"
-          }
-        ]
       },
-      "instance_2": {
-        "elements": [
-          {
-            "name": "Image",
-            "description": "Scenic mountain landscape (Gunung Andong Magelang)"
-          },
-          {
-            "name": "Title",
-            "value": "Gunung Andong Magelang",
-            "typography_style": "Bold, dark gray"
-          },
-          {
-            "name": "Location Icon",
-            "description": "Map pin icon"
-          },
-          {
-            "name": "Location Text",
-            "value": "Magelang, East Java",
-            "typography_style": "Regular, medium gray"
-          },
-          {
-            "name": "Distance Icon",
-            "description": "Winding road/speed icon"
-          },
-          {
-            "name": "Distance Text",
-            "value": "14km",
-            "typography_style": "Regular, medium gray"
-          },
-          {
-            "name": "Price",
-            "value": "$9k/Trip",
-            "typography_style": "Regular, dark gray"
-          }
-        ]
-      }
+      "position": "Below Status Bar",
+      "style": "Teal background, white text"
     },
     {
-      "name": "Bottom Navigation Bar",
-      "type": "Tab Bar",
-      "elements": [
-        {
-          "name": "Home Icon",
-          "status": "Active",
-          "icon": "House",
-          "background_color": "Green"
-        },
-        {
-          "name": "Map Icon",
-          "status": "Inactive",
-          "icon": "Map"
-        },
-        {
-          "name": "Bookmarks/Saved Icon",
-          "status": "Inactive",
-          "icon": "Stacked papers"
-        },
-        {
-          "name": "Calendar/Bookings Icon",
-          "status": "Inactive",
-          "icon": "Calendar"
-        },
-        {
-          "name": "Profile Icon",
-          "status": "Inactive",
-          "icon": "User"
-        }
-      ]
+      "type": "Action Card",
+      "label": "Redeem",
+      "icon": "Gift box outline",
+      "background": "Purple gradient",
+      "position": "Content area, top-left"
     },
     {
-      "name": "Home Indicator",
-      "type": "System UI",
-      "description": "iOS gesture bar"
+      "type": "Action Card",
+      "label": "Rate Us",
+      "icon": "Star outline",
+      "background": "Blue gradient",
+      "position": "Content area, top-right"
+    },
+    {
+      "type": "Category Card",
+      "title": "MATHS",
+      "subtitle": "Beginner",
+      "icon": "Illustrative icon related to math (symbols, book)",
+      "background": "Purple gradient",
+      "position": "Content area, stacked"
+    },
+    {
+      "type": "Category Card",
+      "title": "GK",
+      "subtitle": "Beginner",
+      "icon": "Illustrative icon related to general knowledge (person with glasses, laptop, speech bubble)",
+      "background": "Blue gradient",
+      "position": "Content area, stacked"
+    },
+    {
+      "type": "Category Card",
+      "title": "SCIENCE",
+      "subtitle": "Beginner",
+      "icon": "Illustrative icon related to science (microscope, gears, test tube)",
+      "background": "Red/Orange gradient",
+      "position": "Content area, stacked"
+    },
+    {
+      "type": "System Navigation Bar",
+      "content": "Back, Home, Recent Apps buttons",
+      "position": "Bottom"
     }
   ],
-  "layout_structure": "The screen features a top-down vertical stacking layout. It starts with a fixed header (user profile, notifications) and a search/location bar. Below this is a horizontal scrollable row of category filter chips. The main content area consists of a vertically scrolling list of large, full-width destination cards. Each card has an image occupying the top portion and an overlayed text box at the bottom, containing the title, location, distance, and price. A fixed bottom navigation bar provides primary app navigation.",
+  "layout_structure": "The screen follows a vertical stacking layout. The App Bar is fixed at the top. Below it, two 'Action Cards' are arranged side-by-side in a 2-column grid. The main content area features 'Category Cards' stacked vertically, each taking up the full width (with horizontal padding). There is consistent vertical spacing between all cards and elements, and consistent horizontal padding on the main content.",
   "color_scheme": {
-    "primary_background": "#FFFFFF (White)",
-    "primary_text": "#333333 (Dark Gray/Black)",
-    "secondary_text": "#888888 (Medium Gray)",
-    "accent_color": "#6B8E23 (Olive Green)",
-    "inactive_element_color": "#AAAAAA (Light Gray)",
-    "active_chip_background": "#F0F0F0 (Very Light Gray)",
-    "system_status_bar_text": "#000000 (Black)",
-    "card_image_dominance": "Natural tones (greens, browns, whites, blues)"
+    "primary_accent": "#3fcfd9 (Teal/Cyan)",
+    "background_primary": "#FFFFFF (White)",
+    "text_primary": "#FFFFFF (White) on App Bar and Category Cards",
+    "text_secondary": "#000000 (Black) on Action Cards",
+    "gradient_accents": {
+      "purple_pink": "Used for Redeem and MATHS cards",
+      "blue_light_blue": "Used for Rate Us and GK cards",
+      "red_orange": "Used for SCIENCE card"
+    },
+    "icon_colors": "Black outlines for Redeem/Rate Us, multi-color illustrations for categories, red for score count, yellow for money icon.",
+    "system_background_wallpaper": "Dark blue/purple gradient"
   },
   "typography": {
-    "font_family": "Sans-serif (likely system default like San Francisco or similar modern sans-serif)",
-    "weights_used": [
-      {
-        "purpose": "Headings, User Name, Destination Titles",
-        "weight": "Bold/Semi-bold"
-      },
-      {
-        "purpose": "Body Text, Search Placeholder, Location Details, Price",
-        "weight": "Regular"
-      }
-    ],
-    "sizes_used": [
-      {
-        "purpose": "Destination Titles",
-        "size_category": "Large"
-      },
-      {
-        "purpose": "User Name, Section Titles",
-        "size_category": "Medium"
-      },
-      {
-        "purpose": "Account Status, Location/Distance, Category Names, 'See more'",
-        "size_category": "Small"
-      },
-      {
-        "purpose": "Price per trip",
-        "size_category": "Very Small"
-      }
-    ],
-    "color_for_hierarchy": "Darker shades for primary information, lighter grays for secondary details."
+    "font_family": "Sans-serif (likely Roboto or similar system default)",
+    "app_title": {
+      "text": "Quiz Pool",
+      "size": "Large",
+      "weight": "Bold",
+      "color": "White"
+    },
+    "app_subtitle": {
+      "text": "Play Quiz Earn Money",
+      "size": "Medium",
+      "weight": "Regular",
+      "color": "White"
+    },
+    "action_card_labels": {
+      "text": "Redeem, Rate Us",
+      "size": "Medium",
+      "weight": "Regular",
+      "color": "Black"
+    },
+    "category_titles": {
+      "text": "MATHS, GK, SCIENCE",
+      "size": "Large",
+      "weight": "Bold",
+      "color": "White",
+      "case": "Uppercase"
+    },
+    "category_subtitles": {
+      "text": "Beginner",
+      "size": "Small",
+      "weight": "Regular",
+      "color": "White"
+    },
+    "points_count": {
+      "text": "27",
+      "size": "Medium",
+      "weight": "Bold",
+      "color": "Red"
+    }
   },
   "spacing_and_density": {
-    "vertical_spacing": "Generous padding between major sections (header, search, filters, content cards). Noticeable vertical margins between destination cards.",
-    "horizontal_padding": "Consistent and moderate padding on left and right edges, preventing elements from touching screen boundaries.",
-    "element_density": "Overall a relatively open layout, not overly dense. Elements within components (e.g., card text overlay) are compact but readable. Category chips have good internal padding.",
-    "touch_target_size": "Generally sufficient for interactive elements like buttons, chips, and navigation icons."
+    "overall_density": "Moderate, with clear separation between components.",
+    "padding": "Consistent horizontal padding applied to content within the main area. Internal padding within cards ensures content is not too close to edges.",
+    "margins": "Consistent vertical margins between cards and app bar. The top action cards have horizontal margins separating them.",
+    "hit_areas": "Card-based design provides large and distinct tap targets for actions and category selection."
   },
   "accessibility_observations": [
-    "Good contrast for primary text on white background. Secondary gray text appears readable.",
-    "Interactive elements (profile, notification, search, chips, bottom nav icons) generally have adequate touch target sizes.",
-    "Clear visual hierarchy established through varied font sizes, weights, and color usage.",
-    "Icons are mostly self-explanatory or accompanied by text labels (e.g., category chips, bottom nav icons, search bar icons).",
-    "Potential for improvement: Ensure images on destination cards have appropriate alt text for screen readers."
+    "Good contrast for primary text on the app bar and black text on white backgrounds.",
+    "Contrast for white text on gradient backgrounds (e.g., 'MATHS' on purple gradient) appears acceptable but should be verified with accessibility tools.",
+    "Large tap targets provided by the card-based layout improve usability for users with motor impairments.",
+    "Icons are generally clear and descriptive.",
+    "Font sizes for main titles and labels appear readable, but there's no visible indication of dynamic text scaling support."
   ],
   "notable_patterns": [
-    "Card-based UI for presenting discoverable content, a common pattern for lists of items with rich media.",
-    "Bottom navigation bar for primary global navigation.",
-    "Personalized header with user name and profile avatar, enhancing user engagement.",
-    "Combined search and filter functionality at the top for easy content discovery.",
-    "Use of accent color (green) to highlight active states and important actions.",
-    "Familiar iconography across the interface, aiding usability.",
-    "Implied horizontal scrolling for category filters, indicated by the number of visible chips and the general design pattern.",
-    "iOS-specific system UI elements (Dynamic Island, Home Indicator) indicate the target platform."
+    "Card-based UI design for organizing actions and content categories.",
+    "Extensive use of colorful gradient backgrounds to differentiate sections and add visual appeal.",
+    "Illustrative, topic-specific icons/artwork for each quiz category.",
+    "Standard hamburger menu for navigation.",
+    "Prominent display of user points/currency in the app bar, common in gamified apps."
   ]
 }
