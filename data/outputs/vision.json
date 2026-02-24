@@ -1,0 +1,254 @@
+{
+  "screen_type": "Social Media Feed / Home Screen",
+  "components": [
+    {
+      "name": "Status Bar",
+      "type": "system_component",
+      "elements": [
+        {
+          "label": "Time",
+          "value": "21:05"
+        },
+        {
+          "label": "Network/Signal",
+          "value": "4G"
+        },
+        {
+          "label": "Battery Percentage",
+          "value": "42"
+        }
+      ],
+      "description": "Displays system information at the top of the screen."
+    },
+    {
+      "name": "App Header",
+      "type": "header",
+      "elements": [
+        {
+          "label": "Facebook Logo",
+          "value": "facebook",
+          "icon": false
+        },
+        {
+          "label": "Create Post/Story Icon",
+          "icon_name": "Plus",
+          "action": "Navigate to content creation"
+        },
+        {
+          "label": "Search Icon",
+          "icon_name": "Search",
+          "action": "Open search interface"
+        },
+        {
+          "label": "Messenger Icon",
+          "icon_name": "Chat Bubble",
+          "badge": "9+",
+          "action": "Open Messenger app/section"
+        }
+      ],
+      "description": "Persistent top bar with brand logo and global actions."
+    },
+    {
+      "name": "Story/Post Creation Bar",
+      "type": "input_section",
+      "elements": [
+        {
+          "label": "User Profile Picture",
+          "image_content": "Woman in floral dress"
+        },
+        {
+          "label": "Text Input Hint",
+          "value": "What's on your mind?",
+          "action": "Tap to create a new post"
+        },
+        {
+          "label": "Gallery Icon",
+          "icon_name": "Image",
+          "action": "Select image/video for post"
+        }
+      ],
+      "description": "Area for quick content creation, showing user's profile and a prompt."
+    },
+    {
+      "name": "Stories Carousel",
+      "type": "horizontal_scroll_list",
+      "elements": [
+        {
+          "label": "Create Story Card",
+          "icon_name": "Plus",
+          "text": "Create story",
+          "action": "Start creating a new story"
+        },
+        {
+          "label": "User Story Card",
+          "profile_name": "Harindu Samarasinghe",
+          "image_content": "Group celebrating",
+          "action": "View Harindu's story"
+        },
+        {
+          "label": "User Story Card",
+          "profile_name": "Prabhath Madhusanka",
+          "image_content": "Man in gym",
+          "action": "View Prabhath's story"
+        },
+        {
+          "label": "User Story Card",
+          "profile_name": "Anuda Pasandul",
+          "image_content": "Valentine's themed ad",
+          "action": "View Anuda's story (partially visible)"
+        }
+      ],
+      "description": "Horizontally scrollable section displaying user stories, with an option to create a new one."
+    },
+    {
+      "name": "News Feed Post",
+      "type": "content_card",
+      "elements": [
+        {
+          "label": "Post Header",
+          "elements": [
+            {
+              "label": "Author Profile Picture",
+              "value": "Babuku"
+            },
+            {
+              "label": "Author Name",
+              "value": "Babuku - බබුකු"
+            },
+            {
+              "label": "Timestamp and Privacy",
+              "value": "5h • 🌍"
+            },
+            {
+              "label": "More Options Icon",
+              "icon_name": "Three Dots",
+              "action": "Open post options menu"
+            },
+            {
+              "label": "Dismiss Post Icon",
+              "icon_name": "X",
+              "action": "Hide or report post"
+            }
+          ]
+        },
+        {
+          "label": "Reactions",
+          "elements": [
+            {
+              "label": "Emoji Reaction",
+              "value": "😭 (Sad face)"
+            },
+            {
+              "label": "Emoji Reaction",
+              "value": "❤️ (Red Heart)"
+            }
+          ]
+        },
+        {
+          "label": "Post Image",
+          "image_content": "Woman putting money in pocket, children watching"
+        },
+        {
+          "label": "Post Caption",
+          "value": "Multiline text in Sinhala script"
+        }
+      ],
+      "description": "A single post in the news feed, including author info, reactions, media, and caption."
+    },
+    {
+      "name": "Bottom Navigation Bar",
+      "type": "navigation_bar",
+      "elements": [
+        {
+          "label": "Home",
+          "icon_name": "Home",
+          "status": "active",
+          "action": "Navigate to Home Feed"
+        },
+        {
+          "label": "Reels",
+          "icon_name": "Play",
+          "action": "Navigate to Reels section"
+        },
+        {
+          "label": "Friends",
+          "icon_name": "People",
+          "badge": "1",
+          "action": "Navigate to Friends section"
+        },
+        {
+          "label": "Marketplace",
+          "icon_name": "Shop",
+          "action": "Navigate to Marketplace"
+        },
+        {
+          "label": "Notifications",
+          "icon_name": "Bell",
+          "badge": "2",
+          "action": "Navigate to Notifications"
+        },
+        {
+          "label": "Menu",
+          "icon_name": "Hamburger",
+          "action": "Open main menu"
+        }
+      ],
+      "description": "Persistent navigation at the bottom for quick access to core app sections."
+    }
+  ],
+  "layout_structure": "The screen follows a top-to-bottom vertical stacking layout for its main sections: Status Bar, App Header, Story/Post Creator, Stories Carousel, and News Feed posts. The Stories Carousel introduces a horizontal scrolling dimension within its section. The Bottom Navigation Bar is fixed horizontally at the bottom of the screen. Within the App Header and Story/Post Creator, elements are arranged horizontally. News Feed posts are structured vertically, with a distinct header, reactions, media, and caption stacked within each post block.",
+  "color_scheme": {
+    "primary_background": "#FFFFFF (White)",
+    "primary_brand_color": "#1877F2 (Facebook Blue) - used for logo, active home icon, create story button",
+    "text_colors": {
+      "primary": "#1C1E21 (Dark Grey/Black) - for main text like time, names, captions",
+      "secondary": "#65676B (Medium Grey) - for hints, timestamps",
+      "accent": "#FFFFFF (White) - for text on blue/red backgrounds (badges)"
+    },
+    "accent_colors": {
+      "notification_badge": "#EB3E3E (Red)",
+      "create_story_button": "#1877F2 (Facebook Blue)",
+      "emoji_reactions": "Standard emoji colors"
+    },
+    "separator_lines": "#DADDE1 (Light Grey)"
+  },
+  "typography": {
+    "font_family": "Sans-serif (likely system font or FB Sans)",
+    "font_sizes_relative": {
+      "large": "Facebook logo",
+      "medium_large": "What's on your mind? hint",
+      "medium": "User names, post captions, bottom nav labels",
+      "small": "Timestamps, notification badge numbers"
+    },
+    "font_weights": {
+      "bold": "Facebook logo, possibly user names",
+      "regular": "Most other text content"
+    },
+    "text_alignment": "Left-aligned for most text, center-aligned for bottom navigation labels under icons."
+  },
+  "spacing_and_density": {
+    "vertical_spacing": "Generous spacing between major sections (header, story creator, stories, post). Each post in the feed is a distinct block with internal padding. Bottom navigation is compact.",
+    "horizontal_spacing": "Consistent padding from screen edges. Elements within the header and bottom nav are evenly distributed. Stories carousel items have a moderate gap.",
+    "density": "The header and story creator sections are moderately dense. The stories carousel is dense horizontally. The news feed post is vertically dense, especially due to the large image. The bottom navigation bar is quite dense with six items.",
+    "whitespace_usage": "Effective use of whitespace around the logo, search bar, and post components to improve readability and visual hierarchy."
+  },
+  "accessibility_observations": [
+    "Good color contrast for primary text on white backgrounds.",
+    "Interactive elements (icons, buttons) appear to have adequate tap target sizes.",
+    "Notification badges use both color (red) and numerical indicators, aiding users with color vision deficiencies.",
+    "Text sizes are varied, with primary content being readable, though some smaller text (e.g., bottom nav labels) might be challenging for users with visual impairments without scaling options.",
+    "Localization is evident with Sinhala text, enhancing accessibility for native speakers.",
+    "Standard and recognizable icon usage improves comprehension."
+  ],
+  "notable_patterns": [
+    "Standard social media feed (infinite scroll implied).",
+    "Persistent header with brand, search, and core actions.",
+    "Persistent bottom navigation bar for primary app sections.",
+    "Horizontal 'Stories' carousel for ephemeral content.",
+    "Circular profile pictures for user identity.",
+    "Notification badges on icons.",
+    "Card-based layout for individual stories and posts.",
+    "Emoji-based reactions directly visible on posts.",
+    "Input field with 'What's on your mind?' prompt for content creation."
+  ]
+}

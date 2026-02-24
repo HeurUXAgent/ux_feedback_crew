@@ -8,6 +8,7 @@ import shutil
 from src.ws_manager import manager
 from fastapi import WebSocket, WebSocketDisconnect
 from starlette.concurrency import run_in_threadpool
+from app.services.s3_service import upload_image_to_s3
 # Import from your pipeline bridge
 # (
 #     run_evaluation_pipeline,
@@ -52,46 +53,90 @@ def cleanup_files(*paths: Path):
         except Exception as e:
             print(f"Cleanup error: {e}")
 
-@app.post("/analyze-and-wireframe/{client_id}")
-async def analyze_and_wireframe(background_tasks: BackgroundTasks,file: UploadFile = File(...), client_id: str = ""):
+# # parsing the image as bytes
+# @app.post("/analyze-and-wireframe/{client_id}")
+# async def analyze_and_wireframe(background_tasks: BackgroundTasks,file: UploadFile = File(...), client_id: str = ""):
+#     try:
+#         job_id = str(uuid.uuid4())
+#         upload_path = UPLOAD_DIR / f"{job_id}.png"
+
+#         with open(upload_path, "wb") as f:
+#             f.write(await file.read())
+
+#         await manager.send_progress(client_id, "Initializing Agents...", 0)
+
+#         # Run the consolidated pipeline 
+#         # This returns the report and the wireframe in one execution
+#         feedback_report, wireframe_output = await run_in_threadpool(
+#             run_full_ux_pipeline, 
+#             str(upload_path), 
+#             client_id
+#         )
+
+#         # Save everything to a single JSON for records
+#         final_data = {
+#             "evaluation_id": job_id,
+#             "feedback": feedback_report,
+#             "wireframe": wireframe_output
+#         }
+        
+#         job_id = str(uuid.uuid4())
+#         upload_path = UPLOAD_DIR / f"{job_id}.png"
+#         result_json_path = OUTPUT_DIR / f"{job_id}_result.json"
+
+#         with open(result_json_path, "w") as f:
+#             json.dump(final_data, f, indent=2)
+
+#         background_tasks.add_task(cleanup_files, upload_path, result_json_path)
+
+#         # Return everything to Flutter in one response
+#         return final_data
+    
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"System Error: {str(e)}")
+    
+    # parsing the image as bytes and then uploading to S3
+@app.post("/analyze-and-wireframe-s3/{client_id}")
+async def analyze_and_wireframe_s3(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    client_id: str = ""
+):
     try:
         job_id = str(uuid.uuid4())
-        upload_path = UPLOAD_DIR / f"{job_id}.png"
 
-        with open(upload_path, "wb") as f:
-            f.write(await file.read())
+        # 🔹 Upload image directly to S3
+        await manager.send_progress(client_id, "Uploading image to S3...", 5)
+        image_url = await upload_image_to_s3(file)
 
-        await manager.send_progress(client_id, "Initializing Agents...", 0)
+        await manager.send_progress(client_id, "Initializing Agents...", 10)
 
-        # Run the consolidated pipeline 
-        # This returns the report and the wireframe in one execution
+        # 🔹 Run pipeline with S3 URL instead of local path
         feedback_report, wireframe_output = await run_in_threadpool(
-            run_full_ux_pipeline, 
-            str(upload_path), 
+            run_full_ux_pipeline,
+            image_url,   # ← pass URL instead of file path
             client_id
         )
 
-        # Save everything to a single JSON for records
         final_data = {
             "evaluation_id": job_id,
+            "image_url": image_url,
             "feedback": feedback_report,
             "wireframe": wireframe_output
         }
-        
-        job_id = str(uuid.uuid4())
-        upload_path = UPLOAD_DIR / f"{job_id}.png"
+
         result_json_path = OUTPUT_DIR / f"{job_id}_result.json"
 
         with open(result_json_path, "w") as f:
             json.dump(final_data, f, indent=2)
 
-        background_tasks.add_task(cleanup_files, upload_path, result_json_path)
+        background_tasks.add_task(cleanup_files, result_json_path)
 
-        # Return everything to Flutter in one response
         return final_data
-    
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"System Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"S3 Pipeline Error: {str(e)}")
+
     
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):

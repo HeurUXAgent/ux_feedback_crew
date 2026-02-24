@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OUTPUT_DIR = Path("data/outputs/current")
+OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 @tool("create_wireframe")
@@ -41,7 +41,7 @@ IMPROVEMENTS TO IMPLEMENT:
 
 **Requirements:**
 
-1. **Mobile-first design** (max-width: 375px, scale up for display)
+1. **Mobile-first design** (360px*800px, scale up for display)
 2. **Implement ALL feedback suggestions:**
    - Fix color contrast issues
    - Adjust typography sizes

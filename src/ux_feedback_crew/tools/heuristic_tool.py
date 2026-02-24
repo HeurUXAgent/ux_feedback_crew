@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OUTPUT_DIR = Path("data/outputs/current")
+OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -60,8 +60,7 @@ def evaluate_heuristics(vision_analysis: str) -> str:
         heuristics_list = []
 
     prompt = f"""
-TASK: Evaluate this mobile UI against Nielsen's 10 Usability Heuristics and WCAG2 guidelines. 
-Identify specific violations and strengths, and provide an overall UX score (1-10).
+TASK: Evaluate this mobile UI against Nielsen's 10 Usability Heuristics
 
 UI ANALYSIS:
 {vision_analysis}

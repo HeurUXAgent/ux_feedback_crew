@@ -7,10 +7,11 @@ import os
 import io
 import json
 import re
+import requests
 
 load_dotenv()
 
-OUTPUT_DIR = Path("data/outputs/current")
+OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -58,7 +59,17 @@ def analyze_ui_screenshot(image_path: str) -> str:
 
     client = genai.Client(api_key=api_key)
 
-    img = Image.open(image_path)
+    # img = Image.open(image_path)
+    # img_bytes = io.BytesIO()
+    # img.save(img_bytes, format=img.format or "PNG")
+    # 🔹 Support both local path and S3 URL
+    if image_path.startswith("http"):
+        response = requests.get(image_path)
+        response.raise_for_status()
+        img = Image.open(io.BytesIO(response.content))
+    else:
+        img = Image.open(image_path)
+
     img_bytes = io.BytesIO()
     img.save(img_bytes, format=img.format or "PNG")
 

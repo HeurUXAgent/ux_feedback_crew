@@ -8,5 +8,6 @@ uvicorn
 python-multipart
 pydantic
 setuptools
-
+boto3
+botocore
 

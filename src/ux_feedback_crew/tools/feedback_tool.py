@@ -10,7 +10,7 @@ from crewai.tools import tool
 
 load_dotenv()
 
-OUTPUT_DIR = Path("data/outputs/current")
+OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- HELPER METHODS ---

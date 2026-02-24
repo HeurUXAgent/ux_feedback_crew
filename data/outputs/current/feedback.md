@@ -3,9 +3,9 @@
 ---
 
 ## 📊 Summary
-- **Total Issues:** 5
-- **High Priority:** 1
-- **Medium Priority:** 2
+- **Total Issues:** 7
+- **High Priority:** 2
+- **Medium Priority:** 3
 - **Low Priority:** 2
 - **Estimated Effort:** Medium
 
@@ -13,86 +13,113 @@
 
 ## ⚡ Quick Wins
 
-- **Add a simple ripple effect on card taps.** — Provides immediate visual feedback for user interaction, improving perceived responsiveness. (Effort: Very Small)
-- **Ensure sufficient contrast for white text on gradient backgrounds.** — Improves readability and accessibility for all users, particularly those with visual impairments. (Effort: Very Small)
+- **Improve contrast on 'Beginner' subtitle on gradient backgrounds.** — Improved readability and accessibility. (Effort: Very Small)
+- **Use consistent styling for all buttons.** — Improved consistency and aesthetics. (Effort: Small)
 
 ---
 
 ## 🔧 Detailed Recommendations
 
-### Implement Dynamic Text Scaling
+### Implement tap feedback for interactive elements
+**Priority:** high | **Effort:** Small
+
+**Why it matters:**
+Users need to know if their taps are registering. Lack of feedback leads to uncertainty and frustration, especially with network delays.
+
+**Implementation Steps:**
+- Add a subtle visual cue (e.g., ripple effect, slight color change, animation) upon tapping any interactive element like Action Cards, Category Cards, Hamburger Menu, and the Money Bag icon.
+- Ensure the feedback is immediate and clearly visible to the user.
+
+**Wireframe changes:** Add a note to the wireframe showing visual feedback states for all touch targets.  Specify the type of feedback (color change, animation, etc.).
+
+---
+
+### Introduce loading indicators for content fetching
 **Priority:** high | **Effort:** Medium
 
 **Why it matters:**
-Users with low vision or cognitive disabilities will be unable to use the app effectively if they cannot adjust text sizes via their system settings. This violates WCAG 2.1 guidelines (1.4.4 Resize text / 1.4.10 Reflow) and makes the app inaccessible to a significant user group.
+Users need to understand when content is loading. Without indicators, the app can appear frozen, leading to a poor user experience.
 
 **Implementation Steps:**
-- Implement support for dynamic text scaling using platform-specific APIs (e.g., `adjustsFontSizeToFitWidth` in iOS, `AutoSizeTextType` in Android).
-- Test the application with various system font sizes to ensure text reflows correctly and the layout remains usable.
-- Verify that all text elements, including titles, subtitles, labels, and points count, respond appropriately to text size changes.
+- Implement skeleton loaders or progress indicators when new category content or quiz data is being fetched.
+- Use a determinate progress bar when the loading progress can be accurately tracked, and an indeterminate progress bar when it cannot.
+- Ensure the loading indicators are visually consistent with the app's overall design.
 
-**Wireframe changes:** N/A (Implementation focused)
+**Wireframe changes:** Add skeleton loading states or progress bar visuals to the wireframes for Category Cards and other areas where data is fetched dynamically.
 
 ---
 
-### Implement Keyboard Navigation and Visible Focus Indicators
-**Priority:** medium | **Effort:** Medium
-
-**Why it matters:**
-Users relying on keyboard navigation, screen readers, or switch access require clear focus indicators to navigate the interface. Lack of keyboard support and focus indicators violates WCAG 2.1 guidelines (2.4.3 Focus Order / 2.4.7 Focus Visible) and makes the app unusable for these users.
-
-**Implementation Steps:**
-- Ensure all interactive elements (Hamburger menu, Money bag, Redeem card, Rate Us card, Category Cards, System Navigation Bar) are focusable using the tab key or equivalent.
-- Define a logical tab order for elements, typically following a left-to-right, top-to-bottom flow.
-- Implement clear and consistent visual focus indicators (e.g., a distinct border or highlight) when an element is focused.
-- Test keyboard navigation and focus visibility with a screen reader to ensure accessibility.
-
-**Wireframe changes:** N/A (Implementation focused)
-
----
-
-### Provide Visual Feedback on User Interactions
+### Implement confirmation dialog for 'Redeem' action
 **Priority:** medium | **Effort:** Small
 
 **Why it matters:**
-Lack of visual feedback when tapping on Action Cards or Category Cards leaves users uncertain if their actions have been registered. This violates the 'Visibility of system status' heuristic and can lead to frustration and repeated taps.
+Redeeming virtual currency is potentially irreversible. A confirmation dialog prevents accidental actions and user dissatisfaction.
 
 **Implementation Steps:**
-- Add a subtle visual feedback effect when users tap on interactive elements.
-- Consider using a brief color change, a ripple effect, or a slight scaling animation.
-- Implement a loading spinner or progress indicator if transitioning to a new screen or fetching content takes more than a few milliseconds.
+- Add a confirmation dialog before processing the 'Redeem' action.
+- The dialog should clearly state the action being performed and the consequences (e.g., 'Are you sure you want to redeem [amount] for [item]?').
+- Provide 'Confirm' and 'Cancel' options.
 
-**Wireframe changes:** N/A (Micro-interaction design)
+**Wireframe changes:** Add a wireframe for the 'Redeem' confirmation dialog, showing the message and confirmation/cancel buttons.
 
 ---
 
-### Standardize Iconography
-**Priority:** low | **Effort:** Small
+### Clearly disable 'QUIZ' button when unavailable
+**Priority:** medium | **Effort:** Small
 
 **Why it matters:**
-Inconsistent icon styling and coloring (black outlines vs. multi-colored illustrations) creates a disparate visual language and reduces the app's overall polish. This violates the 'Consistency and standards' heuristic.
+Users need to understand when a quiz is not available. Ambiguous button states lead to confusion and frustration.
 
 **Implementation Steps:**
-- Establish a consistent iconographic style guide across the application.
-- Choose either an outline or filled style for all icons.
-- Harmonize the color palette for functional icons, potentially using the app's primary accent colors.
+- If a quiz is not available for a category, the 'QUIZ' button should be clearly disabled (e.g., grayed out, with a different appearance).
+- Add a tooltip or short explanation when hovering over or tapping the disabled button (e.g., 'Quiz unavailable').
 
-**Wireframe changes:** Update icon styles in design files
+**Wireframe changes:** Add a wireframe state for the Category Card showing the disabled 'QUIZ' button and tooltip.
 
 ---
 
-### Simplify Color Palette for Gradients
-**Priority:** low | **Effort:** Small
+### Implement user-friendly error messages
+**Priority:** medium | **Effort:** Medium
 
 **Why it matters:**
-The extensive use of various strong gradient backgrounds might make the UI feel visually busy and overwhelming, violating the 'Aesthetic and minimalist design' heuristic.
+Clear error messages help users understand and recover from problems.
 
 **Implementation Steps:**
-- Reduce the number of distinct gradient types used.
-- Use more subtle gradients.
-- Allow the system background wallpaper to be a simpler solid color or subtle pattern to reduce visual noise.
+- Implement user-friendly error messages that clearly state what went wrong, why it happened (if possible), and suggest actionable steps for recovery (e.g., 'Network error. Please check your connection and try again.').
+- Ensure error messages are displayed prominently and are visually distinct from other UI elements.
+- Log errors for debugging purposes.
 
-**Wireframe changes:** Adjust gradient colors and background in design files
+**Wireframe changes:** Add wireframe examples of common error message displays (e.g., network error, redemption failure) within the application context.
+
+---
+
+### Implement advanced interaction patterns (long-press)
+**Priority:** low | **Effort:** Medium
+
+**Why it matters:**
+Power users benefit from shortcuts. Long-press can provide quicker access to frequently used features.
+
+**Implementation Steps:**
+- Consider adding long-press functionality to Category Cards (e.g., long-press for 'Play Random Quiz').
+- Consider swipe gestures for navigation if this is a multi-screen application.
+- Make sure these features don't interfere with the core functionality of single-tap interactions.
+
+**Wireframe changes:** Add a wireframe showing the UI response to a long-press action on a Category Card (e.g., displaying a context menu with 'Play Random Quiz').
+
+---
+
+### Implement a 'Help' or 'FAQ' section
+**Priority:** low | **Effort:** Medium
+
+**Why it matters:**
+Help documentation assists users, especially new ones or those encountering problems.
+
+**Implementation Steps:**
+- Ensure a 'Help' or 'FAQ' section is easily accessible, likely via the Hamburger Menu.
+- Populate the section with frequently asked questions and troubleshooting guides.
+- Keep the content up-to-date.
+
+**Wireframe changes:** Create wireframes for the 'Help' section, including the layout and example content.
 
 ---
 

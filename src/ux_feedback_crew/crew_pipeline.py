@@ -1,8 +1,16 @@
 from ux_feedback_crew.crew import UxFeedbackCrew
 
 def run_full_ux_pipeline(image_path: str, client_id: str):
+    if image_path.startswith("http"):
+        image_source = image_path  # S3 URL
+    else:
+        image_source = image_path
+
+# if the s3 bucket implementation is successful, the image_path will be a URL, otherwise 
+# it will be a local file path. The crew's vision analyst agent should be able to handle both cases as 
+# long as the input is correctly formatted.
     inputs = {
-        "screenshot_path": image_path
+        "screenshot_path": image_source
     }
 
     crew_instance = UxFeedbackCrew(client_id)
