@@ -67,6 +67,7 @@ class UxFeedbackCrew():
         return Task(
             config=self.tasks_config['analyze_ui'],
             callback=self.step_callback("Vision Analysis", 1),
+            human_input=True
             )
 
     @task

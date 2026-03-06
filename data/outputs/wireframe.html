@@ -3,308 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Improved Mobile UX Design</title>
+    <title>Dialog Dashboard - Re-designed</title>
     <style>
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
-            --error: #d93025;
-            --text-main: #202124;
-            --text-muted: #5f6368;
-            --bg-app: #f8f9fa;
-            --bg-card: #ffffff;
-            --radius: 8px;
-            --spacing-xs: 4px;
-            --spacing-sm: 8px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
+            --primary-purple: #8C2F98;
+            --dark-purple: #581C6E;
+            --accent-yellow: #FFD700;
+            --bg-light: #F5F5F7;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --white: #FFFFFF;
+            --success-green: #28a745;
+            --transition: all 0.3s ease;
         }
 
         * {
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
             background-color: #e0e0e0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-main);
+            padding: 20px;
         }
 
-        /* Mobile Container Simulation */
-        .mobile-viewport {
-            width: 360px;
-            height: 800px;
-            background: var(--bg-app);
-            overflow-y: auto;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            border: 8px solid #333;
+        /* Mobile Container */
+        .iphone-frame {
+            width: 375px;
+            background-color: var(--bg-light);
+            border-radius: 40px;
+            overflow: hidden;
             position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            height: 812px;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Annotations Style */
-        .annotation {
-            display: block;
-            font-size: 10px;
-            color: #888;
-            font-style: italic;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Layout Parts */
-        header {
-            padding: var(--spacing-lg) var(--spacing-md);
-            background: #fff;
-            border-bottom: 1px solid #eee;
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .container {
-            padding: var(--spacing-md);
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-lg);
-        }
-
-        /* Feature: Optimized Image (Issue 2) */
-        .card-image-wrapper {
-            background: #eee;
-            border-radius: var(--radius);
-            overflow: hidden;
-            height: 180px;
-            position: relative;
-        }
-
-        .card-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Implementation: Lazy loading placeholder logic */
-            transition: opacity 0.3s ease;
-        }
-
-        /* Feature: Error Message (Quick Win 2) */
-        .error-container {
-            padding: var(--spacing-sm);
-            border-radius: var(--radius);
-            background: #fce8e6;
-            border-left: 4px solid var(--error);
-        }
-
-        .error-text {
-            color: var(--error);
+            font-size: 14px;
             font-weight: 600;
-            font-size: 16px; /* Improved: Increased size */
+        }
+
+        .status-icons span {
+            margin-left: 4px;
+        }
+
+        /* Header */
+        .app-header {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+        }
+
+        .user-info {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        /* Feature: Accessible Button (Issue 1) */
-        .btn-primary {
-            background-color: var(--primary); /* Improved: High Contrast */
-            color: white;
-            padding: 14px 24px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            min-height: 48px; /* Improved: Large Touch Target */
-            transition: background 0.2s, outline 0.1s;
+        .user-name {
+            font-weight: 700;
+            font-size: 18px;
         }
 
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .btn-primary:focus {
-            outline: 3px solid #ff9800; /* Improved: Clear keyboard focus */
-            outline-offset: 2px;
-        }
-
-        /* Feature: Icon Buttons with Tooltips (Quick Win 1) */
-        .action-row {
-            display: flex;
-            gap: var(--spacing-md);
-            margin-top: var(--spacing-sm);
-        }
-
-        .icon-btn {
-            position: relative;
-            width: 44px;
-            height: 44px;
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-green);
             border-radius: 50%;
-            border: 1px solid #ddd;
-            background: #fff;
+            display: inline-block;
+        }
+
+        .connection-status {
+            font-size: 12px;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 4px;
+        }
+
+        /* Carousel Section */
+        .carousel-container {
+            padding: 16px 0;
+            position: relative;
+        }
+
+        .banner {
+            background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+            margin: 0 16px;
+            border-radius: 16px;
+            padding: 20px;
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            min-height: 140px;
+        }
+
+        .banner-content {
+            flex: 1;
+            z-index: 2;
+        }
+
+        .banner-headline {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            line-height: 1.2;
+            letter-spacing: 0.5px;
+        }
+
+        /* IMPROVED: Color Contrast & CTA */
+        .cta-button {
+            background: var(--accent-yellow);
+            color: #000; /* High contrast text */
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            border: none;
+            display: inline-block;
             cursor: pointer;
+            text-transform: uppercase;
         }
 
-        /* Tooltip Logic */
-        .icon-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: #fff;
-            padding: 4px 8px;
+        /* IMPROVED: Information Density */
+        .banner-disclaimer {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 10px;
+            display: block;
+        }
+
+        .banner-image {
+            width: 100px;
+            height: auto;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        .annotation {
+            font-size: 9px;
+            color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+            padding: 2px 4px;
             border-radius: 4px;
-            font-size: 11px;
-            white-space: nowrap;
-            opacity: 0;
+            position: absolute;
+            font-weight: bold;
             pointer-events: none;
-            transition: opacity 0.2s;
         }
 
-        .icon-btn:hover::after {
-            opacity: 1;
+        /* Info Bar & Refresh */
+        .info-bar {
+            padding: 12px 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ededed;
         }
 
-        /* Loading Indicator (Feedback Item 2) */
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
+        /* IMPROVED: Refresh Feedback */
+        .refresh-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(140, 47, 152, 0.2);
+            border-top: 2px solid var(--primary-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        .input-group {
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--white);
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary-purple);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            width: 60%;
+            height: 3px;
+            background: var(--primary-purple);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Grid Content */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .bill-period {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .usage-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            gap: var(--spacing-sm);
+            gap: 8px;
+            transition: var(--transition);
+            border: 1px solid transparent;
         }
 
-        label {
-            font-size: 14px;
-            font-weight: 600;
+        .usage-card:active {
+            transform: scale(0.98);
+            border-color: var(--primary-purple);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        input {
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: var(--radius);
-            font-size: 16px;
+        .data-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-purple);
         }
 
-        h1 { font-size: 22px; font-weight: 700; }
-        p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+        .data-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
+        /* FAB */
+        .fab {
+            position: absolute;
+            right: 20px;
+            bottom: 100px;
+            width: 56px;
+            height: 56px;
+            background: var(--primary-purple);
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(140, 47, 152, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid var(--white);
+        }
+
+        .fab img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            height: 84px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            width: 60px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-purple);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #000;
+            border-radius: 100px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="mobile-viewport">
-        <header>
-            <div>
-                <h1>Checkout</h1>
+    <div class="iphone-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="time">5:12</div>
+            <div class="status-icons">
+                <span>📶 4G</span>
+                <span>📶</span>
+                <span>🔋 84%</span>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <span class="annotation">Tooltips added</span>
-                <button class="icon-btn" data-tooltip="View Profile" aria-label="Profile">👤</button>
-                <button class="icon-btn" data-tooltip="Help Center" aria-label="Help">❓</button>
+        </div>
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="user-info">
+                <span style="font-size: 20px;">👤</span>
+                <div>
+                    <div class="user-name">Peter ▾</div>
+                    <div class="connection-status"><span class="status-dot"></span> Connected</div>
+                </div>
+            </div>
+            <div class="header-icons">
+                <span style="font-size: 20px; color: var(--primary-purple);">📞</span>
             </div>
         </header>
 
-        <div class="container">
-            <!-- Hero Image Section -->
-            <section>
-                <span class="annotation">Optimized: Lazy loading & compression enabled</span>
-                <div class="card-image-wrapper">
-                    <!-- Added loading="lazy" for performance -->
-                    <img src="https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=360&q=80" 
-                         alt="Product Showcase" 
-                         class="card-image" 
-                         loading="lazy">
+        <!-- Carousel -->
+        <div class="carousel-container">
+            <div class="banner">
+                <div class="banner-content">
+                    <div class="banner-headline">EXCLUSIVE<br>ONLINE OFFER</div>
+                    <button class="cta-button">Order Now</button>
+                    <span class="annotation" style="top: 100px; left: 20px;">[IMPROVED: High Contrast CTA]</span>
+                    <div class="banner-disclaimer">T&C Apply | 30th June</div>
+                    <span class="annotation" style="top: 125px; left: 120px;">[IMPROVED: Lowered density]</span>
                 </div>
-            </section>
-
-            <!-- Error Feedback Section -->
-            <section>
-                <span class="annotation">Improved: Font size & visibility</span>
-                <div class="error-container">
-                    <div class="error-text">
-                        <span>⚠️</span>
-                        Payment method expired. Please update.
-                    </div>
+                <div style="position: relative;">
+                    <span style="font-size: 60px;">📡</span>
                 </div>
-            </section>
-
-            <!-- Input Form -->
-            <section class="input-group">
-                <span class="annotation">Spacing & Labels added</span>
-                <label for="card-number">Card Number</label>
-                <input type="text" id="card-number" placeholder="0000 0000 0000 0000">
-            </section>
-
-            <!-- Primary Action -->
-            <section>
-                <span class="annotation">Accessible: High contrast + ARIA + Focus state</span>
-                <button class="btn-primary" 
-                        role="button" 
-                        aria-label="Complete your purchase of fifty dollars">
-                    Complete Purchase — $50.00
-                </button>
-            </section>
-
-            <!-- Loading Placeholder Simulation -->
-            <section>
-                <span class="annotation">Added: Loading States</span>
-                <div style="display:flex; gap:12px; align-items: center;">
-                    <div class="loading-skeleton" style="width: 50px; height: 50px; border-radius: 50%;"></div>
-                    <div style="flex:1;">
-                        <div class="loading-skeleton" style="width: 70%; height: 12px; margin-bottom: 8px;"></div>
-                        <div class="loading-skeleton" style="width: 40%; height: 10px;"></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Quick Actions -->
-            <section>
-                <p>Quick Actions</p>
-                <div class="action-row">
-                    <button class="icon-btn" data-tooltip="Save for later" aria-label="Save">🔖</button>
-                    <button class="icon-btn" data-tooltip="Share item" aria-label="Share">🔗</button>
-                    <button class="icon-btn" data-tooltip="Delete item" aria-label="Delete">🗑️</button>
-                </div>
-            </section>
+            </div>
         </div>
 
-        <!-- Navigation Bar (Simulated) -->
-        <nav style="position: absolute; bottom: 0; width: 100%; height: 60px; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center;">
-            <div style="text-align: center; color: var(--primary);">
-                <div style="font-size: 20px;">🏠</div>
-                <div style="font-size: 10px; font-weight: bold;">Home</div>
+        <!-- Info Bar -->
+        <div class="info-bar">
+            <span>Updated 5:12 PM, Today</span>
+            <div class="refresh-indicator">
+                <div class="spinner"></div>
+                <span>Refreshing...</span>
+                <span class="annotation" style="right: 10px; top: 35px;">[IMPROVED: Loading Feedback]</span>
             </div>
-            <div style="text-align: center; color: var(--text-muted);">
-                <div style="font-size: 20px;">🛍️</div>
-                <div style="font-size: 10px;">Orders</div>
-            </div>
-            <div style="text-align: center; color: var(--text-muted);">
-                <div style="font-size: 20px;">⚙️</div>
-                <div style="font-size: 10px;">Settings</div>
-            </div>
+        </div>
+
+        <!-- Tabs -->
+        <nav class="tabs">
+            <div class="tab active">DATA</div>
+            <div class="tab">VOICE</div>
+            <div class="tab">SMS</div>
+            <div class="tab">MONEY</div>
         </nav>
+
+        <!-- Scrollable Content -->
+        <main class="content-scroll">
+            <div class="bill-period">Bill period: 05 Jun - 04 Jul</div>
+            
+            <div class="data-grid">
+                <!-- Anytime Card -->
+                <div class="usage-card">
+                    <div class="card-header">
+                        <span>Anytime</span>
+                        <span>☀️</span>
+                    </div>
+                    <div class="data-value">19.5 GB</div>
+                    <div class="data-label">remaining</div>
+                </div>
+
+                <!-- Night time Card -->
+                <div class="usage-card">
+                    <div class="card-header">
+                        <span>Night time</span>
+                        <span>🌙</span>
+                    </div>
+                    <div class="data-value">5.1 GB</div>
+                    <div class="data-label">remaining</div>
+                </div>
+
+                <!-- 4G Bonus Card -->
+                <div class="usage-card">
+                    <div class="card-header">
+                        <span>4G Bonus</span>
+                        <span>🎁</span>
+                    </div>
+                    <div class="data-value" style="font-size: 18px;">879.51 MB</div>
+                    <div class="data-label">remaining</div>
+                </div>
+
+                <!-- Work & Learn Card -->
+                <div class="usage-card">
+                    <div class="card-header">
+                        <span>Work & Learn</span>
+                        <span>💼</span>
+                    </div>
+                    <div class="data-value">9.9 GB</div>
+                    <div class="data-label">remaining</div>
+                </div>
+            </div>
+            
+            <span class="annotation" style="margin-top: 10px; position: static; display: block;">[IMPROVED: Standardized Grid Spacing]</span>
+        </main>
+
+        <!-- Floating Action Button -->
+        <div class="fab">
+            <img src="https://i.pravatar.cc/100?img=32" alt="Support">
+            <span class="annotation" style="right: 60px; top: 15px;">[Quick Support Access]</span>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">🎧</span>
+                <span>Support</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">🏷️</span>
+                <span>Offers</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">🔔</span>
+                <span>Alerts</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon">☰</span>
+                <span>Menu</span>
+            </a>
+        </nav>
+
+        <!-- Home Indicator -->
+        <div class="home-indicator"></div>
     </div>
 
 </body>

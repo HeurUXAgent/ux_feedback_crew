@@ -1,3 +1,5 @@
+import logging
+import time
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 import uuid
@@ -19,13 +21,17 @@ from app.services.s3_service import upload_image_to_s3
 import sys
 from pathlib import Path
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT_DIR / "src"
 sys.path.append(str(SRC_DIR))
 
 from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline
-
-
 
 app = FastAPI()
 
@@ -97,6 +103,7 @@ def cleanup_files(*paths: Path):
     
     # parsing the image as bytes and then uploading to S3
 @app.post("/analyze-and-wireframe-s3/{client_id}")
+
 async def analyze_and_wireframe_s3(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
@@ -104,20 +111,30 @@ async def analyze_and_wireframe_s3(
 ):
     try:
         job_id = str(uuid.uuid4())
+        logger.info("========== NEW REQUEST ==========")
+        logger.info(f"[JOB ID] {job_id}")
 
         # 🔹 Upload image directly to S3
+        s3_start = time.time()
         await manager.send_progress(client_id, "Uploading image to S3...", 5)
         image_url = await upload_image_to_s3(file)
+        s3_end = time.time()
+        logger.info(f"[S3 UPLOAD TIME] {s3_end - s3_start:.2f} seconds")
 
         await manager.send_progress(client_id, "Initializing Agents...", 10)
 
         # 🔹 Run pipeline with S3 URL instead of local path
+        crew_start = time.time()
         feedback_report, wireframe_output = await run_in_threadpool(
             run_full_ux_pipeline,
             image_url,   # ← pass URL instead of file path
             client_id
         )
+        crew_end = time.time()
+        logger.info(f"[CREW EXECUTION TIME] {crew_end - crew_start:.2f} seconds")
 
+        total_time = time.time() - s3_start
+        logger.info(f"[TOTAL PIPELINE TIME] {total_time:.2f} seconds")
         final_data = {
             "evaluation_id": job_id,
             "image_url": image_url,

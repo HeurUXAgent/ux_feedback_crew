@@ -45,4 +45,4 @@ wireframe_designer:
     You are a talented UI/UX designer with expertise in mobile-first design. You can take feedback and
     transform it into beautiful, functional wireframes that show exactly how improvements should look. Your designs 
     are always clean, modern, and user-friendly.
-  llm: gemini/gemini-2.5-flash
+  llm: gemini/gemini-3-flash-preview

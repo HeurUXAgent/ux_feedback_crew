@@ -1,254 +1,178 @@
 {
-  "screen_type": "Social Media Feed / Home Screen",
+  "screen_type": "Dashboard / Home Screen",
   "components": [
     {
-      "name": "Status Bar",
-      "type": "system_component",
+      "type": "Status Bar",
       "elements": [
-        {
-          "label": "Time",
-          "value": "21:05"
-        },
-        {
-          "label": "Network/Signal",
-          "value": "4G"
-        },
-        {
-          "label": "Battery Percentage",
-          "value": "42"
-        }
-      ],
-      "description": "Displays system information at the top of the screen."
+        "Time (5:12)",
+        "Signal Strength (4G)",
+        "Wi-Fi Icon",
+        "Battery Level"
+      ]
     },
     {
-      "name": "App Header",
-      "type": "header",
+      "type": "App Header",
       "elements": [
-        {
-          "label": "Facebook Logo",
-          "value": "facebook",
-          "icon": false
-        },
-        {
-          "label": "Create Post/Story Icon",
-          "icon_name": "Plus",
-          "action": "Navigate to content creation"
-        },
-        {
-          "label": "Search Icon",
-          "icon_name": "Search",
-          "action": "Open search interface"
-        },
-        {
-          "label": "Messenger Icon",
-          "icon_name": "Chat Bubble",
-          "badge": "9+",
-          "action": "Open Messenger app/section"
-        }
-      ],
-      "description": "Persistent top bar with brand logo and global actions."
+        "Phone Icon (purple)",
+        "User Name (Peter) with Dropdown",
+        "Connection Status (Connected with green dot)"
+      ]
     },
     {
-      "name": "Story/Post Creation Bar",
-      "type": "input_section",
+      "type": "Image Carousel / Banner",
       "elements": [
-        {
-          "label": "User Profile Picture",
-          "image_content": "Woman in floral dress"
-        },
-        {
-          "label": "Text Input Hint",
-          "value": "What's on your mind?",
-          "action": "Tap to create a new post"
-        },
-        {
-          "label": "Gallery Icon",
-          "icon_name": "Image",
-          "action": "Select image/video for post"
-        }
+        "Product Image (set-top box, SIM, antenna)",
+        "Headline Text: 'EXCLUSIVE ONLINE OFFER'",
+        "Call to Action: 'ORDER NOW'",
+        "Disclaimer Text: 'T&C Apply | Offer valid till 30th June'",
+        "Company Logo: 'Dialog'",
+        "Icon: 'FREE DELIVERY'",
+        "Partially visible next banner (to the right)"
       ],
-      "description": "Area for quick content creation, showing user's profile and a prompt."
+      "interaction": "Horizontal scrollable"
     },
     {
-      "name": "Stories Carousel",
-      "type": "horizontal_scroll_list",
+      "type": "Information Bar",
       "elements": [
-        {
-          "label": "Create Story Card",
-          "icon_name": "Plus",
-          "text": "Create story",
-          "action": "Start creating a new story"
-        },
-        {
-          "label": "User Story Card",
-          "profile_name": "Harindu Samarasinghe",
-          "image_content": "Group celebrating",
-          "action": "View Harindu's story"
-        },
-        {
-          "label": "User Story Card",
-          "profile_name": "Prabhath Madhusanka",
-          "image_content": "Man in gym",
-          "action": "View Prabhath's story"
-        },
-        {
-          "label": "User Story Card",
-          "profile_name": "Anuda Pasandul",
-          "image_content": "Valentine's themed ad",
-          "action": "View Anuda's story (partially visible)"
-        }
+        "Text: 'Here's Info as at 5:12 PM, Today. Pull to refresh'"
       ],
-      "description": "Horizontally scrollable section displaying user stories, with an option to create a new one."
+      "interaction": "Pull to refresh"
     },
     {
-      "name": "News Feed Post",
-      "type": "content_card",
+      "type": "Text Label",
       "elements": [
-        {
-          "label": "Post Header",
-          "elements": [
-            {
-              "label": "Author Profile Picture",
-              "value": "Babuku"
-            },
-            {
-              "label": "Author Name",
-              "value": "Babuku - බබුකු"
-            },
-            {
-              "label": "Timestamp and Privacy",
-              "value": "5h • 🌍"
-            },
-            {
-              "label": "More Options Icon",
-              "icon_name": "Three Dots",
-              "action": "Open post options menu"
-            },
-            {
-              "label": "Dismiss Post Icon",
-              "icon_name": "X",
-              "action": "Hide or report post"
-            }
-          ]
-        },
-        {
-          "label": "Reactions",
-          "elements": [
-            {
-              "label": "Emoji Reaction",
-              "value": "😭 (Sad face)"
-            },
-            {
-              "label": "Emoji Reaction",
-              "value": "❤️ (Red Heart)"
-            }
-          ]
-        },
-        {
-          "label": "Post Image",
-          "image_content": "Woman putting money in pocket, children watching"
-        },
-        {
-          "label": "Post Caption",
-          "value": "Multiline text in Sinhala script"
-        }
-      ],
-      "description": "A single post in the news feed, including author info, reactions, media, and caption."
+        "Bill period: 05 Jun - 04 Jul"
+      ]
     },
     {
-      "name": "Bottom Navigation Bar",
-      "type": "navigation_bar",
+      "type": "Tab Navigation",
       "elements": [
-        {
-          "label": "Home",
-          "icon_name": "Home",
-          "status": "active",
-          "action": "Navigate to Home Feed"
-        },
-        {
-          "label": "Reels",
-          "icon_name": "Play",
-          "action": "Navigate to Reels section"
-        },
-        {
-          "label": "Friends",
-          "icon_name": "People",
-          "badge": "1",
-          "action": "Navigate to Friends section"
-        },
-        {
-          "label": "Marketplace",
-          "icon_name": "Shop",
-          "action": "Navigate to Marketplace"
-        },
-        {
-          "label": "Notifications",
-          "icon_name": "Bell",
-          "badge": "2",
-          "action": "Navigate to Notifications"
-        },
-        {
-          "label": "Menu",
-          "icon_name": "Hamburger",
-          "action": "Open main menu"
-        }
+        "Tab: 'DATA' (active, underlined)",
+        "Tab: 'VOICE'",
+        "Tab: 'SMS'",
+        "Tab: 'MONEY'"
       ],
-      "description": "Persistent navigation at the bottom for quick access to core app sections."
+      "interaction": "Tap to switch content"
+    },
+    {
+      "type": "Data Usage Card (Anytime)",
+      "elements": [
+        "Title: 'Anytime'",
+        "Data Amount: '19.5 GB'",
+        "Status: 'remaining'",
+        "Icon: Half-moon / Sun (time indicator)",
+        "Icon: Arrow in circle (detail/navigation)"
+      ]
+    },
+    {
+      "type": "Data Usage Card (Night time)",
+      "elements": [
+        "Title: 'Night time'",
+        "Data Amount: '5.1 GB'",
+        "Status: 'remaining'",
+        "Icon: Crescent moon (time indicator)",
+        "Icon: Arrow in circle (detail/navigation)"
+      ]
+    },
+    {
+      "type": "Data Usage Card (4G Bonus)",
+      "elements": [
+        "Title: '4G Bonus'",
+        "Data Amount: '879.51 MB'",
+        "Status: 'remaining'",
+        "Icon: Bin / Trash (contextual, perhaps for expiring bonus)",
+        "Icon: Arrow in circle (detail/navigation)"
+      ]
+    },
+    {
+      "type": "Data Usage Card (Work & Learn)",
+      "elements": [
+        "Title: 'Work & Learn'",
+        "Data Amount: '9.9 GB'",
+        "Status: 'remaining'",
+        "Icon: Briefcase / Bag",
+        "Icon: Arrow in circle (detail/navigation)"
+      ]
+    },
+    {
+      "type": "Floating Action Button (FAB)",
+      "elements": [
+        "Avatar Image (woman's face)"
+      ],
+      "purpose": "Quick access to chat/support"
+    },
+    {
+      "type": "Bottom Navigation Bar",
+      "elements": [
+        "Navigation Item: 'Home' (active, underlined, house icon)",
+        "Navigation Item: 'Support' (headphones icon)",
+        "Navigation Item: 'My Offers' (price tag icon)",
+        "Navigation Item: 'Notifications' (bell icon)",
+        "Navigation Item: 'Menu' (three horizontal lines icon)"
+      ]
+    },
+    {
+      "type": "Home Indicator",
+      "elements": [
+        "Horizontal bar at the bottom (iOS specific)"
+      ]
     }
   ],
-  "layout_structure": "The screen follows a top-to-bottom vertical stacking layout for its main sections: Status Bar, App Header, Story/Post Creator, Stories Carousel, and News Feed posts. The Stories Carousel introduces a horizontal scrolling dimension within its section. The Bottom Navigation Bar is fixed horizontally at the bottom of the screen. Within the App Header and Story/Post Creator, elements are arranged horizontally. News Feed posts are structured vertically, with a distinct header, reactions, media, and caption stacked within each post block.",
+  "layout_structure": "The screen uses a vertical stacking layout. The top section contains a header and a horizontally scrollable carousel banner. Below that are informational text elements. A tab navigation bar (DATA, VOICE, SMS, MONEY) allows for content switching. The main content area for the active 'DATA' tab is a 2x2 grid of data usage cards, providing a clear visual overview. A Floating Action Button (FAB) is positioned at the bottom right, overlaid on content. A fixed bottom navigation bar provides persistent access to main app sections.",
   "color_scheme": {
-    "primary_background": "#FFFFFF (White)",
-    "primary_brand_color": "#1877F2 (Facebook Blue) - used for logo, active home icon, create story button",
-    "text_colors": {
-      "primary": "#1C1E21 (Dark Grey/Black) - for main text like time, names, captions",
-      "secondary": "#65676B (Medium Grey) - for hints, timestamps",
-      "accent": "#FFFFFF (White) - for text on blue/red backgrounds (badges)"
-    },
-    "accent_colors": {
-      "notification_badge": "#EB3E3E (Red)",
-      "create_story_button": "#1877F2 (Facebook Blue)",
-      "emoji_reactions": "Standard emoji colors"
-    },
-    "separator_lines": "#DADDE1 (Light Grey)"
+    "primary_brand_colors": [
+      "Deep Purple / Magenta (various shades, e.g., for cards, active tab, icons)",
+      "#8C2F98",
+      "#581C6E"
+    ],
+    "accent_colors": [
+      "Bright Yellow / Orange (on banner for 'ONLINE OFFER')",
+      "Green (for 'Connected' status dot)"
+    ],
+    "background_colors": [
+      "White (main background, text on purple)",
+      "Light Grey (for info bar and overall background)",
+      "#F5F5F5"
+    ],
+    "text_colors": [
+      "Dark Grey / Black (for most labels on light backgrounds)",
+      "White (for text on purple cards and active elements)"
+    ]
   },
   "typography": {
-    "font_family": "Sans-serif (likely system font or FB Sans)",
-    "font_sizes_relative": {
-      "large": "Facebook logo",
-      "medium_large": "What's on your mind? hint",
-      "medium": "User names, post captions, bottom nav labels",
-      "small": "Timestamps, notification badge numbers"
+    "font_family": "Modern sans-serif (e.g., system default or similar to Roboto/Open Sans)",
+    "font_sizes": {
+      "large_bold_data_points": "Approx. 20-24pt (e.g., '19.5 GB')",
+      "medium_bold_titles": "Approx. 14-16pt (e.g., 'Anytime', 'DATA')",
+      "medium_regular_body_text": "Approx. 12-14pt (e.g., 'remaining', 'Here's Info as at...')",
+      "small_regular_labels": "Approx. 10-12pt (e.g., 'T&C Apply', 'ORDER NOW')"
     },
-    "font_weights": {
-      "bold": "Facebook logo, possibly user names",
-      "regular": "Most other text content"
-    },
-    "text_alignment": "Left-aligned for most text, center-aligned for bottom navigation labels under icons."
+    "font_weights": [
+      "Regular",
+      "Bold"
+    ],
+    "text_alignment": "Mostly left-aligned, some center-aligned elements on banners or cards."
   },
   "spacing_and_density": {
-    "vertical_spacing": "Generous spacing between major sections (header, story creator, stories, post). Each post in the feed is a distinct block with internal padding. Bottom navigation is compact.",
-    "horizontal_spacing": "Consistent padding from screen edges. Elements within the header and bottom nav are evenly distributed. Stories carousel items have a moderate gap.",
-    "density": "The header and story creator sections are moderately dense. The stories carousel is dense horizontally. The news feed post is vertically dense, especially due to the large image. The bottom navigation bar is quite dense with six items.",
-    "whitespace_usage": "Effective use of whitespace around the logo, search bar, and post components to improve readability and visual hierarchy."
+    "vertical_spacing": "Generous vertical spacing between major sections (header, carousel, info bar, tabs) provides good content separation.",
+    "horizontal_padding": "Consistent horizontal padding from screen edges and between elements, creating a clean look.",
+    "element_padding": "Sufficient internal padding within cards and interactive elements for readability and tapability.",
+    "density": "Medium density, balancing information display with ample whitespace to avoid clutter.",
+    "corner_radii": "Consistent use of rounded corners for cards and banners, giving a softer, modern aesthetic."
   },
   "accessibility_observations": [
-    "Good color contrast for primary text on white backgrounds.",
-    "Interactive elements (icons, buttons) appear to have adequate tap target sizes.",
-    "Notification badges use both color (red) and numerical indicators, aiding users with color vision deficiencies.",
-    "Text sizes are varied, with primary content being readable, though some smaller text (e.g., bottom nav labels) might be challenging for users with visual impairments without scaling options.",
-    "Localization is evident with Sinhala text, enhancing accessibility for native speakers.",
-    "Standard and recognizable icon usage improves comprehension."
+    "**Color Contrast**: White text on purple backgrounds (data cards) generally appears to have good contrast. However, the yellow 'ORDER NOW' text on the purple banner might pose a contrast challenge for some users with visual impairments.",
+    "**Tap Target Size**: Most interactive elements like tabs, data cards, and bottom navigation items appear to have sufficiently large tap targets, improving usability for all users.",
+    "**Visual Hierarchy**: Clear use of font size, weight, and color provides a strong visual hierarchy, making it easy to identify important information and interactive elements.",
+    "**Semantic Grouping**: Information is logically grouped within cards and sections, which benefits screen reader users.",
+    "**Status Indicators**: The green 'Connected' dot and underlined active tab/navigation item provide clear visual cues for status and current location."
   ],
   "notable_patterns": [
-    "Standard social media feed (infinite scroll implied).",
-    "Persistent header with brand, search, and core actions.",
-    "Persistent bottom navigation bar for primary app sections.",
-    "Horizontal 'Stories' carousel for ephemeral content.",
-    "Circular profile pictures for user identity.",
-    "Notification badges on icons.",
-    "Card-based layout for individual stories and posts.",
-    "Emoji-based reactions directly visible on posts.",
-    "Input field with 'What's on your mind?' prompt for content creation."
+    "**Card-based UI**: Extensive use of cards for grouping and presenting distinct pieces of information (banners, data usage categories), which is a common and effective dashboard pattern.",
+    "**Bottom Tab Navigation**: Provides persistent and easily accessible navigation to primary sections of the app, enhancing overall usability.",
+    "**Hero Banner / Carousel**: Used for prominent promotions or announcements, often with a horizontal scrolling feature.",
+    "**Floating Action Button (FAB)**: A common pattern for a primary, context-independent action (e.g., chat/support), offering quick access to help.",
+    "**Pull-to-Refresh Hint**: An explicit textual hint for a common gesture interaction, making the feature discoverable.",
+    "**Personalization**: Displaying the user's name ('Peter') and specific data usage reflects a personalized user experience."
   ]
 }

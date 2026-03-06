@@ -41,7 +41,7 @@ IMPROVEMENTS TO IMPLEMENT:
 
 **Requirements:**
 
-1. **Mobile-first design** (360px*800px, scale up for display)
+1. **Mobile-first design** (375px, scale up for display)
 2. **Implement ALL feedback suggestions:**
    - Fix color contrast issues
    - Adjust typography sizes
