@@ -1,6 +1,7 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from src.ws_manager import safe_emit
+from app.utils.hitl_handler import wait_for_human_feedback
 from .tools import (
     analyze_ui_screenshot,
     evaluate_heuristics,
@@ -13,9 +14,9 @@ class UxFeedbackCrew():
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
-
-    def __init__(self, client_id: str):
+    def __init__(self, client_id: str, evaluation_id: str):
         self.client_id = client_id
+        self.evaluation_id = evaluation_id
 
     def step_callback(self, step_name: str, step_number: int):
         def callback(_output):
@@ -26,6 +27,7 @@ class UxFeedbackCrew():
             )
         return callback
 
+# Agents 
     @agent
     def vision_analyst(self) -> Agent:
         return Agent(
@@ -62,12 +64,12 @@ class UxFeedbackCrew():
             allow_delegation=False
         )
 
+# Tasks
     @task
     def analyze_ui(self) -> Task:
         return Task(
             config=self.tasks_config['analyze_ui'],
             callback=self.step_callback("Vision Analysis", 1),
-            human_input=True
             )
 
     @task
@@ -79,16 +81,49 @@ class UxFeedbackCrew():
 
     @task
     def generate_feedback(self) -> Task:
+        """
+        Feedback task with HITL — pipeline pauses here for human review.
+        The reviewer can approve, reject, or suggest modifications.
+        If rejected, CrewAI re-runs this task with the reviewer's context.
+        """
+        evaluation_id = self.evaluation_id
+        client_id = self.client_id
+
+        def hitl_input_handler(agent_output: str) -> str:
+            return wait_for_human_feedback(
+                evaluation_id=evaluation_id,
+                agent_name="feedback_specialist",
+                agent_output=agent_output,
+                client_id=client_id,
+            )
+        
         return Task(
             config=self.tasks_config['generate_feedback'],
             callback=self.step_callback("Feedback Generation", 3),
+            human_input=True,               # CrewAI pauses for input
+            input_handler=hitl_input_handler  # handler provides it
         )
 
     @task
     def create_wireframe(self) -> Task:
+        """
+        Wireframe task with HITL — reviewer checks the generated wireframe.
+        """
+        evaluation_id = self.evaluation_id
+        client_id = self.client_id
+
+        def hitl_input_handler(agent_output: str) -> str:
+            return wait_for_human_feedback(
+                evaluation_id=evaluation_id,
+                agent_name="wireframe_designer",
+                agent_output=agent_output,
+                client_id=client_id,
+            )
         return Task(
             config=self.tasks_config['create_wireframe'],
-            callback=self.step_callback("Wireframe Creation", 4),)
+            callback=self.step_callback("Wireframe Creation", 4),
+            human_input=True,
+            input_handler=hitl_input_handler)
 
     @crew
     def full_flow_crew(self) -> Crew:

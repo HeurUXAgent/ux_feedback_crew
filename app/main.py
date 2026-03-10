@@ -1,25 +1,30 @@
 import logging
 import time
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Header
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import uuid
 import os
-import json
 from pathlib import Path
-import shutil
 from src.ws_manager import manager
 from fastapi import WebSocket, WebSocketDisconnect
 from starlette.concurrency import run_in_threadpool
 from app.services.s3_service import upload_image_to_s3
-# Import from your pipeline bridge
-# (
-#     run_evaluation_pipeline,
-#     run_wireframe_pipeline
-# )
-
-
+from app.services.database import (
+    create_evaluation_document,
+    complete_evaluation,
+    fail_evaluation,
+    save_hitl_response,
+    get_evaluation,
+    get_user_evaluations,
+    get_evaluations_for_analysis,
+)
+from app.utils.hitl_handler import (
+    register_hitl_session,
+    submit_human_feedback,
+    cleanup_hitl_session,
+)
 import sys
-from pathlib import Path
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,10 +33,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-SRC_DIR = ROOT_DIR / "src"
+SRC_DIR  = ROOT_DIR / "src"
 sys.path.append(str(SRC_DIR))
 
-from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline
+from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline_raw
 
 app = FastAPI()
 
@@ -42,119 +47,169 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = Path("uploads")
 OUTPUT_DIR = Path("outputs")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-def cleanup_files(*paths: Path):
-    """Deletes files after the response is sent."""
-    for path in paths:
-        try:
-            if path.is_file():
-                path.unlink()
-            elif path.is_dir():
-                shutil.rmtree(path)
-            print(f"Successfully cleaned up: {path}")
-        except Exception as e:
-            print(f"Cleanup error: {e}")
 
-# # parsing the image as bytes
-# @app.post("/analyze-and-wireframe/{client_id}")
-# async def analyze_and_wireframe(background_tasks: BackgroundTasks,file: UploadFile = File(...), client_id: str = ""):
-#     try:
-#         job_id = str(uuid.uuid4())
-#         upload_path = UPLOAD_DIR / f"{job_id}.png"
+# ─── Pydantic Models ──────────────────────────────────────────────────────────
 
-#         with open(upload_path, "wb") as f:
-#             f.write(await file.read())
+class HITLFeedbackRequest(BaseModel):
+    evaluation_id: str
+    agent_name: str                  # "feedback_specialist" | "wireframe_designer"
+    ai_suggestion: str = ""          # the original AI suggestion being reviewed
+    user_action: str                 # "agree" | "disagree" | "modify"
+    user_modified_suggestion: str = ""
 
-#         await manager.send_progress(client_id, "Initializing Agents...", 0)
 
-#         # Run the consolidated pipeline 
-#         # This returns the report and the wireframe in one execution
-#         feedback_report, wireframe_output = await run_in_threadpool(
-#             run_full_ux_pipeline, 
-#             str(upload_path), 
-#             client_id
-#         )
+# ─── Main Pipeline Endpoint ───────────────────────────────────────────────────
 
-#         # Save everything to a single JSON for records
-#         final_data = {
-#             "evaluation_id": job_id,
-#             "feedback": feedback_report,
-#             "wireframe": wireframe_output
-#         }
-        
-#         job_id = str(uuid.uuid4())
-#         upload_path = UPLOAD_DIR / f"{job_id}.png"
-#         result_json_path = OUTPUT_DIR / f"{job_id}_result.json"
-
-#         with open(result_json_path, "w") as f:
-#             json.dump(final_data, f, indent=2)
-
-#         background_tasks.add_task(cleanup_files, upload_path, result_json_path)
-
-#         # Return everything to Flutter in one response
-#         return final_data
-    
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"System Error: {str(e)}")
-    
-    # parsing the image as bytes and then uploading to S3
 @app.post("/analyze-and-wireframe-s3/{client_id}")
-
 async def analyze_and_wireframe_s3(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    client_id: str = ""
+    client_id: str = "",
+    x_user_id: str = Header(default="anonymous"),   # Firebase UID sent from Flutter
 ):
-    try:
-        job_id = str(uuid.uuid4())
-        logger.info("========== NEW REQUEST ==========")
-        logger.info(f"[JOB ID] {job_id}")
+    job_id = str(uuid.uuid4())
+    pipeline_start = time.time()
 
-        # 🔹 Upload image directly to S3
-        s3_start = time.time()
+    try:
+        logger.info(f"[JOB START] {job_id} | user: {x_user_id}")
+
+        # ── 1. Upload to S3 ──
         await manager.send_progress(client_id, "Uploading image to S3...", 5)
         image_url = await upload_image_to_s3(file)
-        s3_end = time.time()
-        logger.info(f"[S3 UPLOAD TIME] {s3_end - s3_start:.2f} seconds")
+
+        # ── 2. Create MongoDB document immediately (status: processing) ──
+        create_evaluation_document(
+            evaluation_id=job_id,
+            user_id=x_user_id,
+            screenshot_url=image_url,
+        )
+        logger.info(f"[MONGO] Document created for {job_id}")
 
         await manager.send_progress(client_id, "Initializing Agents...", 10)
 
-        # 🔹 Run pipeline with S3 URL instead of local path
-        crew_start = time.time()
-        feedback_report, wireframe_output = await run_in_threadpool(
-            run_full_ux_pipeline,
-            image_url,   # ← pass URL instead of file path
-            client_id
-        )
-        crew_end = time.time()
-        logger.info(f"[CREW EXECUTION TIME] {crew_end - crew_start:.2f} seconds")
+        # ── 3. Register HITL session ──
+        register_hitl_session(job_id)
 
-        total_time = time.time() - s3_start
-        logger.info(f"[TOTAL PIPELINE TIME] {total_time:.2f} seconds")
-        final_data = {
+        # ── 4. Run CrewAI pipeline ──
+        result = await run_in_threadpool(
+            run_full_ux_pipeline_raw,
+            image_url,
+            client_id,
+            job_id,
+        )
+
+        duration = time.time() - pipeline_start
+        logger.info(f"[PIPELINE] Done in {duration:.2f}s")
+
+        # ── 5. Complete MongoDB document with all agent outputs ──
+        complete_evaluation(
+            evaluation_id=job_id,
+            tasks_output=result.tasks_output,
+            pipeline_duration_seconds=duration,
+        )
+        logger.info(f"[MONGO] Evaluation completed for {job_id}")
+
+        # ── 6. Cleanup ──
+        background_tasks.add_task(cleanup_hitl_session, job_id)
+
+        await manager.send_progress(client_id, "Pipeline Complete", 100)
+
+        return {
             "evaluation_id": job_id,
             "image_url": image_url,
-            "feedback": feedback_report,
-            "wireframe": wireframe_output
+            "feedback": str(result.tasks_output[2].raw),
+            "wireframe": str(result.tasks_output[3].raw),
         }
 
-        result_json_path = OUTPUT_DIR / f"{job_id}_result.json"
-
-        with open(result_json_path, "w") as f:
-            json.dump(final_data, f, indent=2)
-
-        background_tasks.add_task(cleanup_files, result_json_path)
-
-        return final_data
-
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"S3 Pipeline Error: {str(e)}")
+        # Mark as failed in MongoDB so history UI shows correct status
+        fail_evaluation(job_id, str(e))
+        logger.error(f"[ERROR] {job_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-    
+
+# ─── HITL Feedback Endpoint ───────────────────────────────────────────────────
+
+@app.post("/submit-feedback")
+async def submit_hitl_feedback(
+    body: HITLFeedbackRequest,
+    x_user_id: str = Header(default="anonymous"),
+):
+    """
+    Called by Flutter when reviewer submits their rating on an agent output.
+    Does two things:
+      1. Unblocks the waiting CrewAI pipeline thread
+      2. Persists the feedback to MongoDB
+    """
+    if body.user_action not in ["agree", "disagree", "modify"]:
+        raise HTTPException(status_code=400, detail="user_action must be: agree | disagree | modify")
+
+    evaluation = get_evaluation(body.evaluation_id)
+    if not evaluation:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+
+    # Unblock the CrewAI pipeline
+    unblocked = submit_human_feedback(
+        evaluation_id=body.evaluation_id,
+        rating=body.user_action,
+        suggestion=body.user_modified_suggestion,
+    )
+
+    # Persist to MongoDB
+    save_hitl_response(
+        evaluation_id=body.evaluation_id,
+        agent_name=body.agent_name,
+        ai_suggestion=body.ai_suggestion,
+        user_action=body.user_action,
+        user_modified_suggestion=body.user_modified_suggestion,
+        reviewed_by=x_user_id,
+    )
+
+    logger.info(f"[HITL] {body.agent_name} | {body.user_action} | {body.evaluation_id}")
+
+    return {
+        "message": "Feedback saved",
+        "pipeline_unblocked": unblocked,
+        "evaluation_id": body.evaluation_id,
+    }
+
+
+# ─── History / Fetch Endpoints ────────────────────────────────────────────────
+
+@app.get("/evaluation/{evaluation_id}")
+async def get_single_evaluation(evaluation_id: str):
+    """Full evaluation details — used on result screen."""
+    doc = get_evaluation(evaluation_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+    return doc
+
+
+@app.get("/evaluations/user/{user_id}")
+async def get_user_history(user_id: str):
+    """
+    Lightweight evaluation history for a user.
+    Used to render the history screen in Flutter.
+    """
+    docs = get_user_evaluations(user_id)
+    return {"evaluations": docs}
+
+
+@app.get("/evaluations/analysis/export")
+async def export_for_analysis():
+    """
+    Exports all completed evaluations for thesis analysis.
+    Use this to compute HITL agreement rates, score distributions etc.
+    """
+    docs = get_evaluations_for_analysis()
+    return {"total": len(docs), "evaluations": docs}
+
+
+# ─── WebSocket ────────────────────────────────────────────────────────────────
+
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await manager.connect(client_id, websocket)
@@ -163,4 +218,14 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(client_id)
+
+    
+# @app.websocket("/ws/{client_id}")
+# async def websocket_endpoint(websocket: WebSocket, client_id: str):
+#     await manager.connect(client_id, websocket)
+#     try:
+#         while True:
+#             await websocket.receive_text()
+#     except WebSocketDisconnect:
+#         manager.disconnect(client_id)
 

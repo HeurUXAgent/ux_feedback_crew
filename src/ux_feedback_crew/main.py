@@ -1,11 +1,9 @@
-#!/usr/bin/env python
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
 from ux_feedback_crew.crew import UxFeedbackCrew
 
-# Load environment variables
 load_dotenv()
 
 # Add src/ to sys.path dynamically
@@ -16,7 +14,6 @@ def run():
     Run the UX Feedback Crew
     """
     
-    # Get screenshot path from command line or use default
     if len(sys.argv) > 1:
         screenshot_path = sys.argv[1]
     else:
