@@ -1,500 +1,1272 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dialog Dashboard - Re-designed</title>
+    <title>Facebook Feed - Improved Design</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root {
-            --primary-purple: #8C2F98;
-            --dark-purple: #581C6E;
-            --accent-yellow: #FFD700;
-            --bg-light: #F5F5F7;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --white: #FFFFFF;
-            --success-green: #28a745;
-            --transition: all 0.3s ease;
-        }
+        /* Base styles from original, with improvements and new elements */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        :root {
+            /* Facebook Color Scheme */
+            --facebook-blue: #1877F2;
+            --background-white: #FFFFFF;
+            --background-light-gray: #F0F2F5; /* Used for separators and subtle backgrounds */
+            --text-primary: #050505; /* Dark gray/black */
+            --text-secondary: #65676B; /* Medium gray */
+            --notification-red: #E42647; /* Red for badges/errors */
+            --green-accent: #27a441; /* For gallery icon */
+            --border-gray: #dddfe2; /* Subtle border color */
         }
 
         body {
-            background-color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        /* Mobile Container */
-        .iphone-frame {
-            width: 375px;
-            background-color: var(--bg-light);
-            border-radius: 40px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            height: 812px;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background-color: var(--background-light-gray);
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll, content-area handles it */
+            color: var(--text-primary);
         }
 
-        /* Status Bar */
+        /* --- Annotation Styles --- */
+        /* Used to highlight specific improvements from the feedback */
+        .annotation {
+            font-size: 10px;
+            color: #888;
+            background-color: #fce8a6; /* Subtle yellow background */
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-left: 5px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            font-weight: 500;
+            opacity: 0.9;
+            white-space: nowrap; /* Prevent text from breaking onto new lines */
+            z-index: 9999; /* Ensure annotations are visible */
+        }
+
+        .annotation-block {
+            font-size: 10px;
+            color: #888;
+            background-color: #fce8a6;
+            padding: 3px 5px;
+            border-radius: 3px;
+            margin-top: 5px;
+            line-height: 1.3;
+            font-weight: 500;
+            opacity: 0.9;
+            display: block;
+            z-index: 9999;
+        }
+        /* --- End Annotation Styles --- */
+
+
+        /* --- Status Bar --- */
         .status-bar {
-            height: 44px;
-            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 8px 15px;
+            background-color: var(--background-white);
+            font-size: 14px; /* Slightly larger for clarity */
+            color: var(--text-secondary);
         }
 
-        .status-icons span {
-            margin-left: 4px;
+        .status-bar .left {
+            font-weight: 500;
+            color: var(--text-primary); /* Time is usually primary */
+            font-size: 14px; /* Consistent with other primary text */
         }
 
-        /* Header */
-        .app-header {
-            padding: 10px 20px;
+        .status-bar .right {
+            display: flex;
+            align-items: center;
+            gap: 5px; /* Spacing between icons and text */
+        }
+
+        /* --- Top Navigation Bar --- */
+        .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--white);
+            padding: 10px 15px;
+            background-color: var(--background-white);
+            border-bottom: 1px solid var(--border-gray);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 48px; /* Ensure sufficient height for tap targets and content */
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .user-name {
+        .top-nav .logo {
+            color: var(--facebook-blue);
+            font-size: 24px;
             font-weight: 700;
-            font-size: 18px;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success-green);
+        .top-nav .right-icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-nav .icon-button {
+            background-color: var(--background-light-gray);
             border-radius: 50%;
-            display: inline-block;
+            width: 38px; /* Increased for better tap target size (min 44px recommended, but visually balanced here) */
+            height: 38px; /* Increased for better tap target size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: var(--text-primary);
+            cursor: pointer;
+            position: relative;
+            border: none;
+            transition: background-color 0.2s; /* Smooth hover state */
+        }
+        .top-nav .icon-button:hover {
+            background-color: #e0e2e5;
         }
 
-        .connection-status {
+        .top-nav .icon-button .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: var(--notification-red);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 10px;
+            padding: 2px 5px;
+            min-width: 10px;
+            text-align: center;
+            line-height: 1; /* Adjust for better vertical alignment */
+            font-weight: 500;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex-grow: 1; /* Allows it to fill available vertical space */
+            overflow-y: auto; /* Enables vertical scrolling for content */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS devices */
+            padding-bottom: 5px; /* Small buffer at the bottom */
+        }
+
+        /* --- Story Creation / Post Input Section --- */
+        .post-input-section {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: var(--background-white);
+            border-bottom: 8px solid var(--background-light-gray); /* Section separator */
+            position: relative; /* For error message and progress overlay positioning */
+        }
+
+        .post-input-section .profile-picture {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            flex-shrink: 0; /* Prevent shrinking on smaller screens */
+        }
+
+        .post-input-section .text-input {
+            flex-grow: 1;
+            padding: 10px 15px; /* Increased padding for improved tap target and readability */
+            border: 1px solid var(--border-gray);
+            border-radius: 20px;
+            background-color: var(--background-light-gray);
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            cursor: text;
+            transition: border-color 0.2s, background-color 0.2s; /* Smooth focus state */
+            min-height: 24px; /* Ensure input has minimal height for content */
+        }
+        .post-input-section .text-input:focus {
+            border-color: var(--facebook-blue);
+            background-color: #fff;
+        }
+        .post-input-section .text-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .post-input-section .gallery-icon {
+            font-size: 22px;
+            color: var(--green-accent);
+            margin-left: 10px;
+            cursor: pointer;
+            width: 44px; /* Minimum recommended tap target size */
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* Inline validation error message */
+        .post-input-section .error-message {
+            color: var(--notification-red);
             font-size: 12px;
-            color: var(--text-muted);
+            position: absolute;
+            bottom: -8px; /* Position below the input field */
+            left: 65px; /* Aligned with input text start (after profile picture) */
+            width: calc(100% - 80px); /* Account for side elements */
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .post-input-section .error-message.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Progress overlay for media upload */
+        .post-input-section .progress-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white overlay */
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 4px;
+            border-radius: 0;
+            z-index: 10;
+            display: none; /* Hidden by default */
         }
 
-        /* Carousel Section */
-        .carousel-container {
-            padding: 16px 0;
-            position: relative;
+        .progress-overlay .spinner {
+            border: 3px solid var(--background-light-gray);
+            border-top: 3px solid var(--facebook-blue); /* Blue spinner part */
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            animation: spin 1s linear infinite; /* Spinning animation */
         }
 
-        .banner {
-            background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
-            margin: 0 16px;
-            border-radius: 16px;
-            padding: 20px;
-            color: var(--white);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Stories Section --- */
+        .stories-section {
+            padding: 10px 0;
+            background-color: var(--background-white);
+            border-bottom: 8px solid var(--background-light-gray); /* Section separator */
+            position: relative; /* For annotation positioning */
+        }
+
+        .stories-section .stories-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            min-height: 140px;
+            overflow-x: auto; /* Enables horizontal scrolling */
+            padding: 0 15px; /* Consistent horizontal padding */
+            gap: 10px; /* Spacing between story cards */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+            -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
         }
 
-        .banner-content {
-            flex: 1;
+        .stories-container::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
+        }
+
+        .story-card {
+            flex: 0 0 auto; /* Prevent cards from shrinking */
+            width: 110px;
+            height: 180px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background-color: #ddd; /* Placeholder background */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for card effect */
+            cursor: pointer;
+        }
+
+        /* Skeleton loading state for stories */
+        .story-card.loading {
+            background: linear-gradient(90deg, var(--background-light-gray) 25%, #e0e2e5 50%, var(--background-light-gray) 75%);
+            background-size: 200% 100%;
+            animation: loading-animation 1.5s infinite; /* Shimmer effect */
+        }
+
+        .story-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block; /* Remove extra space below image */
+        }
+
+        .story-card .profile-picture-overlay {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid var(--facebook-blue); /* Blue border for viewed stories */
+            background-color: var(--background-white);
+            object-fit: cover;
             z-index: 2;
         }
 
-        .banner-headline {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            line-height: 1.2;
-            letter-spacing: 0.5px;
-        }
-
-        /* IMPROVED: Color Contrast & CTA */
-        .cta-button {
-            background: var(--accent-yellow);
-            color: #000; /* High contrast text */
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            border: none;
-            display: inline-block;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        /* IMPROVED: Information Density */
-        .banner-disclaimer {
-            font-size: 10px;
-            opacity: 0.8;
-            margin-top: 10px;
-            display: block;
-        }
-
-        .banner-image {
-            width: 100px;
-            height: auto;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
-        }
-
-        .annotation {
-            font-size: 9px;
-            color: #ff4757;
-            background: rgba(255, 71, 87, 0.1);
-            padding: 2px 4px;
-            border-radius: 4px;
+        .story-card .floating-action-button {
             position: absolute;
-            font-weight: bold;
-            pointer-events: none;
-        }
-
-        /* Info Bar & Refresh */
-        .info-bar {
-            padding: 12px 20px;
-            font-size: 12px;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #ededed;
-        }
-
-        /* IMPROVED: Refresh Feedback */
-        .refresh-indicator {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(140, 47, 152, 0.2);
-            border-top: 2px solid var(--primary-purple);
+            bottom: 30px; /* Positioned above the text overlay */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--facebook-blue);
+            color: #fff;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            background: var(--white);
-            border-bottom: 1px solid #eee;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 16px 0;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
-            position: relative;
-        }
-
-        .tab.active {
-            color: var(--primary-purple);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20%;
-            width: 60%;
-            height: 3px;
-            background: var(--primary-purple);
-            border-radius: 3px 3px 0 0;
-        }
-
-        /* Grid Content */
-        .content-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .bill-period {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        .data-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .usage-card {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: var(--transition);
-            border: 1px solid transparent;
-        }
-
-        .usage-card:active {
-            transform: scale(0.98);
-            border-color: var(--primary-purple);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .data-value {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--primary-purple);
-        }
-
-        .data-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* FAB */
-        .fab {
-            position: absolute;
-            right: 20px;
-            bottom: 100px;
-            width: 56px;
-            height: 56px;
-            background: var(--primary-purple);
-            border-radius: 28px;
-            box-shadow: 0 8px 20px rgba(140, 47, 152, 0.4);
+            width: 30px;
+            height: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            border: 2px solid var(--white);
+            font-size: 18px;
+            border: 2px solid var(--background-white);
+            z-index: 2;
         }
 
-        .fab img {
-            width: 100%;
-            height: 100%;
+        .story-card .text-overlay {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            right: 8px; /* Allows text to span card width */
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Text readability over images */
+            z-index: 2;
+            text-align: center; /* For 'Create story' text */
+        }
+
+        /* --- News Feed Posts --- */
+        .news-feed {
+            padding-bottom: 10px;
+        }
+
+        .news-feed-post {
+            background-color: var(--background-white);
+            margin-bottom: 8px; /* Spacing between posts */
+            padding-bottom: 10px;
+            position: relative;
+        }
+
+        /* Skeleton loading state for posts */
+        .news-feed-post.loading {
+            padding: 15px;
+            background: linear-gradient(90deg, var(--background-light-gray) 25%, #e0e2e5 50%, var(--background-light-gray) 75%);
+            background-size: 200% 100%;
+            animation: loading-animation 1.5s infinite; /* Shimmer effect */
+            border-radius: 8px; /* Rounded corners for skeleton cards */
+            margin: 8px 15px; /* Inset from edges */
+            min-height: 250px; /* Ensure skeleton has some height */
+        }
+
+        @keyframes loading-animation {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            min-height: 48px; /* Ensures tap target area for header elements */
+        }
+
+        .post-header .profile-picture {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
+            margin-right: 8px;
+            flex-shrink: 0;
         }
 
-        /* Bottom Nav */
-        .bottom-nav {
-            height: 84px;
-            background: var(--white);
+        .post-header .username {
+            font-weight: 600; /* Semi-bold for usernames */
+            font-size: 15px;
+            line-height: 1.2;
+        }
+
+        .post-header .post-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .post-header .post-info i {
+            font-size: 10px;
+        }
+
+        .post-header .post-options {
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 18px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .post-header .post-options i {
+            cursor: pointer;
+            width: 32px; /* Visual size of icon */
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            transition: background-color 0.2s; /* Hover effect */
+            /* Implicit tap target of at least 44x44px due to surrounding padding/margin */
+        }
+        .post-header .post-options i:hover {
+             background-color: var(--background-light-gray);
+        }
+
+        .post-text {
+            padding: 0 15px 10px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .post-media {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            position: relative;
+            background-color: #eee; /* Placeholder background */
+        }
+
+        .post-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .post-media .profile-picture-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--background-white);
+        }
+
+        .post-footer {
+            padding: 10px 15px 0;
+        }
+
+        .reaction-counts {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .reaction-counts i {
+            margin-right: 5px;
+        }
+
+        .post-actions {
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            padding-bottom: 20px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--background-light-gray);
+            padding-top: 8px;
         }
 
-        .nav-item {
+        .post-actions .action-button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 8px 10px; /* Provides good tap target area */
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            flex: 1;
+            justify-content: center;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+            min-height: 36px; /* Ensure minimal tap target height */
+        }
+
+        .post-actions .action-button:hover {
+            background-color: var(--background-light-gray);
+        }
+
+        .like-button.liked {
+            color: var(--facebook-blue); /* Active like state color */
+        }
+
+        @keyframes like-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); } /* Pop effect */
+            100% { transform: scale(1); }
+        }
+
+        /* --- Bottom Navigation Bar --- */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--background-white);
+            border-top: 1px solid var(--border-gray);
+            padding: 5px 0;
+            position: sticky;
+            bottom: 0;
+            z-index: 1000;
+            min-height: 50px; /* Standard bottom navigation height */
+        }
+
+        .bottom-nav .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            color: var(--text-muted);
+            padding: 5px 0;
+            color: var(--text-secondary);
             font-size: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            width: 60px;
+            cursor: pointer;
+            position: relative;
+            flex: 1;
+            min-width: 44px; /* Minimum tap target width */
+            min-height: 44px; /* Minimum tap target height */
+            justify-content: center;
+            transition: color 0.2s;
         }
 
-        .nav-item.active {
-            color: var(--primary-purple);
-        }
-
-        .nav-icon {
+        .bottom-nav .nav-item i {
             font-size: 20px;
+            margin-bottom: 2px;
         }
 
-        .home-indicator {
+        .bottom-nav .nav-item.active {
+            color: var(--facebook-blue); /* Active icon color */
+        }
+
+        .bottom-nav .nav-item .badge {
             position: absolute;
-            bottom: 8px;
+            top: 0px;
+            right: calc(50% - 25px); /* Position badge over icon */
+            background-color: var(--notification-red);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 9px;
+            padding: 1px 4px;
+            min-width: 8px;
+            text-align: center;
+            line-height: 1;
+            font-weight: 500;
+        }
+
+        /* --- Skeleton Loading Placeholder Styles --- */
+        .skeleton-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e2e5;
+        }
+
+        .skeleton-text {
+            background-color: #e0e2e5;
+            height: 12px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .skeleton-text-short {
+            width: 70%;
+        }
+
+        .skeleton-text-medium {
+            width: 95%;
+            height: 14px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-text-x-small {
+            width: 40%;
+            height: 10px;
+        }
+
+        .skeleton-rect {
+            background-color: #e0e2e5;
+            border-radius: 4px;
+        }
+
+        .skeleton-icon {
+            background-color: #e0e2e5;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .skeleton-button {
+            background-color: #e0e2e5;
+            width: 60px;
+            height: 30px;
+            border-radius: 20px;
+        }
+
+        /* --- Global Feedback (Snackbars/Toasts) --- */
+        .snackbar {
+            visibility: hidden;
+            min-width: 280px;
+            background-color: #333; /* Dark background */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 14px 20px;
+            position: fixed;
+            z-index: 1000; /* Above all other content, below dialogs */
             left: 50%;
             transform: translateX(-50%);
-            width: 134px;
-            height: 5px;
-            background: #000;
-            border-radius: 100px;
+            bottom: 65px; /* Positioned above the bottom navigation bar */
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: bottom 0.5s ease-out, opacity 0.5s ease-out; /* Smooth slide-in/fade-in animation */
+        }
+
+        .snackbar.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 75px; /* Final visible position */
+        }
+
+        .snackbar-action {
+            background: none;
+            border: none;
+            color: var(--facebook-blue); /* Action button in brand color */
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            min-width: 60px; /* Consistent button width */
+            min-height: 24px; /* Consistent button height */
+        }
+        .snackbar-action:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .snackbar.error {
+            background-color: var(--notification-red); /* Red background for error messages */
+        }
+
+        .snackbar.error .snackbar-action {
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Dialog/Modal for critical errors (e.g., network issues) --- */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Highest z-index for modals */
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+        }
+
+        .dialog-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .dialog {
+            background-color: var(--background-white);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .dialog-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .dialog-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right (standard for action dialogs) */
+            gap: 10px;
+        }
+
+        .dialog-button {
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s, color 0.2s;
+            min-width: 70px; /* Consistent button size */
+        }
+
+        .dialog-button.secondary {
+            background-color: var(--background-light-gray);
+            color: var(--text-primary);
+        }
+        .dialog-button.secondary:hover {
+            background-color: #e0e2e5;
+        }
+
+        .dialog-button.primary {
+            background-color: var(--facebook-blue);
+            color: #fff;
+        }
+        .dialog-button.primary:hover {
+            background-color: #1a6edb;
+        }
+
+        /* --- Indeterminate Progress Bar for Top Nav (Global Loading) --- */
+        .top-nav-progress-container {
+            position: absolute; /* Positioned relative to .top-nav */
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 100%;
+            overflow: hidden;
+            background-color: transparent; /* Track is invisible unless loading */
+            z-index: 1001; /* Above top-nav border */
+        }
+        .top-nav-progress-container.loading .top-nav-progress-bar {
+            animation: indeterminate-progress 2s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+            display: block;
+        }
+        .top-nav-progress-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--facebook-blue);
+            display: none; /* Hidden by default */
+            transform: translateX(-100%) scaleX(0);
+            transform-origin: left;
+        }
+
+        @keyframes indeterminate-progress {
+            0% { transform: translateX(-100%) scaleX(0); opacity: 0; }
+            5% { transform: translateX(-100%) scaleX(0.1); opacity: 1;}
+            25% { transform: translateX(0%) scaleX(0.3); opacity: 1;}
+            50% { transform: translateX(100%) scaleX(0); opacity: 0;}
+            100% { transform: translateX(100%) scaleX(0); opacity: 0;}
+        }
+
+        /* --- Help & Support Placeholder Screen --- */
+        .help-support-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background-white);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text-primary);
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .help-support-screen.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .help-support-screen h2 {
+            margin-bottom: 20px;
+            color: var(--facebook-blue);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .help-support-screen p {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            max-width: 300px;
+            line-height: 1.5;
+        }
+
+        .help-support-screen button {
+            background-color: var(--facebook-blue);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        .help-support-screen button:hover {
+            background-color: #1a6edb;
         }
     </style>
 </head>
 <body>
 
-    <div class="iphone-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="time">5:12</div>
-            <div class="status-icons">
-                <span>📶 4G</span>
-                <span>📶</span>
-                <span>🔋 84%</span>
-            </div>
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="left">
+            <span>21:05</span>
         </div>
-
-        <!-- Header -->
-        <header class="app-header">
-            <div class="user-info">
-                <span style="font-size: 20px;">👤</span>
-                <div>
-                    <div class="user-name">Peter ▾</div>
-                    <div class="connection-status"><span class="status-dot"></span> Connected</div>
-                </div>
-            </div>
-            <div class="header-icons">
-                <span style="font-size: 20px; color: var(--primary-purple);">📞</span>
-            </div>
-        </header>
-
-        <!-- Carousel -->
-        <div class="carousel-container">
-            <div class="banner">
-                <div class="banner-content">
-                    <div class="banner-headline">EXCLUSIVE<br>ONLINE OFFER</div>
-                    <button class="cta-button">Order Now</button>
-                    <span class="annotation" style="top: 100px; left: 20px;">[IMPROVED: High Contrast CTA]</span>
-                    <div class="banner-disclaimer">T&C Apply | 30th June</div>
-                    <span class="annotation" style="top: 125px; left: 120px;">[IMPROVED: Lowered density]</span>
-                </div>
-                <div style="position: relative;">
-                    <span style="font-size: 60px;">📡</span>
-                </div>
-            </div>
+        <div class="right">
+            <span>4G</span>
+            <i class="fa-solid fa-signal"></i>
+            <i class="fa-solid fa-wifi"></i>
+            <span style="margin-left: 2px;">42%</span>
+            <i class="fa-solid fa-battery-half"></i>
         </div>
-
-        <!-- Info Bar -->
-        <div class="info-bar">
-            <span>Updated 5:12 PM, Today</span>
-            <div class="refresh-indicator">
-                <div class="spinner"></div>
-                <span>Refreshing...</span>
-                <span class="annotation" style="right: 10px; top: 35px;">[IMPROVED: Loading Feedback]</span>
-            </div>
-        </div>
-
-        <!-- Tabs -->
-        <nav class="tabs">
-            <div class="tab active">DATA</div>
-            <div class="tab">VOICE</div>
-            <div class="tab">SMS</div>
-            <div class="tab">MONEY</div>
-        </nav>
-
-        <!-- Scrollable Content -->
-        <main class="content-scroll">
-            <div class="bill-period">Bill period: 05 Jun - 04 Jul</div>
-            
-            <div class="data-grid">
-                <!-- Anytime Card -->
-                <div class="usage-card">
-                    <div class="card-header">
-                        <span>Anytime</span>
-                        <span>☀️</span>
-                    </div>
-                    <div class="data-value">19.5 GB</div>
-                    <div class="data-label">remaining</div>
-                </div>
-
-                <!-- Night time Card -->
-                <div class="usage-card">
-                    <div class="card-header">
-                        <span>Night time</span>
-                        <span>🌙</span>
-                    </div>
-                    <div class="data-value">5.1 GB</div>
-                    <div class="data-label">remaining</div>
-                </div>
-
-                <!-- 4G Bonus Card -->
-                <div class="usage-card">
-                    <div class="card-header">
-                        <span>4G Bonus</span>
-                        <span>🎁</span>
-                    </div>
-                    <div class="data-value" style="font-size: 18px;">879.51 MB</div>
-                    <div class="data-label">remaining</div>
-                </div>
-
-                <!-- Work & Learn Card -->
-                <div class="usage-card">
-                    <div class="card-header">
-                        <span>Work & Learn</span>
-                        <span>💼</span>
-                    </div>
-                    <div class="data-value">9.9 GB</div>
-                    <div class="data-label">remaining</div>
-                </div>
-            </div>
-            
-            <span class="annotation" style="margin-top: 10px; position: static; display: block;">[IMPROVED: Standardized Grid Spacing]</span>
-        </main>
-
-        <!-- Floating Action Button -->
-        <div class="fab">
-            <img src="https://i.pravatar.cc/100?img=32" alt="Support">
-            <span class="annotation" style="right: 60px; top: 15px;">[Quick Support Access]</span>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <a href="#" class="nav-item active">
-                <span class="nav-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">🎧</span>
-                <span>Support</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">🏷️</span>
-                <span>Offers</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">🔔</span>
-                <span>Alerts</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">☰</span>
-                <span>Menu</span>
-            </a>
-        </nav>
-
-        <!-- Home Indicator -->
-        <div class="home-indicator"></div>
     </div>
 
+    <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <div class="logo">facebook</div>
+        <div class="right-icons">
+            <button class="icon-button"><i class="fa-solid fa-plus"></i><span class="annotation">Tap target increased</span></button>
+            <button class="icon-button"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="icon-button">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span class="badge">9+</span>
+            </button>
+        </div>
+        <!-- Indeterminate Progress Bar for global loading feedback -->
+        <div class="top-nav-progress-container" id="global-loading-bar">
+            <div class="top-nav-progress-bar"></div>
+            <span class="annotation-block" style="position: absolute; top: -22px; left: 0;">Global loading indicator for feed refresh</span>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+
+        <!-- Story Creation / Post Input -->
+        <div class="post-input-section">
+            <img class="profile-picture" src="https://via.placeholder.com/40x40?text=U" alt="User Profile" />
+            <input type="text" class="text-input" placeholder="What's on your mind?" onclick="showKeyboardAnnotation()" />
+            <span class="gallery-icon" onclick="simulatePostAction()"><i class="fa-solid fa-image"></i></span>
+            <div id="post-input-error" class="error-message">
+                <span class="annotation">Inline validation feedback for input fields</span>
+            </div>
+            <div class="progress-overlay" id="post-upload-progress">
+                <div class="spinner"></div>
+                <span class="annotation">Progress indicator for media uploads</span>
+            </div>
+        </div>
+
+        <!-- Stories Section -->
+        <div class="stories-section">
+            <div class="stories-container" id="stories-container">
+                <!-- Skeleton stories will be inserted here initially by JS -->
+                <span class="annotation-block" style="position: absolute; top: 15px; left: 15px; width: 100px; text-align: center;">Skeleton loading for stories</span>
+            </div>
+        </div>
+
+        <!-- News Feed -->
+        <div class="news-feed" id="news-feed">
+            <!-- Skeleton posts will be inserted here initially by JS -->
+            <span class="annotation-block" style="position: relative; top: 10px; left: 15px; width: 100px; text-align: center;">Skeleton loading for posts</span>
+            <!-- Real posts will be loaded later -->
+        </div>
+
+    </div>
+
+    <!-- Global Feedback / Error Snackbar -->
+    <div id="global-feedback-snackbar" class="snackbar">
+      <span id="snackbar-message">Action completed successfully!</span>
+      <button id="snackbar-action-button" class="snackbar-action hidden"></button>
+      <span class="annotation" style="position: absolute; bottom: -20px; right: 5px;">Snackbar for action feedback and 'Undo'</span>
+    </div>
+
+    <!-- Network Error Dialog (Modal) -->
+    <div id="network-error-dialog-overlay" class="dialog-overlay">
+        <div class="dialog">
+            <h3 class="dialog-title" id="dialog-title"></h3>
+            <p class="dialog-message" id="dialog-message"></p>
+            <div class="dialog-buttons">
+                <button class="dialog-button secondary hidden" id="dialog-secondary-button"></button>
+                <button class="dialog-button primary" id="dialog-primary-button"></button>
+            </div>
+            <span class="annotation-block" style="position: absolute; bottom: 5px; left: 5px;">Dialog for critical errors with recovery options</span>
+        </div>
+    </div>
+
+    <!-- Help & Support Placeholder Screen -->
+    <div id="help-support-screen" class="help-support-screen">
+        <h2>Help & Support</h2>
+        <p>Find answers to common questions, troubleshoot issues, or contact our support team.</p>
+        <p>This is where users can get assistance with features or problems.</p>
+        <button onclick="hideHelpSupport()">Go Back to Feed</button>
+        <span class="annotation-block" style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);">Easily accessible 'Help & Support' screen</span>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <i class="fa-solid fa-house"></i>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-play"></i>
+            <div class="nav-label">Reels</div>
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-user-group"></i>
+            <div class="nav-label">Friends</div>
+            <span class="badge">1</span>
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-shop"></i>
+            <div class="nav-label">Marketplace</div>
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-bell"></i>
+            <div class="nav-label">Notifications</div>
+            <span class="badge">2</span>
+        </div>
+        <div class="nav-item menu-item" onclick="showHelpSupportScreen()">
+            <i class="fa-solid fa-bars"></i>
+            <div class="nav-label">Menu</div>
+            <span class="annotation" style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);">Menu provides access to help</span>
+        </div>
+    </div>
+
+    <!-- Inline JavaScript for interactivity -->
+    <script>
+        // --- Snackbar / Toast functionality ---
+        function showSnackbar(message, isError = false, actionText = null, actionCallback = null, duration = null) {
+            const snackbar = document.getElementById('global-feedback-snackbar');
+            const snackbarMessage = document.getElementById('snackbar-message');
+            const snackbarActionButton = document.getElementById('snackbar-action-button');
+
+            snackbarMessage.textContent = message;
+            snackbar.className = 'snackbar'; // Reset classes for new state
+
+            if (isError) {
+                snackbar.classList.add('error');
+            } else {
+                snackbar.classList.remove('error');
+            }
+
+            if (actionText && actionCallback) {
+                snackbarActionButton.textContent = actionText;
+                snackbarActionButton.onclick = () => {
+                    actionCallback();
+                    snackbar.classList.remove('show'); // Dismiss snackbar on action
+                };
+                snackbarActionButton.classList.remove('hidden');
+                duration = duration || 5000; // Longer duration for actionable snackbars
+            } else {
+                snackbarActionButton.classList.add('hidden');
+                duration = duration || 3000; // Default duration
+            }
+
+            snackbar.classList.add('show');
+
+            // Clear previous timeouts and set a new one
+            if (snackbar.timeoutId) {
+                clearTimeout(snackbar.timeoutId);
+            }
+            snackbar.timeoutId = setTimeout(() => {
+                snackbar.classList.remove('show');
+            }, duration);
+        }
+
+        // --- Dialog / Modal functionality ---
+        function showDialog(title, message, primaryButtonText, primaryButtonCallback, secondaryButtonText = null, secondaryButtonCallback = null) {
+            const dialogOverlay = document.getElementById('network-error-dialog-overlay');
+            document.getElementById('dialog-title').textContent = title;
+            document.getElementById('dialog-message').textContent = message;
+
+            const primaryBtn = document.getElementById('dialog-primary-button');
+            primaryBtn.textContent = primaryButtonText;
+            primaryBtn.onclick = () => {
+                primaryButtonCallback();
+                dialogOverlay.classList.remove('show');
+            };
+
+            const secondaryBtn = document.getElementById('dialog-secondary-button');
+            if (secondaryButtonText && secondaryButtonCallback) {
+                secondaryBtn.textContent = secondaryButtonText;
+                secondaryBtn.onclick = () => {
+                    secondaryButtonCallback();
+                    dialogOverlay.classList.remove('show');
+                };
+                secondaryBtn.classList.remove('hidden');
+            } else {
+                secondaryBtn.classList.add('hidden');
+            }
+
+            dialogOverlay.classList.add('show');
+        }
+
+        // --- Post actions (like, hide) ---
+        function animateLikeButton(button) {
+            button.classList.toggle('liked');
+            // Reset animation to allow re-triggering
+            button.style.animation = 'none';
+            void button.offsetWidth; // Trigger reflow
+            button.style.animation = 'like-animation 0.3s ease-out';
+
+            if (button.classList.contains('liked')) {
+                showSnackbar('You liked this post!', false);
+            } else {
+                showSnackbar('You unliked this post!', false);
+            }
+        }
+
+        function simulateHidePost(postElement) {
+            // In a real app, this would send an API request to hide the post permanently
+            postElement.style.display = 'none'; // Temporarily hide the post for demonstration
+            showSnackbar('Post hidden.', false, 'Undo', () => {
+                postElement.style.display = 'block'; // Show it again
+                showSnackbar('Post unhidden!', false);
+            });
+        }
+
+        // --- Post Creation / Upload Logic ---
+        function simulatePostAction() {
+            const inputField = document.querySelector('.post-input-section .text-input');
+            const progressOverlay = document.getElementById('post-upload-progress');
+            const errorMessage = document.getElementById('post-input-error');
+
+            errorMessage.textContent = ''; // Clear previous errors
+            errorMessage.classList.remove('show');
+
+            if (inputField.value.trim() === '') {
+                errorMessage.textContent = 'Post content cannot be empty.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Simulate upload progress
+            progressOverlay.style.display = 'flex';
+            setTimeout(() => {
+                progressOverlay.style.display = 'none';
+                inputField.value = ''; // Clear input on success
+                showSnackbar('Post sent successfully!');
+                
+                // Simulate network error for next attempt, for demonstration purposes, randomly
+                if (Math.random() > 0.6) { // ~40% chance of network error
+                    showDialog(
+                        'Network Error',
+                        'Failed to upload post. Please check your connection and try again.',
+                        'Retry',
+                        () => console.log('Retrying post upload...'),
+                        'Cancel',
+                        () => console.log('Cancelled post upload.')
+                    );
+                }
+            }, 2000); // Simulate a 2-second upload time
+        }
+
+        function showKeyboardAnnotation() {
+            // This is purely for annotation demonstration, in a real app, a keyboard would just appear.
+            showSnackbar("Keyboard opens here. Placeholder text guides user to initiate post creation.", false, null, null, 2500);
+        }
+
+        // --- Help & Support Screen ---
+        function showHelpSupportScreen() {
+            document.getElementById('help-support-screen').classList.add('show');
+        }
+
+        function hideHelpSupport() {
+            document.getElementById('help-support-screen').classList.remove('show');
+        }
+
+
+        // --- Initial Loading States (Skeleton Screens) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const storiesContainer = document.getElementById('stories-container');
+            const newsFeed = document.getElementById('news-feed');
+            const globalLoadingBar = document.getElementById('global-loading-bar');
+
+            // Show global loading bar at the top
+            globalLoadingBar.classList.add('loading');
+
+            // Add skeleton stories placeholders
+            for (let i = 0; i < 4; i++) { // Generate 4 skeleton story cards
+                const skeletonStory = document.createElement('div');
+                skeletonStory.className = 'story-card loading';
+                storiesContainer.appendChild(skeletonStory);
+            }
+
+            // Add skeleton news feed posts placeholders
+            for (let i = 0; i < 2; i++) { // Generate 2 skeleton posts
+                const skeletonPost = document.createElement('div');
+                skeletonPost.className = 'news-feed-post loading';
+                skeletonPost.innerHTML = `
+                    <div class="post-header">
+                        <div class="profile-picture skeleton-circle"></div>
+                        <div style="flex-grow: 1;">
+                            <div class="username skeleton-text skeleton-text-short"></div>
+                            <div class="timestamp skeleton-text skeleton-text-x-small"></div>
+                        </div>
+                        <div class="post-options" style="display:flex; gap:15px">
+                            <div class="skeleton-icon"></div>
+                            <div class="skeleton-icon"></div>
+                        </div>
+                    </div>
+                    <div class="post-text skeleton-text skeleton-text-medium" style="height: 40px;"></div>
+                    <div class="post-media skeleton-rect" style="height: 200px;"></div>
+                    <div class="post-footer">
+                        <div class="reaction-counts skeleton-text skeleton-text-x-small"></div>
+                        <div class="post-actions" style="display:flex; justify-content: space-around; gap: 5px;">
+                            <div class="action-button skeleton-button"></div>
+                            <div class="action-button skeleton-button"></div>
+                            <div class="action-button skeleton-button"></div>
+                        </div>
+                    </div>
+                `;
+                newsFeed.appendChild(skeletonPost);
+            }
+
+            // Simulate loading actual content after a delay
+            setTimeout(() => {
+                // Hide global loading bar
+                globalLoadingBar.classList.remove('loading');
+
+                // Clear skeleton stories and replace with real ones
+                while (storiesContainer.firstChild) {
+                    storiesContainer.removeChild(storiesContainer.firstChild);
+                }
+                storiesContainer.innerHTML = `
+                    <div class="story-card">
+                        <img src="https://via.placeholder.com/110x180?text=Your+Story" alt="Create Story" />
+                        <div class="floating-action-button"><i class="fa-solid fa-plus"></i></div>
+                        <div class="text-overlay" style="text-align: center; width: 100%; left: 0;">Create story</div>
+                    </div>
+                    <div class="story-card">
+                        <img src="https://via.placeholder.com/110x180/ADD8E6/000000?text=Birthday+Event" alt="Harindu Story" />
+                        <img class="profile-picture-overlay" src="https://via.placeholder.com/32x32?text=H" alt="Harindu" />
+                        <div class="text-overlay">Harindu Samarasinghe</div>
+                    </div>
+                    <div class="story-card">
+                        <img src="https://via.placeholder.com/110x180/B0E0E6/000000?text=Gym+Workout" alt="Prabhath Story" />
+                        <img class="profile-picture-overlay" src="https://via.placeholder.com/32x32?text=P" alt="Prabhath" />
+                        <div class="text-overlay">Prabhath Madhusanka</div>
+                    </div>
+                    <div class="story-card">
+                        <img src="https://via.placeholder.com/110x180/FFC0CB/000000?text=Valentine's" alt="Anuda Story" />
+                        <img class="profile-picture-overlay" src="https://via.placeholder.com/32x32?text=A" alt="Anuda" />
+                        <div class="text-overlay">Anuda Pasandul</div>
+                    </div>
+                `;
+
+                // Clear skeleton posts and replace with actual posts
+                while (newsFeed.firstChild) {
+                    newsFeed.removeChild(newsFeed.firstChild);
+                }
+                newsFeed.innerHTML += `
+                    <div class="news-feed-post" id="post-1">
+                        <div class="post-header">
+                            <img class="profile-picture" src="https://via.placeholder.com/40x40?text=B" alt="Babuku Profile" />
+                            <div>
+                                <div class="username">Babuku - බබූකූ</div>
+                                <div class="post-info">5h <i class="fa-solid fa-earth-americas"></i></div>
+                            </div>
+                            <div class="post-options">
+                                <i class="fa-solid fa-ellipsis"></i>
+                                <i class="fa-solid fa-xmark" onclick="simulateHidePost(document.getElementById('post-1'))"></i>
+                            </div>
+                        </div>
+                        <div class="post-text">සංසාරේ පුරුදු ලෙසින්... (Read More)</div>
+                        <div class="post-media">
+                            <img src="https://via.placeholder.com/400x250?text=Woman+placing+money+with+children" alt="Post Image" />
+                            <img class="profile-picture-overlay" src="https://via.placeholder.com/30x30?text=B" alt="Babuku Overlay" />
+                        </div>
+                        <div class="post-footer">
+                            <div class="reaction-counts">
+                                <i class="fa-solid fa-face-sad-cry"></i>
+                                <i class="fa-solid fa-heart"></i>
+                                <span>500K</span>
+                            </div>
+                            <div class="post-actions">
+                                <button class="action-button like-button" onclick="animateLikeButton(this)"><i class="fa-regular fa-thumbs-up"></i> Like</button>
+                                <button class="action-button"><i class="fa-regular fa-comment"></i> Comment</button>
+                                <button class="action-button"><i class="fa-solid fa-share"></i> Share</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-feed-post" id="post-2">
+                        <div class="post-header">
+                            <img class="profile-picture" src="https://via.placeholder.com/40x40?text=U" alt="User Profile" />
+                            <div>
+                                <div class="username">Another User</div>
+                                <div class="post-info">1h <i class="fa-solid fa-earth-americas"></i></div>
+                            </div>
+                            <div class="post-options">
+                                <i class="fa-solid fa-ellipsis"></i>
+                                <i class="fa-solid fa-xmark" onclick="simulateHidePost(document.getElementById('post-2'))"></i>
+                            </div>
+                        </div>
+                        <div class="post-text">Just enjoying a beautiful sunset today!</div>
+                        <div class="post-media">
+                            <img src="https://via.placeholder.com/400x250?text=Beautiful+Sunset" alt="Sunset Image" />
+                            <img class="profile-picture-overlay" src="https://via.placeholder.com/30x30?text=U" alt="User Overlay" />
+                        </div>
+                        <div class="post-footer">
+                            <div class="reaction-counts">
+                                <i class="fa-solid fa-heart"></i>
+                                <span>2.3K</span>
+                            </div>
+                            <div class="post-actions">
+                                <button class="action-button like-button" onclick="animateLikeButton(this)"><i class="fa-regular fa-thumbs-up"></i> Like</button>
+                                <button class="action-button"><i class="fa-regular fa-comment"></i> Comment</button>
+                                <button class="action-button"><i class="fa-solid fa-share"></i> Share</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }, 3000); // Simulate a 3-second loading time
+        });
+    </script>
 </body>
 </html>

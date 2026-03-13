@@ -1,5 +1,10 @@
 from fastapi import WebSocket
 import asyncio
+import logging
+import json
+
+logger = logging.getLogger("ws_manager")
+
 
 class ConnectionManager:
     def __init__(self):
@@ -8,38 +13,54 @@ class ConnectionManager:
     async def connect(self, client_id: str, websocket: WebSocket):
         await websocket.accept()
         self.active_connections[client_id] = websocket
+        logger.info(f"[WS] Client connected: {client_id}")
 
     def disconnect(self, client_id: str):
-        self.active_connections.pop(client_id, None)
+        if client_id in self.active_connections:
+            self.active_connections.pop(client_id)
+            logger.info(f"[WS] Client disconnected: {client_id}")
 
-    async def send_progress(self, client_id: str, message: str, step: int):
+    async def send_progress(self, client_id: str, message: str | dict, step: int):
+
         ws = self.active_connections.get(client_id)
-        if ws:
-            await ws.send_json({
-                "message": message,
-                "step": step,
-                "status": "processing"
-            })
+
+        if not ws:
+            logger.warning(f"[WS] No active websocket for client {client_id}")
+            return
+
+        payload = {
+            "message": message,
+            "step": step,
+            "status": "processing"
+        }
+
+        try:
+            logger.info(f"[WS SEND] -> {json.dumps(payload)[:200]}")
+            await ws.send_json(payload)
+            logger.info(f"[WS] Sent successfully to {client_id}")
+
+        except Exception as e:
+            logger.error(f"[WS ERROR] sending to {client_id}: {e}")
+
 
 manager = ConnectionManager()
 
-def safe_emit(client_id: str, message: str, step: int):
+
+def safe_emit(client_id: str, message: str | dict, step: int):
     """
-    Can be called from sync code safely
+    Safe websocket emitter from any thread (CrewAI runs in worker threads)
     """
+
+    logger.info(f"[WS EMIT] client={client_id} step={step}")
+
     try:
-        # get the existing loop from the main FastAPI thread
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            asyncio.run_coroutine_threadsafe(
-                manager.send_progress(client_id, message, step), 
-                loop
-            )
-        else:
-            loop.run_until_complete(manager.send_progress(client_id, message, step))
-    except Exception as e:
-        # Fallback for worker threads
-        new_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(new_loop)
-        new_loop.run_until_complete(manager.send_progress(client_id, message, step))
-        new_loop.close()
+        loop = asyncio.get_running_loop()
+
+        asyncio.run_coroutine_threadsafe(
+            manager.send_progress(client_id, message, step),
+            loop,
+        )
+
+    except RuntimeError:
+        # If no running loop, fallback
+        asyncio.run(manager.send_progress(client_id, message, step))

@@ -1,100 +1,141 @@
 """
 hitl_handler.py
 
-Bridges CrewAI's human_input=True with FastAPI.
-Instead of waiting for console input, it:
-1. Sends the agent output to Flutter via WebSocket
-2. Waits for the human reviewer to submit feedback via /submit-feedback
-3. Returns that feedback to CrewAI to continue the pipeline
+Patches builtins.input at import time.
+Stores the agent output from the task callback so it can be sent
+to Flutter for display in the review dialog.
 """
 
+import builtins
 import threading
-import time
 import logging
 from src.ws_manager import safe_emit
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("hitl_handler")
 
-# Global store: evaluation_id -> threading.Event + feedback result
-_hitl_events: dict[str, dict] = {}
+_original_input = builtins.input
 
+_context: dict = {
+    "evaluation_id": None,
+    "client_id": None,
+}
 
-def register_hitl_session(evaluation_id: str):
-    """Call this before starting the pipeline for a given evaluation."""
-    _hitl_events[evaluation_id] = {
-        "event": threading.Event(),
-        "feedback": None,
-    }
+_sessions: dict[str, dict] = {}
 
 
-def wait_for_human_feedback(evaluation_id: str, agent_name: str, agent_output: str, client_id: str, timeout: int = 300) -> str:
-    """
-    Called by CrewAI's human input handler.
-    Sends the agent output to Flutter and blocks until reviewer submits feedback.
-    
-    Args:
-        evaluation_id: The current job ID
-        agent_name: Which agent is waiting (e.g. "feedback_specialist")
-        agent_output: What the agent produced
-        client_id: WebSocket client ID for Flutter
-        timeout: How long to wait in seconds (default 5 mins)
-    
-    Returns:
-        Human feedback string to inject back into CrewAI
-    """
-    session = _hitl_events.get(evaluation_id)
+def _patched_input(prompt=""):
+    evaluation_id = _context.get("evaluation_id")
+    client_id     = _context.get("client_id")
+
+    if not evaluation_id or not client_id:
+        logger.warning("[HITL] No active context — console fallback")
+        return _original_input(prompt)
+
+    session = _sessions.get(evaluation_id)
     if not session:
-        logger.warning(f"No HITL session found for {evaluation_id}, skipping human input")
-        return "Approved"
+        logger.warning(f"[HITL] No session for {evaluation_id} — returning ''")
+        return ""
 
-    # Reset event for this round
+    # Second call after disagree/modify — return "" to exit CrewAI loop
+    if session.get("reviewed_once"):
+        logger.info(f"[HITL] Second input() call — returning '' to exit loop")
+        session["reviewed_once"] = False
+        return ""
+
     session["event"].clear()
     session["feedback"] = None
 
-    # Notify Flutter via WebSocket that human review is needed
-    safe_emit(
-        client_id,
-        f"HITL_REQUIRED:{agent_name}",  # Flutter listens for this prefix
-        50 if agent_name == "feedback_specialist" else 75
-    )
+    # Send the feedback report content FIRST so Flutter can display it
+    agent_output = session.get("agent_output", "")
+    if agent_output:
+        # Send as a separate WS message with HITL_OUTPUT: prefix
+        # Flutter parses this to populate the dialog text
+        safe_emit(client_id, f"HITL_OUTPUT:{agent_output[:3000]}", 55)
 
-    logger.info(f"[HITL] Waiting for human feedback on '{agent_name}' for evaluation {evaluation_id}")
+    # Then send HITL_REQUIRED to trigger the dialog
+    safe_emit(client_id, "HITL_REQUIRED", 55)
+    logger.info(f"[HITL] Sent output + HITL_REQUIRED | evaluation={evaluation_id}")
+    logger.info("[HITL] Blocking pipeline thread...")
 
-    # Block until feedback arrives or timeout
-    received = session["event"].wait(timeout=timeout)
+    received = session["event"].wait(timeout=300)
 
     if not received:
-        logger.warning(f"[HITL] Timeout waiting for feedback on {evaluation_id}, continuing with approval")
-        return "Approved - no reviewer response within timeout"
+        logger.warning("[HITL] Timeout — returning '' to exit loop")
+        return ""
 
-    feedback = session["feedback"] or "Approved"
-    logger.info(f"[HITL] Received feedback for {evaluation_id}: {feedback}")
-    return feedback
+    rating   = session.get("rating", "agree")
+    feedback = session.get("feedback", "")
+    logger.info(f"[HITL] Unblocked | rating={rating}")
+
+    if rating == "agree":
+        session["reviewed_once"] = False
+        return ""   # Enter key equivalent — CrewAI exits loop
+    else:
+        session["reviewed_once"] = True
+        return feedback  # CrewAI reruns task, then input() returns "" next time
 
 
-def submit_human_feedback(evaluation_id: str, rating: str, suggestion: str):
+# ── Patch at import time ──
+builtins.input = _patched_input
+logger.info("[HITL] builtins.input patched globally")
+
+
+# ─── Public API ───────────────────────────────────────────────────────────────
+
+def register_hitl_session(evaluation_id: str):
+    _sessions[evaluation_id] = {
+        "event": threading.Event(),
+        "feedback": None,
+        "rating": None,
+        "agent_output": "",
+        "reviewed_once": False,
+    }
+    logger.info(f"[HITL] Session registered: {evaluation_id}")
+
+
+def store_agent_output(evaluation_id: str, output: str):
     """
-    Called by FastAPI's /submit-feedback endpoint.
-    Unblocks the waiting pipeline with the reviewer's input.
+    Called from crew.py task callback BEFORE human_input=True triggers input().
+    Stores the feedback report so _patched_input() can send it to Flutter.
     """
-    session = _hitl_events.get(evaluation_id)
+    session = _sessions.get(evaluation_id)
+    if session:
+        session["agent_output"] = output
+        logger.info(f"[HITL] Agent output stored ({len(output)} chars)")
+
+
+def set_active_context(evaluation_id: str, client_id: str):
+    _context["evaluation_id"] = evaluation_id
+    _context["client_id"]     = client_id
+    logger.info(f"[HITL] Context set: {evaluation_id} | client: {client_id}")
+
+
+def clear_active_context():
+    _context["evaluation_id"] = None
+    _context["client_id"]     = None
+    logger.info("[HITL] Context cleared")
+
+
+def submit_human_feedback(evaluation_id: str, rating: str, suggestion: str) -> bool:
+    session = _sessions.get(evaluation_id)
     if not session:
         logger.warning(f"[HITL] No waiting session for {evaluation_id}")
         return False
 
-    # Format feedback for CrewAI context
     if rating == "agree":
-        feedback_text = "Approved. The output looks correct, proceed."
+        feedback_text = ""
     elif rating == "disagree":
-        feedback_text = f"Rejected. Please revise. Reviewer comment: {suggestion or 'No specific comment provided'}"
-    else:  # modify
-        feedback_text = f"Partially approved with modifications needed: {suggestion or 'No specific comment provided'}"
+        feedback_text = f"The feedback needs improvement. Reviewer comment: {suggestion or 'No comment'}"
+    else:
+        feedback_text = f"Please modify the feedback. Required changes: {suggestion or 'No comment'}"
 
+    session["rating"]   = rating
     session["feedback"] = feedback_text
-    session["event"].set()  # Unblock the waiting pipeline
+    session["event"].set()
+    logger.info(f"[HITL] Thread unblocked | evaluation={evaluation_id} rating={rating}")
     return True
 
 
 def cleanup_hitl_session(evaluation_id: str):
-    """Call after pipeline completes to free memory."""
-    _hitl_events.pop(evaluation_id, None)
+    _sessions.pop(evaluation_id, None)
+    logger.info(f"[HITL] Session cleaned: {evaluation_id}")

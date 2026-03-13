@@ -65,6 +65,15 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
         for w in feedback_data["quick_wins"]:
             md += f"- **{w.get('change', 'N/A')}** — {w.get('impact', 'N/A')} (Effort: {w.get('effort', 'N/A')})\n"
         md += "\n---\n\n"
+    
+    if "ux_score" in feedback_data:
+        score = feedback_data["ux_score"]
+
+        md += "## 🎯 Overall UX Score\n"
+        md += f"- **Score:** {score.get('score', 'N/A')} / 100\n"
+        md += f"- **Grade:** {score.get('grade', 'N/A')}\n"
+        md += f"- **Severity Level:** {score.get('severity', 'N/A')}\n"
+        md += f"- **Reason:** {score.get('reasoning', 'N/A')}\n\n---\n\n"
 
     md += "## 🔧 Detailed Recommendations\n\n"
     for item in feedback_data.get("feedback_items", []):
@@ -87,6 +96,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
 def generate_feedback(vision_analysis: str, heuristic_evaluation: str) -> str:
     """
     Convert UX violations into developer-friendly feedback JSON and save report.
+    Also estimate an overall UX score from 0–100 based on the severity and number of usability issues.
 
     Args:
         vision_analysis: JSON string from vision tool.
@@ -129,6 +139,12 @@ Return ONLY valid JSON in this structure:
       "effort": "..."
     }}
   ],
+  "ux_score": {{
+    "score": 0,
+    "grade": "excellent|good|average|poor",
+    "severity": "low|moderate|high",
+    "reasoning": "short explanation"
+  }},
   "summary": {{
     "total_issues": 10,
     "high": 2,
@@ -142,7 +158,7 @@ Return ONLY valid JSON in this structure:
 
     # Generate content
     response = client.models.generate_content(
-        model="gemini-2.0-flash", # Note: Changed to 2.0 unless you have specific access to a 2.5/3.0 preview
+        model="gemini-2.5-flash", # Note: Changed to 2.0 unless you have specific access to a 2.5/3.0 preview
         contents=prompt
     )
     
@@ -152,7 +168,7 @@ Return ONLY valid JSON in this structure:
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
-        print(f"❌ Error parsing feedback JSON: {e}")
+        print(f"Error parsing feedback JSON: {e}")
         return f"Error: Could not parse JSON. Raw output: {raw_text[:200]}"
 
     # Save the files

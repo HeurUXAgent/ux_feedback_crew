@@ -1,14 +1,21 @@
+# ══ CRITICAL: This must be the very first import ══
+# Patches builtins.input globally before CrewAI or any other module loads.
+# If this import is not first, CrewAI caches the original input() and the
+# patch won't intercept it.
+import app.utils.hitl_handler  # noqa: F401  ← patch happens here at import time
+
 import logging
 import time
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Header
+import sys
+from pathlib import Path
+from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Header, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uuid
 import os
-from pathlib import Path
-from src.ws_manager import manager
-from fastapi import WebSocket, WebSocketDisconnect
 from starlette.concurrency import run_in_threadpool
+
+from src.ws_manager import manager
 from app.services.s3_service import upload_image_to_s3
 from app.services.database import (
     create_evaluation_document,
@@ -24,7 +31,6 @@ from app.utils.hitl_handler import (
     submit_human_feedback,
     cleanup_hitl_session,
 )
-import sys
 
 logging.basicConfig(
     level=logging.INFO,
@@ -43,32 +49,32 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-OUTPUT_DIR = Path("outputs")
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs("outputs", exist_ok=True)
 
 
-# ─── Pydantic Models ──────────────────────────────────────────────────────────
+# ─── Models ───────────────────────────────────────────────────────────────────
 
 class HITLFeedbackRequest(BaseModel):
     evaluation_id: str
-    agent_name: str                  # "feedback_specialist" | "wireframe_designer"
-    ai_suggestion: str = ""          # the original AI suggestion being reviewed
-    user_action: str                 # "agree" | "disagree" | "modify"
+    agent_name: str
+    ai_suggestion: str = ""
+    user_action: str                    # "agree" | "disagree" | "modify"
     user_modified_suggestion: str = ""
 
 
-# ─── Main Pipeline Endpoint ───────────────────────────────────────────────────
+# ─── Pipeline Endpoint ────────────────────────────────────────────────────────
 
 @app.post("/analyze-and-wireframe-s3/{client_id}")
 async def analyze_and_wireframe_s3(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     client_id: str = "",
-    x_user_id: str = Header(default="anonymous"),   # Firebase UID sent from Flutter
+    x_user_id: str = Header(default="anonymous"),
 ):
     job_id = str(uuid.uuid4())
     pipeline_start = time.time()
@@ -76,24 +82,29 @@ async def analyze_and_wireframe_s3(
     try:
         logger.info(f"[JOB START] {job_id} | user: {x_user_id}")
 
-        # ── 1. Upload to S3 ──
+        # 1. Upload to S3
         await manager.send_progress(client_id, "Uploading image to S3...", 5)
         image_url = await upload_image_to_s3(file)
 
-        # ── 2. Create MongoDB document immediately (status: processing) ──
+        # 2. Create MongoDB document (status: processing)
         create_evaluation_document(
             evaluation_id=job_id,
             user_id=x_user_id,
             screenshot_url=image_url,
         )
-        logger.info(f"[MONGO] Document created for {job_id}")
 
+        # 3. Send JOB_ID to Flutter BEFORE pipeline starts
+        #    Flutter stores this so it can POST to /submit-feedback mid-pipeline
+        await manager.send_progress(client_id, f"JOB_ID:{job_id}", 8)
         await manager.send_progress(client_id, "Initializing Agents...", 10)
 
-        # ── 3. Register HITL session ──
+        # 4. Register HITL session for this evaluation
         register_hitl_session(job_id)
 
-        # ── 4. Run CrewAI pipeline ──
+        # 5. Run pipeline in thread
+        #    When generate_feedback task completes, CrewAI calls input()
+        #    → our patch intercepts → sends HITL_REQUIRED to Flutter
+        #    → blocks until Flutter POSTs to /submit-feedback
         result = await run_in_threadpool(
             run_full_ux_pipeline_raw,
             image_url,
@@ -102,63 +113,49 @@ async def analyze_and_wireframe_s3(
         )
 
         duration = time.time() - pipeline_start
-        logger.info(f"[PIPELINE] Done in {duration:.2f}s")
+        logger.info(f"[PIPELINE] Completed in {duration:.2f}s")
 
-        # ── 5. Complete MongoDB document with all agent outputs ──
+        # 6. Save results to MongoDB
         complete_evaluation(
             evaluation_id=job_id,
             tasks_output=result.tasks_output,
             pipeline_duration_seconds=duration,
         )
-        logger.info(f"[MONGO] Evaluation completed for {job_id}")
 
-        # ── 6. Cleanup ──
         background_tasks.add_task(cleanup_hitl_session, job_id)
-
         await manager.send_progress(client_id, "Pipeline Complete", 100)
 
         return {
             "evaluation_id": job_id,
             "image_url": image_url,
-            "feedback": str(result.tasks_output[2].raw),
+            "feedback":  str(result.tasks_output[2].raw),
             "wireframe": str(result.tasks_output[3].raw),
         }
 
     except Exception as e:
-        # Mark as failed in MongoDB so history UI shows correct status
         fail_evaluation(job_id, str(e))
         logger.error(f"[ERROR] {job_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ─── HITL Feedback Endpoint ───────────────────────────────────────────────────
+# ─── HITL Endpoint ────────────────────────────────────────────────────────────
 
 @app.post("/submit-feedback")
 async def submit_hitl_feedback(
     body: HITLFeedbackRequest,
     x_user_id: str = Header(default="anonymous"),
 ):
-    """
-    Called by Flutter when reviewer submits their rating on an agent output.
-    Does two things:
-      1. Unblocks the waiting CrewAI pipeline thread
-      2. Persists the feedback to MongoDB
-    """
     if body.user_action not in ["agree", "disagree", "modify"]:
         raise HTTPException(status_code=400, detail="user_action must be: agree | disagree | modify")
 
-    evaluation = get_evaluation(body.evaluation_id)
-    if not evaluation:
-        raise HTTPException(status_code=404, detail="Evaluation not found")
-
-    # Unblock the CrewAI pipeline
+    # Unblocks the pipeline thread waiting inside _patched_input()
     unblocked = submit_human_feedback(
         evaluation_id=body.evaluation_id,
         rating=body.user_action,
         suggestion=body.user_modified_suggestion,
     )
 
-    # Persist to MongoDB
+    # Save to MongoDB regardless of whether pipeline was waiting
     save_hitl_response(
         evaluation_id=body.evaluation_id,
         agent_name=body.agent_name,
@@ -168,7 +165,7 @@ async def submit_hitl_feedback(
         reviewed_by=x_user_id,
     )
 
-    logger.info(f"[HITL] {body.agent_name} | {body.user_action} | {body.evaluation_id}")
+    logger.info(f"[HITL] {body.agent_name} | {body.user_action} | unblocked={unblocked}")
 
     return {
         "message": "Feedback saved",
@@ -177,11 +174,10 @@ async def submit_hitl_feedback(
     }
 
 
-# ─── History / Fetch Endpoints ────────────────────────────────────────────────
+# ─── Fetch Endpoints ──────────────────────────────────────────────────────────
 
 @app.get("/evaluation/{evaluation_id}")
 async def get_single_evaluation(evaluation_id: str):
-    """Full evaluation details — used on result screen."""
     doc = get_evaluation(evaluation_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Evaluation not found")
@@ -190,20 +186,11 @@ async def get_single_evaluation(evaluation_id: str):
 
 @app.get("/evaluations/user/{user_id}")
 async def get_user_history(user_id: str):
-    """
-    Lightweight evaluation history for a user.
-    Used to render the history screen in Flutter.
-    """
-    docs = get_user_evaluations(user_id)
-    return {"evaluations": docs}
+    return {"evaluations": get_user_evaluations(user_id)}
 
 
 @app.get("/evaluations/analysis/export")
 async def export_for_analysis():
-    """
-    Exports all completed evaluations for thesis analysis.
-    Use this to compute HITL agreement rates, score distributions etc.
-    """
     docs = get_evaluations_for_analysis()
     return {"total": len(docs), "evaluations": docs}
 
@@ -213,19 +200,10 @@ async def export_for_analysis():
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await manager.connect(client_id, websocket)
+    logger.info(f"[WS] Connected: {client_id}")
     try:
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(client_id)
-
-    
-# @app.websocket("/ws/{client_id}")
-# async def websocket_endpoint(websocket: WebSocket, client_id: str):
-#     await manager.connect(client_id, websocket)
-#     try:
-#         while True:
-#             await websocket.receive_text()
-#     except WebSocketDisconnect:
-#         manager.disconnect(client_id)
-
+        logger.info(f"[WS] Disconnected: {client_id}")

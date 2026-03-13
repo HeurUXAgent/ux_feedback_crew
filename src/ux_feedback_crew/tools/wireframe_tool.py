@@ -61,14 +61,14 @@ IMPROVEMENTS TO IMPLEMENT:
 
 5. **Make it realistic but clean:**
    - Use actual UI components (buttons, cards, inputs)
-   - Include icons (use emoji or Unicode symbols)
+   - Include icons which are universally recognized symbols that represent top-level destinations
    - Proper visual hierarchy
 
 Return ONLY a single HTML document (no markdown).
 """
 
     response = client.models.generate_content(
-        model="gemini-3-flash-preview",
+        model="gemini-2.5-flash",
         contents=prompt
     )
 
