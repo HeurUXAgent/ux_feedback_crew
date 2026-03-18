@@ -1,1272 +1,657 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook Feed - Improved Design</title>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Artist Profile / Music Player - Redesign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles from original, with improvements and new elements */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-
         :root {
-            /* Facebook Color Scheme */
-            --facebook-blue: #1877F2;
-            --background-white: #FFFFFF;
-            --background-light-gray: #F0F2F5; /* Used for separators and subtle backgrounds */
-            --text-primary: #050505; /* Dark gray/black */
-            --text-secondary: #65676B; /* Medium gray */
-            --notification-red: #E42647; /* Red for badges/errors */
-            --green-accent: #27a441; /* For gallery icon */
-            --border-gray: #dddfe2; /* Subtle border color */
+            /* Original Colors */
+            --color-primary-background-red: #E51A20; /* Used for app frame border */
+            --color-app-background-white: #FFFFFF;
+            --color-dark-gray-black: #333333; /* Primary text */
+            --color-vibrant-blue: #2196F3; /* Play button */
+            --color-mini-player-background: #212121;
+            --color-on-dark: #FFFFFF; /* Text on dark backgrounds */
+
+            /* Improved Colors for Accessibility & UI */
+            --color-secondary-text-improved: #666666; /* Improved contrast for secondary text (was #999999) */
+            --color-status-bar-icons: #333333; /* For status bar on white background */
+            --color-annotation-text: #555555; /* Muted color for annotations */
+            --color-annotation-bg: #f5f5f5;
+            --color-annotation-border: #cccccc;
+
+
+            /* Typography */
+            --font-family-system: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            --font-size-xs: 0.65rem; /* ~10px for annotations */
+            --font-size-small: 0.75rem; /* ~12px */
+            --font-size-medium: 0.9375rem; /* ~15px */
+            --font-size-regular: 1rem; /* ~16px */
+            --font-size-large: 1.25rem; /* ~20px */
+            --font-size-artist-name: 1.75rem; /* ~28px */
+            --font-size-section-header: 1.125rem; /* ~18px */
+            --font-size-mini-player-song: 0.9rem;
+            --font-size-mini-player-artist: 0.8rem;
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-s: 8px;
+            --spacing-m: 16px;
+            --spacing-l: 24px;
+            --spacing-xl: 32px;
+            --padding-horizontal: var(--spacing-m); /* Consistent screen edge padding */
+
+            /* Touch Target */
+            --min-touch-target: 44px; /* Minimum recommended touch target size */
         }
 
+        /* Base Styles */
         body {
-            font-family: 'Roboto', sans-serif;
             margin: 0;
-            background-color: var(--background-light-gray);
+            font-family: var(--font-family-system);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f0f0f0; /* Light gray for outside the app frame */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for better screen display */
+            min-height: 100vh;
+            padding-top: var(--spacing-xl);
+            padding-bottom: var(--spacing-xl);
+        }
+
+        /* App Frame (Simulating iPhone dimensions) */
+        .app-frame {
+            width: 375px; /* Mobile-first width (e.g., iPhone SE/X reference) */
+            background-color: var(--color-app-background-white);
+            border-radius: 2.5rem; /* iOS-like rounded corners */
+            box-shadow: 0 0 0 10px var(--color-primary-background-red),
+                        0 20px 40px rgba(0, 0, 0, 0.2); /* Device shadow */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden; /* Prevent body scroll, content-area handles it */
-            color: var(--text-primary);
+            position: relative;
+            min-height: 812px; /* Typical iPhone X height, for aspect ratio demonstration */
         }
 
-        /* --- Annotation Styles --- */
-        /* Used to highlight specific improvements from the feedback */
-        .annotation {
-            font-size: 10px;
-            color: #888;
-            background-color: #fce8a6; /* Subtle yellow background */
-            padding: 1px 4px;
-            border-radius: 3px;
-            margin-left: 5px;
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-            vertical-align: middle;
-            font-weight: 500;
-            opacity: 0.9;
-            white-space: nowrap; /* Prevent text from breaking onto new lines */
-            z-index: 9999; /* Ensure annotations are visible */
+        /* Scrollable content area, excluding status/nav bar and mini player */
+        .screen-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            padding-bottom: calc(var(--min-touch-target) * 2); /* Ensures mini player doesn't hide content */
         }
 
-        .annotation-block {
-            font-size: 10px;
-            color: #888;
-            background-color: #fce8a6;
-            padding: 3px 5px;
-            border-radius: 3px;
-            margin-top: 5px;
-            line-height: 1.3;
-            font-weight: 500;
-            opacity: 0.9;
-            display: block;
-            z-index: 9999;
-        }
-        /* --- End Annotation Styles --- */
-
-
-        /* --- Status Bar --- */
+        /* iOS Status Bar */
         .status-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 15px;
-            background-color: var(--background-white);
-            font-size: 14px; /* Slightly larger for clarity */
-            color: var(--text-secondary);
-        }
-
-        .status-bar .left {
+            padding: var(--spacing-s) var(--spacing-m);
+            font-size: var(--font-size-small);
             font-weight: 500;
-            color: var(--text-primary); /* Time is usually primary */
-            font-size: 14px; /* Consistent with other primary text */
+            color: var(--color-status-bar-icons);
+            background-color: var(--color-app-background-white);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .status-bar .right {
+        .status-bar-left, .status-bar-right {
             display: flex;
             align-items: center;
-            gap: 5px; /* Spacing between icons and text */
         }
 
-        /* --- Top Navigation Bar --- */
-        .top-nav {
+        .status-bar-left span:first-child { margin-right: var(--spacing-xs); }
+        .status-bar-right span { margin-left: var(--spacing-xs); }
+
+        /* Navigation Bar */
+        .navigation-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            background-color: var(--background-white);
-            border-bottom: 1px solid var(--border-gray);
+            padding: var(--spacing-s) var(--padding-horizontal);
+            background-color: var(--color-app-background-white);
             position: sticky;
-            top: 0;
-            z-index: 1000;
-            min-height: 48px; /* Ensure sufficient height for tap targets and content */
+            top: 0; /* Stays below status bar */
+            z-index: 9; /* Below status bar, above content */
+            min-height: var(--min-touch-target); /* Ensure minimum height */
         }
 
-        .top-nav .logo {
-            color: var(--facebook-blue);
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .top-nav .right-icons {
+        .navigation-bar .icon-button {
             display: flex;
-            gap: 10px;
-        }
-
-        .top-nav .icon-button {
-            background-color: var(--background-light-gray);
-            border-radius: 50%;
-            width: 38px; /* Increased for better tap target size (min 44px recommended, but visually balanced here) */
-            height: 38px; /* Increased for better tap target size */
-            display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 18px;
-            color: var(--text-primary);
-            cursor: pointer;
-            position: relative;
+            justify-content: center;
+            width: var(--min-touch-target);
+            height: var(--min-touch-target);
+            border-radius: 50%; /* Circular buttons */
+            background: none;
             border: none;
-            transition: background-color 0.2s; /* Smooth hover state */
-        }
-        .top-nav .icon-button:hover {
-            background-color: #e0e2e5;
-        }
-
-        .top-nav .icon-button .badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background-color: var(--notification-red);
-            color: #fff;
-            border-radius: 50%;
-            font-size: 10px;
-            padding: 2px 5px;
-            min-width: 10px;
-            text-align: center;
-            line-height: 1; /* Adjust for better vertical alignment */
-            font-weight: 500;
-        }
-
-        /* --- Content Area --- */
-        .content-area {
-            flex-grow: 1; /* Allows it to fill available vertical space */
-            overflow-y: auto; /* Enables vertical scrolling for content */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS devices */
-            padding-bottom: 5px; /* Small buffer at the bottom */
-        }
-
-        /* --- Story Creation / Post Input Section --- */
-        .post-input-section {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background-color: var(--background-white);
-            border-bottom: 8px solid var(--background-light-gray); /* Section separator */
-            position: relative; /* For error message and progress overlay positioning */
-        }
-
-        .post-input-section .profile-picture {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-            flex-shrink: 0; /* Prevent shrinking on smaller screens */
-        }
-
-        .post-input-section .text-input {
-            flex-grow: 1;
-            padding: 10px 15px; /* Increased padding for improved tap target and readability */
-            border: 1px solid var(--border-gray);
-            border-radius: 20px;
-            background-color: var(--background-light-gray);
-            color: var(--text-primary);
-            font-size: 15px;
-            outline: none;
-            cursor: text;
-            transition: border-color 0.2s, background-color 0.2s; /* Smooth focus state */
-            min-height: 24px; /* Ensure input has minimal height for content */
-        }
-        .post-input-section .text-input:focus {
-            border-color: var(--facebook-blue);
-            background-color: #fff;
-        }
-        .post-input-section .text-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .post-input-section .gallery-icon {
-            font-size: 22px;
-            color: var(--green-accent);
-            margin-left: 10px;
+            color: var(--color-dark-gray-black);
+            font-size: var(--font-size-large);
             cursor: pointer;
-            width: 44px; /* Minimum recommended tap target size */
-            height: 44px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        /* Inline validation error message */
-        .post-input-section .error-message {
-            color: var(--notification-red);
-            font-size: 12px;
-            position: absolute;
-            bottom: -8px; /* Position below the input field */
-            left: 65px; /* Aligned with input text start (after profile picture) */
-            width: calc(100% - 80px); /* Account for side elements */
-            display: none; /* Hidden by default */
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .post-input-section .error-message.show {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Progress overlay for media upload */
-        .post-input-section .progress-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white overlay */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 0;
-            z-index: 10;
-            display: none; /* Hidden by default */
-        }
-
-        .progress-overlay .spinner {
-            border: 3px solid var(--background-light-gray);
-            border-top: 3px solid var(--facebook-blue); /* Blue spinner part */
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            animation: spin 1s linear infinite; /* Spinning animation */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* --- Stories Section --- */
-        .stories-section {
-            padding: 10px 0;
-            background-color: var(--background-white);
-            border-bottom: 8px solid var(--background-light-gray); /* Section separator */
+            transition: background-color 0.2s ease, color 0.2s ease;
             position: relative; /* For annotation positioning */
         }
 
-        .stories-section .stories-container {
+        .navigation-bar .icon-button:hover {
+            background-color: #f0f0f0; /* Subtle hover feedback */
+        }
+
+        .navigation-bar .icon-button:active {
+            background-color: #e0e0e0; /* Active state for tap feedback */
+        }
+
+        .navigation-bar .nav-right-icons {
             display: flex;
-            overflow-x: auto; /* Enables horizontal scrolling */
-            padding: 0 15px; /* Consistent horizontal padding */
-            gap: 10px; /* Spacing between story cards */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            scrollbar-width: none; /* Hide scrollbar for Firefox */
-            -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+            gap: var(--spacing-xs);
         }
 
-        .stories-container::-webkit-scrollbar {
-            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
-        }
-
-        .story-card {
-            flex: 0 0 auto; /* Prevent cards from shrinking */
-            width: 110px;
-            height: 180px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            background-color: #ddd; /* Placeholder background */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for card effect */
-            cursor: pointer;
-        }
-
-        /* Skeleton loading state for stories */
-        .story-card.loading {
-            background: linear-gradient(90deg, var(--background-light-gray) 25%, #e0e2e5 50%, var(--background-light-gray) 75%);
-            background-size: 200% 100%;
-            animation: loading-animation 1.5s infinite; /* Shimmer effect */
-        }
-
-        .story-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block; /* Remove extra space below image */
-        }
-
-        .story-card .profile-picture-overlay {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 3px solid var(--facebook-blue); /* Blue border for viewed stories */
-            background-color: var(--background-white);
-            object-fit: cover;
-            z-index: 2;
-        }
-
-        .story-card .floating-action-button {
-            position: absolute;
-            bottom: 30px; /* Positioned above the text overlay */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--facebook-blue);
-            color: #fff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            border: 2px solid var(--background-white);
-            z-index: 2;
-        }
-
-        .story-card .text-overlay {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            right: 8px; /* Allows text to span card width */
-            color: #fff;
-            font-size: 13px;
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Text readability over images */
-            z-index: 2;
-            text-align: center; /* For 'Create story' text */
-        }
-
-        /* --- News Feed Posts --- */
-        .news-feed {
-            padding-bottom: 10px;
-        }
-
-        .news-feed-post {
-            background-color: var(--background-white);
-            margin-bottom: 8px; /* Spacing between posts */
-            padding-bottom: 10px;
-            position: relative;
-        }
-
-        /* Skeleton loading state for posts */
-        .news-feed-post.loading {
-            padding: 15px;
-            background: linear-gradient(90deg, var(--background-light-gray) 25%, #e0e2e5 50%, var(--background-light-gray) 75%);
-            background-size: 200% 100%;
-            animation: loading-animation 1.5s infinite; /* Shimmer effect */
-            border-radius: 8px; /* Rounded corners for skeleton cards */
-            margin: 8px 15px; /* Inset from edges */
-            min-height: 250px; /* Ensure skeleton has some height */
-        }
-
-        @keyframes loading-animation {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            min-height: 48px; /* Ensures tap target area for header elements */
-        }
-
-        .post-header .profile-picture {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 8px;
-            flex-shrink: 0;
-        }
-
-        .post-header .username {
-            font-weight: 600; /* Semi-bold for usernames */
-            font-size: 15px;
-            line-height: 1.2;
-        }
-
-        .post-header .post-info {
-            font-size: 12px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .post-header .post-info i {
-            font-size: 10px;
-        }
-
-        .post-header .post-options {
-            margin-left: auto;
-            color: var(--text-secondary);
-            font-size: 18px;
-            display: flex;
-            gap: 15px;
-        }
-
-        .post-header .post-options i {
-            cursor: pointer;
-            width: 32px; /* Visual size of icon */
-            height: 32px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            transition: background-color 0.2s; /* Hover effect */
-            /* Implicit tap target of at least 44x44px due to surrounding padding/margin */
-        }
-        .post-header .post-options i:hover {
-             background-color: var(--background-light-gray);
-        }
-
-        .post-text {
-            padding: 0 15px 10px;
-            font-size: 15px;
-            line-height: 1.4;
-        }
-
-        .post-media {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            display: block;
-            position: relative;
-            background-color: #eee; /* Placeholder background */
-        }
-
-        .post-media img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .post-media .profile-picture-overlay {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--background-white);
-        }
-
-        .post-footer {
-            padding: 10px 15px 0;
-        }
-
-        .reaction-counts {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-
-        .reaction-counts i {
-            margin-right: 5px;
-        }
-
-        .post-actions {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid var(--background-light-gray);
-            padding-top: 8px;
-        }
-
-        .post-actions .action-button {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 14px;
-            padding: 8px 10px; /* Provides good tap target area */
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            flex: 1;
-            justify-content: center;
-            font-weight: 500;
-            transition: background-color 0.2s, color 0.2s;
-            min-height: 36px; /* Ensure minimal tap target height */
-        }
-
-        .post-actions .action-button:hover {
-            background-color: var(--background-light-gray);
-        }
-
-        .like-button.liked {
-            color: var(--facebook-blue); /* Active like state color */
-        }
-
-        @keyframes like-animation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); } /* Pop effect */
-            100% { transform: scale(1); }
-        }
-
-        /* --- Bottom Navigation Bar --- */
-        .bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            background-color: var(--background-white);
-            border-top: 1px solid var(--border-gray);
-            padding: 5px 0;
-            position: sticky;
-            bottom: 0;
-            z-index: 1000;
-            min-height: 50px; /* Standard bottom navigation height */
-        }
-
-        .bottom-nav .nav-item {
+        /* Artist Profile Header (Hero Section) */
+        .artist-profile-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 5px 0;
-            color: var(--text-secondary);
-            font-size: 10px;
-            cursor: pointer;
+            padding: var(--spacing-l) var(--padding-horizontal) var(--spacing-xl);
+            /* Original design mentioned a gradient for artist header */
+            background: linear-gradient(135deg, #4b0082 0%, #1e90ff 100%); /* Dark blue/purple to lighter blue/teal */
+            color: var(--color-on-dark);
             position: relative;
-            flex: 1;
-            min-width: 44px; /* Minimum tap target width */
-            min-height: 44px; /* Minimum tap target height */
-            justify-content: center;
-            transition: color 0.2s;
+            overflow: hidden;
+            text-align: center;
         }
 
-        .bottom-nav .nav-item i {
-            font-size: 20px;
-            margin-bottom: 2px;
+        .artist-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ccc; /* Placeholder */
+            margin-bottom: var(--spacing-m);
+            border: 3px solid var(--color-on-dark); /* White border around avatar */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+            object-position: center;
         }
 
-        .bottom-nav .nav-item.active {
-            color: var(--facebook-blue); /* Active icon color */
+        .artist-name {
+            font-size: var(--font-size-artist-name);
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
         }
 
-        .bottom-nav .nav-item .badge {
+        .bio-link {
+            font-size: var(--font-size-medium);
+            color: var(--color-on-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-l);
+            opacity: 0.8; /* Slightly less prominent */
+            transition: opacity 0.2s ease;
+        }
+
+        .bio-link:hover {
+            opacity: 1; /* Full opacity on hover */
+        }
+
+        .bio-link .icon {
+            margin-left: var(--spacing-xs);
+            font-size: var(--font-size-medium);
+        }
+
+        .floating-play-button {
             position: absolute;
-            top: 0px;
-            right: calc(50% - 25px); /* Position badge over icon */
-            background-color: var(--notification-red);
-            color: #fff;
-            border-radius: 50%;
-            font-size: 9px;
-            padding: 1px 4px;
-            min-width: 8px;
-            text-align: center;
-            line-height: 1;
-            font-weight: 500;
-        }
-
-        /* --- Skeleton Loading Placeholder Styles --- */
-        .skeleton-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #e0e2e5;
-        }
-
-        .skeleton-text {
-            background-color: #e0e2e5;
-            height: 12px;
-            border-radius: 4px;
-            margin-bottom: 5px;
-        }
-
-        .skeleton-text-short {
-            width: 70%;
-        }
-
-        .skeleton-text-medium {
-            width: 95%;
-            height: 14px;
-            margin-bottom: 8px;
-        }
-
-        .skeleton-text-x-small {
-            width: 40%;
-            height: 10px;
-        }
-
-        .skeleton-rect {
-            background-color: #e0e2e5;
-            border-radius: 4px;
-        }
-
-        .skeleton-icon {
-            background-color: #e0e2e5;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-        }
-
-        .skeleton-button {
-            background-color: #e0e2e5;
-            width: 60px;
-            height: 30px;
-            border-radius: 20px;
-        }
-
-        /* --- Global Feedback (Snackbars/Toasts) --- */
-        .snackbar {
-            visibility: hidden;
-            min-width: 280px;
-            background-color: #333; /* Dark background */
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 14px 20px;
-            position: fixed;
-            z-index: 1000; /* Above all other content, below dialogs */
+            bottom: -30px; /* Half outside the section for overlap effect */
             left: 50%;
             transform: translateX(-50%);
-            bottom: 65px; /* Positioned above the bottom navigation bar */
-            font-size: 14px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--color-vibrant-blue);
+            color: var(--color-on-dark);
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            transition: bottom 0.5s ease-out, opacity 0.5s ease-out; /* Smooth slide-in/fade-in animation */
+            font-size: var(--font-size-large);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            z-index: 5; /* Ensure it's above other content */
         }
 
-        .snackbar.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 75px; /* Final visible position */
+        .floating-play-button:hover {
+            transform: translateX(-50%) scale(1.05);
+            background-color: #1a7fc5; /* Slightly darker blue on hover */
         }
 
-        .snackbar-action {
+        .floating-play-button:active {
+            transform: translateX(-50%) scale(0.95); /* Shrink on active for tactile feedback */
+        }
+
+        /* Content Sections (Latest Release & Top Songs) */
+        .content-section {
+            padding: var(--spacing-xl) var(--padding-horizontal) var(--spacing-m);
+            background-color: var(--color-app-background-white);
+            position: relative; /* For annotation positioning */
+        }
+
+        .content-section:first-of-type {
+             /* Adjust padding-top to compensate for the floating play button's overlap */
+             padding-top: calc(var(--spacing-xl) + 30px);
+        }
+
+        .section-header {
+            font-size: var(--font-size-section-header);
+            font-weight: 700;
+            color: var(--color-dark-gray-black);
+            margin-bottom: var(--spacing-m);
+            text-transform: uppercase;
+        }
+
+        /* List Items (Latest Release & Top Songs) */
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-s) 0;
+            margin-bottom: var(--spacing-s);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative; /* For annotations */
+            min-height: var(--min-touch-target); /* Ensure minimum height for touch */
+            border-radius: var(--spacing-xs);
+        }
+
+        .list-item:hover {
+            background-color: #f9f9f9; /* Subtle hover state */
+        }
+
+        .list-item-rank {
+            font-size: var(--font-size-medium);
+            font-weight: 500;
+            color: var(--color-dark-gray-black);
+            width: var(--spacing-xl); /* Fixed width for rank number */
+            text-align: center;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .album-art-thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--spacing-xs);
+            background-color: #eee; /* Placeholder */
+            margin-right: var(--spacing-m);
+            flex-shrink: 0;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .item-details {
+            flex-grow: 1; /* Allows it to take available space */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0; /* Important for text truncation */
+        }
+
+        .item-title {
+            font-size: var(--font-size-regular);
+            font-weight: 500;
+            color: var(--color-dark-gray-black);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Truncate long titles */
+        }
+
+        .item-meta {
+            font-size: var(--font-size-small);
+            color: var(--color-secondary-text-improved); /* Improved contrast */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Truncate long meta info */
+        }
+
+        .item-options-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--min-touch-target);
+            height: var(--min-touch-target);
+            border-radius: 50%;
             background: none;
             border: none;
-            color: var(--facebook-blue); /* Action button in brand color */
-            font-weight: bold;
+            color: var(--color-dark-gray-black);
+            font-size: var(--font-size-large);
             cursor: pointer;
-            margin-left: 15px;
-            font-size: 14px;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-            min-width: 60px; /* Consistent button width */
-            min-height: 24px; /* Consistent button height */
+            flex-shrink: 0;
+            transition: background-color 0.2s ease;
         }
-        .snackbar-action:hover {
+
+        .item-options-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .item-options-button:active {
+            background-color: #e0e0e0;
+        }
+
+        /* Mini Music Player (Persistent Bottom Bar) */
+        .mini-music-player {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background-color: var(--color-mini-player-background);
+            color: var(--color-on-dark);
+            padding: var(--spacing-s) var(--padding-horizontal);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            min-height: var(--min-touch-target); /* Ensure sufficient height */
+        }
+
+        .mini-player-left {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            min-width: 0; /* Required for flexible item details to truncate */
+        }
+
+        .mini-player-play-pause-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--min-touch-target);
+            height: var(--min-touch-target);
+            border-radius: 50%;
+            background: none;
+            border: none;
+            color: var(--color-on-dark);
+            font-size: var(--font-size-large);
+            cursor: pointer;
+            margin-right: var(--spacing-s);
+            flex-shrink: 0;
+            transition: background-color 0.2s ease;
+        }
+
+        .mini-player-play-pause-button:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .snackbar.error {
-            background-color: var(--notification-red); /* Red background for error messages */
+        .mini-player-play-pause-button:active {
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
-        .snackbar.error .snackbar-action {
-            color: #fff;
-            background-color: rgba(0, 0, 0, 0.1);
+        .mini-player-song-info {
+            flex-grow: 1;
+            min-width: 0;
         }
 
-        /* --- Dialog/Modal for critical errors (e.g., network issues) --- */
-        .dialog-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000; /* Highest z-index for modals */
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s, opacity 0.3s linear;
-        }
-
-        .dialog-overlay.show {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .dialog {
-            background-color: var(--background-white);
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 80%;
-            max-width: 350px;
-            text-align: center;
-        }
-
-        .dialog-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-        }
-
-        .dialog-message {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-
-        .dialog-buttons {
-            display: flex;
-            justify-content: flex-end; /* Align buttons to the right (standard for action dialogs) */
-            gap: 10px;
-        }
-
-        .dialog-button {
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 14px;
+        .mini-player-song-title {
+            font-size: var(--font-size-mini-player-song);
             font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s, color 0.2s;
-            min-width: 70px; /* Consistent button size */
-        }
-
-        .dialog-button.secondary {
-            background-color: var(--background-light-gray);
-            color: var(--text-primary);
-        }
-        .dialog-button.secondary:hover {
-            background-color: #e0e2e5;
-        }
-
-        .dialog-button.primary {
-            background-color: var(--facebook-blue);
-            color: #fff;
-        }
-        .dialog-button.primary:hover {
-            background-color: #1a6edb;
-        }
-
-        /* --- Indeterminate Progress Bar for Top Nav (Global Loading) --- */
-        .top-nav-progress-container {
-            position: absolute; /* Positioned relative to .top-nav */
-            bottom: 0;
-            left: 0;
-            height: 2px;
-            width: 100%;
+            white-space: nowrap;
             overflow: hidden;
-            background-color: transparent; /* Track is invisible unless loading */
-            z-index: 1001; /* Above top-nav border */
-        }
-        .top-nav-progress-container.loading .top-nav-progress-bar {
-            animation: indeterminate-progress 2s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
-            display: block;
-        }
-        .top-nav-progress-bar {
-            height: 100%;
-            width: 100%;
-            background-color: var(--facebook-blue);
-            display: none; /* Hidden by default */
-            transform: translateX(-100%) scaleX(0);
-            transform-origin: left;
+            text-overflow: ellipsis;
         }
 
-        @keyframes indeterminate-progress {
-            0% { transform: translateX(-100%) scaleX(0); opacity: 0; }
-            5% { transform: translateX(-100%) scaleX(0.1); opacity: 1;}
-            25% { transform: translateX(0%) scaleX(0.3); opacity: 1;}
-            50% { transform: translateX(100%) scaleX(0); opacity: 0;}
-            100% { transform: translateX(100%) scaleX(0); opacity: 0;}
+        .mini-player-artist-name {
+            font-size: var(--font-size-mini-player-artist);
+            color: rgba(255, 255, 255, 0.7); /* Slightly muted for secondary info */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* --- Help & Support Placeholder Screen --- */
-        .help-support-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--background-white);
-            z-index: 2000;
+        .mini-player-actions {
             display: flex;
-            flex-direction: column;
+            gap: var(--spacing-xs);
+            flex-shrink: 0;
+        }
+
+        .mini-player-action-button {
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            color: var(--text-primary);
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s, opacity 0.3s linear;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .help-support-screen.show {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .help-support-screen h2 {
-            margin-bottom: 20px;
-            color: var(--facebook-blue);
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .help-support-screen p {
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-            max-width: 300px;
-            line-height: 1.5;
-        }
-
-        .help-support-screen button {
-            background-color: var(--facebook-blue);
-            color: #fff;
-            padding: 10px 20px;
+            width: var(--min-touch-target);
+            height: var(--min-touch-target);
+            border-radius: 50%;
+            background: none;
             border: none;
-            border-radius: 8px;
+            color: var(--color-on-dark);
+            opacity: 0.7; /* Slightly muted */
+            font-size: var(--font-size-large);
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-            transition: background-color 0.2s;
+            transition: opacity 0.2s ease, background-color 0.2s ease;
+            position: relative; /* For annotation positioning */
         }
-        .help-support-screen button:hover {
-            background-color: #1a6edb;
+
+        .mini-player-action-button:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .mini-player-action-button:active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Annotations */
+        .annotation {
+            position: absolute;
+            background-color: var(--color-annotation-bg);
+            border: 1px solid var(--color-annotation-border);
+            border-radius: var(--spacing-xs);
+            padding: var(--spacing-xs);
+            font-size: var(--font-size-xs);
+            color: var(--color-annotation-text);
+            white-space: nowrap;
+            z-index: 20; /* Ensure annotations are on top */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            pointer-events: none; /* Do not interfere with clicks */
+            opacity: 0.95;
+            line-height: 1.3;
+            text-align: left; /* Default text align */
+            max-width: 180px; /* Limit annotation width */
+        }
+
+        /* Annotation positioning helpers */
+        .annotation.top { bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-5px); }
+        .annotation.right { left: 100%; top: 50%; transform: translateY(-50%) translateX(5px); }
+        .annotation.bottom { top: 100%; left: 50%; transform: translateX(-50%) translateY(5px); }
+        .annotation.left { right: 100%; top: 50%; transform: translateY(-50%) translateX(-5px); }
+
+        /* Specific annotation adjustments */
+        .artist-profile-header .annotation {
+            top: var(--spacing-m);
+            right: var(--padding-horizontal);
+            transform: none; /* Override default positioning */
+            width: auto; /* Allow content to dictate width */
+            max-width: 150px;
+            white-space: normal;
+        }
+
+        .latest-release-section .annotation.contrast-fix {
+            top: var(--spacing-m);
+            left: var(--padding-horizontal);
+            transform: none;
+            width: auto;
+            max-width: 180px;
+            white-space: normal;
+        }
+
+        .top-songs-section .annotation.swipe-gesture {
+             top: 50%;
+             left: var(--padding-horizontal);
+             transform: translateY(-50%);
+             width: 120px;
+             white-space: normal;
+        }
+        .top-songs-section .annotation.help-link {
+            bottom: var(--spacing-m);
+            left: var(--padding-horizontal);
+            transform: translateY(100%);
+            white-space: normal;
+            width: 180px;
+        }
+
+
+        /* Icon fonts/SVGs for universal symbols */
+        .icon {
+            /* Basic icon styling */
+            display: inline-block;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-family: 'Material Icons'; /* Using Material Icons for consistent iconography */
+            font-weight: normal;
+            letter-spacing: normal;
+            text-transform: none;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+
+        /* Material Icons Font - Embedded for self-containment */
+        @font-face {
+            font-family: 'Material Icons';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
         }
     </style>
 </head>
 <body>
-
-    <!-- Status Bar -->
-    <div class="status-bar">
-        <div class="left">
-            <span>21:05</span>
+    <div class="app-frame">
+        <!-- iOS Status Bar -->
+        <div class="status-bar">
+            <div class="status-bar-left">
+                <span>Verizon</span>
+                <span class="icon">wifi</span>
+            </div>
+            <span>2:34 PM</span>
+            <div class="status-bar-right">
+                <span>100%</span>
+                <span class="icon">battery_full</span>
+            </div>
         </div>
-        <div class="right">
-            <span>4G</span>
-            <i class="fa-solid fa-signal"></i>
-            <i class="fa-solid fa-wifi"></i>
-            <span style="margin-left: 2px;">42%</span>
-            <i class="fa-solid fa-battery-half"></i>
-        </div>
-    </div>
 
-    <!-- Top Navigation Bar -->
-    <div class="top-nav">
-        <div class="logo">facebook</div>
-        <div class="right-icons">
-            <button class="icon-button"><i class="fa-solid fa-plus"></i><span class="annotation">Tap target increased</span></button>
-            <button class="icon-button"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <button class="icon-button">
-                <i class="fa-solid fa-comment-dots"></i>
-                <span class="badge">9+</span>
+        <!-- Navigation Bar -->
+        <div class="navigation-bar">
+            <button class="icon-button" aria-label="Go Back">
+                <span class="icon">chevron_left</span>
             </button>
-        </div>
-        <!-- Indeterminate Progress Bar for global loading feedback -->
-        <div class="top-nav-progress-container" id="global-loading-bar">
-            <div class="top-nav-progress-bar"></div>
-            <span class="annotation-block" style="position: absolute; top: -22px; left: 0;">Global loading indicator for feed refresh</span>
-        </div>
-    </div>
-
-    <!-- Main Content Area -->
-    <div class="content-area">
-
-        <!-- Story Creation / Post Input -->
-        <div class="post-input-section">
-            <img class="profile-picture" src="https://via.placeholder.com/40x40?text=U" alt="User Profile" />
-            <input type="text" class="text-input" placeholder="What's on your mind?" onclick="showKeyboardAnnotation()" />
-            <span class="gallery-icon" onclick="simulatePostAction()"><i class="fa-solid fa-image"></i></span>
-            <div id="post-input-error" class="error-message">
-                <span class="annotation">Inline validation feedback for input fields</span>
-            </div>
-            <div class="progress-overlay" id="post-upload-progress">
-                <div class="spinner"></div>
-                <span class="annotation">Progress indicator for media uploads</span>
+            <div class="nav-right-icons">
+                <button class="icon-button heart-icon" aria-label="Like/Favorite Artist">
+                    <span class="icon">favorite_border</span>
+                    <span class="annotation top">Visual feedback on tap (e.g., fill with color)</span>
+                </button>
+                <button class="icon-button" aria-label="Share Artist Profile">
+                    <span class="icon">share</span>
+                </button>
             </div>
         </div>
 
-        <!-- Stories Section -->
-        <div class="stories-section">
-            <div class="stories-container" id="stories-container">
-                <!-- Skeleton stories will be inserted here initially by JS -->
-                <span class="annotation-block" style="position: absolute; top: 15px; left: 15px; width: 100px; text-align: center;">Skeleton loading for stories</span>
+        <!-- Main Scrollable Content Area -->
+        <div class="screen-content">
+            <!-- Artist Profile Header -->
+            <div class="artist-profile-header">
+                <img src="https://via.placeholder.com/120/cccccc/333333?text=Drake" alt="Artist Avatar of Drake" class="artist-avatar">
+                <h1 class="artist-name">Drake</h1>
+                <a href="#" class="bio-link" aria-label="Learn more about Drake">
+                    Bio Link
+                    <span class="icon">info</span>
+                </a>
+                <button class="floating-play-button" aria-label="Play all songs by Drake">
+                    <span class="icon">play_arrow</span>
+                </button>
+                <span class="annotation top">Removed promotional background text 'Millions of Free Songs' for improved focus.</span>
+            </div>
+
+            <!-- Latest Release Section -->
+            <div class="content-section latest-release-section">
+                <h2 class="section-header">LATEST RELEASE</h2>
+                <div class="list-item">
+                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
+                    <div class="item-details">
+                        <div class="item-title">Two Birds, One Stone</div>
+                        <div class="item-meta">Oct. 2016 • 1 song</div>
+                    </div>
+                    <button class="item-options-button" aria-label="More options for Two Birds, One Stone">
+                        <span class="icon">more_horiz</span>
+                    </button>
+                    <span class="annotation right swipe-gesture">Quick actions (Add to Playlist, Share) can be revealed via swipe/long-press.</span>
+                </div>
+                <span class="annotation contrast-fix">Secondary text color changed from #999999 to #666666 for improved contrast and accessibility.</span>
+            </div>
+
+            <!-- Top Songs Section -->
+            <div class="content-section top-songs-section">
+                <h2 class="section-header">TOP SONGS</h2>
+                <div class="list-item">
+                    <div class="list-item-rank">1</div>
+                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
+                    <div class="item-details">
+                        <div class="item-title">One Dance</div>
+                        <div class="item-meta">Drake</div>
+                    </div>
+                    <button class="item-options-button" aria-label="More options for One Dance">
+                        <span class="icon">more_horiz</span>
+                    </button>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-rank">2</div>
+                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
+                    <div class="item-details">
+                        <div class="item-title">The Motto</div>
+                        <div class="item-meta">Drake</div>
+                    </div>
+                    <button class="item-options-button" aria-label="More options for The Motto">
+                        <span class="icon">more_horiz</span>
+                    </button>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-rank">3</div>
+                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
+                    <div class="item-details">
+                        <div class="item-title">Hotline Bling</div>
+                        <div class="item-meta">Drake</div>
+                    </div>
+                    <button class="item-options-button" aria-label="More options for Hotline Bling">
+                        <span class="icon">more_horiz</span>
+                    </button>
+                    <span class="annotation right">Corrected song attribution: 'All of Me' changed to 'Hotline Bling' (a Drake song).</span>
+                </div>
+                <span class="annotation help-link">Consider adding an accessible 'Help' or 'Support' section linked from global navigation.</span>
             </div>
         </div>
 
-        <!-- News Feed -->
-        <div class="news-feed" id="news-feed">
-            <!-- Skeleton posts will be inserted here initially by JS -->
-            <span class="annotation-block" style="position: relative; top: 10px; left: 15px; width: 100px; text-align: center;">Skeleton loading for posts</span>
-            <!-- Real posts will be loaded later -->
-        </div>
-
-    </div>
-
-    <!-- Global Feedback / Error Snackbar -->
-    <div id="global-feedback-snackbar" class="snackbar">
-      <span id="snackbar-message">Action completed successfully!</span>
-      <button id="snackbar-action-button" class="snackbar-action hidden"></button>
-      <span class="annotation" style="position: absolute; bottom: -20px; right: 5px;">Snackbar for action feedback and 'Undo'</span>
-    </div>
-
-    <!-- Network Error Dialog (Modal) -->
-    <div id="network-error-dialog-overlay" class="dialog-overlay">
-        <div class="dialog">
-            <h3 class="dialog-title" id="dialog-title"></h3>
-            <p class="dialog-message" id="dialog-message"></p>
-            <div class="dialog-buttons">
-                <button class="dialog-button secondary hidden" id="dialog-secondary-button"></button>
-                <button class="dialog-button primary" id="dialog-primary-button"></button>
+        <!-- Mini Music Player -->
+        <div class="mini-music-player">
+            <div class="mini-player-left">
+                <button class="mini-player-play-pause-button" aria-label="Pause Current Song">
+                    <span class="icon">pause</span>
+                </button>
+                <div class="mini-player-song-info">
+                    <div class="mini-player-song-title">Closer (feat. Halsey)</div>
+                    <div class="mini-player-artist-name">The Chainsmokers</div>
+                </div>
             </div>
-            <span class="annotation-block" style="position: absolute; bottom: 5px; left: 5px;">Dialog for critical errors with recovery options</span>
+            <div class="mini-player-actions">
+                <button class="mini-player-action-button" aria-label="Dislike Song">
+                    <span class="icon">thumb_down</span>
+                    <span class="annotation top">Visual feedback on tap (e.g., highlight/fill icon)</span>
+                </button>
+                <button class="mini-player-action-button" aria-label="Like Song">
+                    <span class="icon">thumb_up</span>
+                </button>
+            </div>
         </div>
     </div>
-
-    <!-- Help & Support Placeholder Screen -->
-    <div id="help-support-screen" class="help-support-screen">
-        <h2>Help & Support</h2>
-        <p>Find answers to common questions, troubleshoot issues, or contact our support team.</p>
-        <p>This is where users can get assistance with features or problems.</p>
-        <button onclick="hideHelpSupport()">Go Back to Feed</button>
-        <span class="annotation-block" style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);">Easily accessible 'Help & Support' screen</span>
-    </div>
-
-    <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav">
-        <div class="nav-item active">
-            <i class="fa-solid fa-house"></i>
-            <div class="nav-label">Home</div>
-        </div>
-        <div class="nav-item">
-            <i class="fa-solid fa-play"></i>
-            <div class="nav-label">Reels</div>
-        </div>
-        <div class="nav-item">
-            <i class="fa-solid fa-user-group"></i>
-            <div class="nav-label">Friends</div>
-            <span class="badge">1</span>
-        </div>
-        <div class="nav-item">
-            <i class="fa-solid fa-shop"></i>
-            <div class="nav-label">Marketplace</div>
-        </div>
-        <div class="nav-item">
-            <i class="fa-solid fa-bell"></i>
-            <div class="nav-label">Notifications</div>
-            <span class="badge">2</span>
-        </div>
-        <div class="nav-item menu-item" onclick="showHelpSupportScreen()">
-            <i class="fa-solid fa-bars"></i>
-            <div class="nav-label">Menu</div>
-            <span class="annotation" style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);">Menu provides access to help</span>
-        </div>
-    </div>
-
-    <!-- Inline JavaScript for interactivity -->
-    <script>
-        // --- Snackbar / Toast functionality ---
-        function showSnackbar(message, isError = false, actionText = null, actionCallback = null, duration = null) {
-            const snackbar = document.getElementById('global-feedback-snackbar');
-            const snackbarMessage = document.getElementById('snackbar-message');
-            const snackbarActionButton = document.getElementById('snackbar-action-button');
-
-            snackbarMessage.textContent = message;
-            snackbar.className = 'snackbar'; // Reset classes for new state
-
-            if (isError) {
-                snackbar.classList.add('error');
-            } else {
-                snackbar.classList.remove('error');
-            }
-
-            if (actionText && actionCallback) {
-                snackbarActionButton.textContent = actionText;
-                snackbarActionButton.onclick = () => {
-                    actionCallback();
-                    snackbar.classList.remove('show'); // Dismiss snackbar on action
-                };
-                snackbarActionButton.classList.remove('hidden');
-                duration = duration || 5000; // Longer duration for actionable snackbars
-            } else {
-                snackbarActionButton.classList.add('hidden');
-                duration = duration || 3000; // Default duration
-            }
-
-            snackbar.classList.add('show');
-
-            // Clear previous timeouts and set a new one
-            if (snackbar.timeoutId) {
-                clearTimeout(snackbar.timeoutId);
-            }
-            snackbar.timeoutId = setTimeout(() => {
-                snackbar.classList.remove('show');
-            }, duration);
-        }
-
-        // --- Dialog / Modal functionality ---
-        function showDialog(title, message, primaryButtonText, primaryButtonCallback, secondaryButtonText = null, secondaryButtonCallback = null) {
-            const dialogOverlay = document.getElementById('network-error-dialog-overlay');
-            document.getElementById('dialog-title').textContent = title;
-            document.getElementById('dialog-message').textContent = message;
-
-            const primaryBtn = document.getElementById('dialog-primary-button');
-            primaryBtn.textContent = primaryButtonText;
-            primaryBtn.onclick = () => {
-                primaryButtonCallback();
-                dialogOverlay.classList.remove('show');
-            };
-
-            const secondaryBtn = document.getElementById('dialog-secondary-button');
-            if (secondaryButtonText && secondaryButtonCallback) {
-                secondaryBtn.textContent = secondaryButtonText;
-                secondaryBtn.onclick = () => {
-                    secondaryButtonCallback();
-                    dialogOverlay.classList.remove('show');
-                };
-                secondaryBtn.classList.remove('hidden');
-            } else {
-                secondaryBtn.classList.add('hidden');
-            }
-
-            dialogOverlay.classList.add('show');
-        }
-
-        // --- Post actions (like, hide) ---
-        function animateLikeButton(button) {
-            button.classList.toggle('liked');
-            // Reset animation to allow re-triggering
-            button.style.animation = 'none';
-            void button.offsetWidth; // Trigger reflow
-            button.style.animation = 'like-animation 0.3s ease-out';
-
-            if (button.classList.contains('liked')) {
-                showSnackbar('You liked this post!', false);
-            } else {
-                showSnackbar('You unliked this post!', false);
-            }
-        }
-
-        function simulateHidePost(postElement) {
-            // In a real app, this would send an API request to hide the post permanently
-            postElement.style.display = 'none'; // Temporarily hide the post for demonstration
-            showSnackbar('Post hidden.', false, 'Undo', () => {
-                postElement.style.display = 'block'; // Show it again
-                showSnackbar('Post unhidden!', false);
-            });
-        }
-
-        // --- Post Creation / Upload Logic ---
-        function simulatePostAction() {
-            const inputField = document.querySelector('.post-input-section .text-input');
-            const progressOverlay = document.getElementById('post-upload-progress');
-            const errorMessage = document.getElementById('post-input-error');
-
-            errorMessage.textContent = ''; // Clear previous errors
-            errorMessage.classList.remove('show');
-
-            if (inputField.value.trim() === '') {
-                errorMessage.textContent = 'Post content cannot be empty.';
-                errorMessage.classList.add('show');
-                return;
-            }
-
-            // Simulate upload progress
-            progressOverlay.style.display = 'flex';
-            setTimeout(() => {
-                progressOverlay.style.display = 'none';
-                inputField.value = ''; // Clear input on success
-                showSnackbar('Post sent successfully!');
-                
-                // Simulate network error for next attempt, for demonstration purposes, randomly
-                if (Math.random() > 0.6) { // ~40% chance of network error
-                    showDialog(
-                        'Network Error',
-                        'Failed to upload post. Please check your connection and try again.',
-                        'Retry',
-                        () => console.log('Retrying post upload...'),
-                        'Cancel',
-                        () => console.log('Cancelled post upload.')
-                    );
-                }
-            }, 2000); // Simulate a 2-second upload time
-        }
-
-        function showKeyboardAnnotation() {
-            // This is purely for annotation demonstration, in a real app, a keyboard would just appear.
-            showSnackbar("Keyboard opens here. Placeholder text guides user to initiate post creation.", false, null, null, 2500);
-        }
-
-        // --- Help & Support Screen ---
-        function showHelpSupportScreen() {
-            document.getElementById('help-support-screen').classList.add('show');
-        }
-
-        function hideHelpSupport() {
-            document.getElementById('help-support-screen').classList.remove('show');
-        }
-
-
-        // --- Initial Loading States (Skeleton Screens) ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const storiesContainer = document.getElementById('stories-container');
-            const newsFeed = document.getElementById('news-feed');
-            const globalLoadingBar = document.getElementById('global-loading-bar');
-
-            // Show global loading bar at the top
-            globalLoadingBar.classList.add('loading');
-
-            // Add skeleton stories placeholders
-            for (let i = 0; i < 4; i++) { // Generate 4 skeleton story cards
-                const skeletonStory = document.createElement('div');
-                skeletonStory.className = 'story-card loading';
-                storiesContainer.appendChild(skeletonStory);
-            }
-
-            // Add skeleton news feed posts placeholders
-            for (let i = 0; i < 2; i++) { // Generate 2 skeleton posts
-                const skeletonPost = document.createElement('div');
-                skeletonPost.className = 'news-feed-post loading';
-                skeletonPost.innerHTML = `
-                    <div class="post-header">
-                        <div class="profile-picture skeleton-circle"></div>
-                        <div style="flex-grow: 1;">
-                            <div class="username skeleton-text skeleton-text-short"></div>
-                            <div class="timestamp skeleton-text skeleton-text-x-small"></div>
-                        </div>
-                        <div class="post-options" style="display:flex; gap:15px">
-                            <div class="skeleton-icon"></div>
-                            <div class="skeleton-icon"></div>
-                        </div>
-                    </div>
-                    <div class="post-text skeleton-text skeleton-text-medium" style="height: 40px;"></div>
-                    <div class="post-media skeleton-rect" style="height: 200px;"></div>
-                    <div class="post-footer">
-                        <div class="reaction-counts skeleton-text skeleton-text-x-small"></div>
-                        <div class="post-actions" style="display:flex; justify-content: space-around; gap: 5px;">
-                            <div class="action-button skeleton-button"></div>
-                            <div class="action-button skeleton-button"></div>
-                            <div class="action-button skeleton-button"></div>
-                        </div>
-                    </div>
-                `;
-                newsFeed.appendChild(skeletonPost);
-            }
-
-            // Simulate loading actual content after a delay
-            setTimeout(() => {
-                // Hide global loading bar
-                globalLoadingBar.classList.remove('loading');
-
-                // Clear skeleton stories and replace with real ones
-                while (storiesContainer.firstChild) {
-                    storiesContainer.removeChild(storiesContainer.firstChild);
-                }
-                storiesContainer.innerHTML = `
-                    <div class="story-card">
-                        <img src="https://via.placeholder.com/110x180?text=Your+Story" alt="Create Story" />
-                        <div class="floating-action-button"><i class="fa-solid fa-plus"></i></div>
-                        <div class="text-overlay" style="text-align: center; width: 100%; left: 0;">Create story</div>
-                    </div>
-                    <div class="story-card">
-                        <img src="https://via.placeholder.com/110x180/ADD8E6/000000?text=Birthday+Event" alt="Harindu Story" />
-                        <img class="profile-picture-overlay" src="https://via.placeholder.com/32x32?text=H" alt="Harindu" />
-                        <div class="text-overlay">Harindu Samarasinghe</div>
-                    </div>
-                    <div class="story-card">
-                        <img src="https://via.placeholder.com/110x180/B0E0E6/000000?text=Gym+Workout" alt="Prabhath Story" />
-                        <img class="profile-picture-overlay" src="https://via.placeholder.com/32x32?text=P" alt="Prabhath" />
-                        <div class="text-overlay">Prabhath Madhusanka</div>
-                    </div>
-                    <div class="story-card">
-                        <img src="https://via.placeholder.com/110x180/FFC0CB/000000?text=Valentine's" alt="Anuda Story" />
-                        <img class="profile-picture-overlay" src="https://via.placeholder.com/32x32?text=A" alt="Anuda" />
-                        <div class="text-overlay">Anuda Pasandul</div>
-                    </div>
-                `;
-
-                // Clear skeleton posts and replace with actual posts
-                while (newsFeed.firstChild) {
-                    newsFeed.removeChild(newsFeed.firstChild);
-                }
-                newsFeed.innerHTML += `
-                    <div class="news-feed-post" id="post-1">
-                        <div class="post-header">
-                            <img class="profile-picture" src="https://via.placeholder.com/40x40?text=B" alt="Babuku Profile" />
-                            <div>
-                                <div class="username">Babuku - බබූකූ</div>
-                                <div class="post-info">5h <i class="fa-solid fa-earth-americas"></i></div>
-                            </div>
-                            <div class="post-options">
-                                <i class="fa-solid fa-ellipsis"></i>
-                                <i class="fa-solid fa-xmark" onclick="simulateHidePost(document.getElementById('post-1'))"></i>
-                            </div>
-                        </div>
-                        <div class="post-text">සංසාරේ පුරුදු ලෙසින්... (Read More)</div>
-                        <div class="post-media">
-                            <img src="https://via.placeholder.com/400x250?text=Woman+placing+money+with+children" alt="Post Image" />
-                            <img class="profile-picture-overlay" src="https://via.placeholder.com/30x30?text=B" alt="Babuku Overlay" />
-                        </div>
-                        <div class="post-footer">
-                            <div class="reaction-counts">
-                                <i class="fa-solid fa-face-sad-cry"></i>
-                                <i class="fa-solid fa-heart"></i>
-                                <span>500K</span>
-                            </div>
-                            <div class="post-actions">
-                                <button class="action-button like-button" onclick="animateLikeButton(this)"><i class="fa-regular fa-thumbs-up"></i> Like</button>
-                                <button class="action-button"><i class="fa-regular fa-comment"></i> Comment</button>
-                                <button class="action-button"><i class="fa-solid fa-share"></i> Share</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="news-feed-post" id="post-2">
-                        <div class="post-header">
-                            <img class="profile-picture" src="https://via.placeholder.com/40x40?text=U" alt="User Profile" />
-                            <div>
-                                <div class="username">Another User</div>
-                                <div class="post-info">1h <i class="fa-solid fa-earth-americas"></i></div>
-                            </div>
-                            <div class="post-options">
-                                <i class="fa-solid fa-ellipsis"></i>
-                                <i class="fa-solid fa-xmark" onclick="simulateHidePost(document.getElementById('post-2'))"></i>
-                            </div>
-                        </div>
-                        <div class="post-text">Just enjoying a beautiful sunset today!</div>
-                        <div class="post-media">
-                            <img src="https://via.placeholder.com/400x250?text=Beautiful+Sunset" alt="Sunset Image" />
-                            <img class="profile-picture-overlay" src="https://via.placeholder.com/30x30?text=U" alt="User Overlay" />
-                        </div>
-                        <div class="post-footer">
-                            <div class="reaction-counts">
-                                <i class="fa-solid fa-heart"></i>
-                                <span>2.3K</span>
-                            </div>
-                            <div class="post-actions">
-                                <button class="action-button like-button" onclick="animateLikeButton(this)"><i class="fa-regular fa-thumbs-up"></i> Like</button>
-                                <button class="action-button"><i class="fa-regular fa-comment"></i> Comment</button>
-                                <button class="action-button"><i class="fa-solid fa-share"></i> Share</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }, 3000); // Simulate a 3-second loading time
-        });
-    </script>
 </body>
 </html>

@@ -1,351 +1,182 @@
 {
-  "screen_type": "Social Media Feed (Facebook Home Screen)",
+  "screen_type": "Artist Profile / Music Player Screen",
   "components": [
     {
-      "name": "Status Bar",
+      "name": "iOS Status Bar",
+      "type": "System Component",
       "elements": [
-        {
-          "type": "Text",
-          "content": "21:05",
-          "position": "Top Left"
-        },
-        {
-          "type": "Icon",
-          "content": "Signal Strength / Wi-Fi",
-          "position": "Top Right"
-        },
-        {
-          "type": "Text",
-          "content": "4G",
-          "position": "Top Right"
-        },
-        {
-          "type": "Icon",
-          "content": "Battery",
-          "position": "Top Right"
-        },
-        {
-          "type": "Text",
-          "content": "42",
-          "position": "Top Right",
-          "description": "Battery percentage"
-        }
+        "Carrier (Verizon)",
+        "WiFi signal icon",
+        "Time (2:34 PM)",
+        "Battery percentage (100%)",
+        "Battery icon"
       ]
     },
     {
-      "name": "Top Navigation Bar",
+      "name": "Navigation Bar",
+      "type": "Header",
       "elements": [
-        {
-          "type": "Brand Logo",
-          "content": "facebook",
-          "color": "Blue",
-          "position": "Left"
-        },
-        {
-          "type": "Icon Button",
-          "content": "Add Post / Create",
-          "icon": "Plus in Square",
-          "position": "Right"
-        },
-        {
-          "type": "Icon Button",
-          "content": "Search",
-          "icon": "Magnifying Glass",
-          "position": "Right"
-        },
-        {
-          "type": "Icon Button",
-          "content": "Messenger",
-          "icon": "Chat Bubble",
-          "position": "Right",
-          "badge": "9+"
-        }
+        "Back icon (<)",
+        "Heart icon (Like/Favorite)",
+        "Share icon"
       ]
     },
     {
-      "name": "Story Creation / Post Input",
+      "name": "Artist Profile Header",
+      "type": "Section",
       "elements": [
-        {
-          "type": "Profile Picture",
-          "content": "User's Profile Picture",
-          "shape": "Circular",
-          "position": "Left"
-        },
-        {
-          "type": "Text Input",
-          "content": "What's on your mind?",
-          "placeholder": true,
-          "position": "Center"
-        },
-        {
-          "type": "Icon",
-          "content": "Gallery / Photo",
-          "position": "Right"
-        }
+        "Circular Artist Avatar (Drake)",
+        "Artist Name (Drake)",
+        "Bio Link with Info icon",
+        "Floating Play Button (circular, blue with white play icon)"
       ]
     },
     {
-      "name": "Stories Section",
-      "description": "Horizontal scrollable list of stories",
+      "name": "Latest Release Section",
+      "type": "Content Section",
       "elements": [
+        "Section Header: 'LATEST RELEASE'",
         {
-          "type": "Story Card",
-          "content": "Create Story",
+          "name": "Latest Release Item",
           "elements": [
-            {
-              "type": "Image",
-              "content": "User's Image"
-            },
-            {
-              "type": "Floating Action Button",
-              "icon": "Plus",
-              "color": "Blue",
-              "position": "Overlay"
-            },
-            {
-              "type": "Text",
-              "content": "Create story"
-            }
-          ]
-        },
-        {
-          "type": "Story Card",
-          "content": "Harindu Samarasinghe's Story",
-          "elements": [
-            {
-              "type": "Image",
-              "content": "Event Image (Birthday)"
-            },
-            {
-              "type": "Profile Picture Overlay",
-              "content": "Harindu Samarasinghe",
-              "border": "Blue"
-            },
-            {
-              "type": "Text Overlay",
-              "content": "Harindu Samarasinghe",
-              "position": "Bottom Left"
-            }
-          ]
-        },
-        {
-          "type": "Story Card",
-          "content": "Prabhath Madhusanka's Story",
-          "elements": [
-            {
-              "type": "Image",
-              "content": "Gym/Workout Image"
-            },
-            {
-              "type": "Profile Picture Overlay",
-              "content": "Prabhath Madhusanka",
-              "border": "Blue"
-            },
-            {
-              "type": "Text Overlay",
-              "content": "Prabhath Madhusanka",
-              "position": "Bottom Left"
-            }
-          ]
-        },
-        {
-          "type": "Story Card",
-          "content": "Anuda Pasandul's Story",
-          "elements": [
-            {
-              "type": "Image",
-              "content": "Valentine's themed image"
-            },
-            {
-              "type": "Profile Picture Overlay",
-              "content": "Anuda Pasandul",
-              "border": "Blue"
-            },
-            {
-              "type": "Text Overlay",
-              "content": "Anuda Pasandul",
-              "position": "Bottom Left"
-            }
+            "Album Art Thumbnail",
+            "Song Title ('Two Birds, One Stone')",
+            "Release Date ('Oct. 2016')",
+            "Number of Songs ('1 song')",
+            "More Options icon (...)"
           ]
         }
       ]
     },
     {
-      "name": "News Feed Post",
+      "name": "Top Songs Section",
+      "type": "Content Section",
       "elements": [
+        "Section Header: 'TOP SONGS'",
         {
-          "type": "Post Header",
+          "name": "Top Song Item 1",
           "elements": [
-            {
-              "type": "Profile Picture",
-              "content": "Babuku's Profile Picture",
-              "shape": "Circular",
-              "position": "Left"
-            },
-            {
-              "type": "Text",
-              "content": "Babuku - බබූකු",
-              "style": "Bold",
-              "position": "Next to Profile"
-            },
-            {
-              "type": "Text",
-              "content": "5h",
-              "style": "Secondary",
-              "position": "Below Username"
-            },
-            {
-              "type": "Icon",
-              "content": "Audience/Privacy (Globe)",
-              "position": "Next to Timestamp"
-            },
-            {
-              "type": "Icon Button",
-              "content": "More Options",
-              "icon": "Ellipsis",
-              "position": "Far Right"
-            },
-            {
-              "type": "Icon Button",
-              "content": "Close Post",
-              "icon": "X",
-              "position": "Far Right"
-            }
+            "Rank Number (1)",
+            "Album Art Thumbnail",
+            "Song Title ('One Dance')",
+            "More Options icon (...)"
           ]
         },
         {
-          "type": "Reactions Bar",
+          "name": "Top Song Item 2",
           "elements": [
-            {
-              "type": "Emoji",
-              "content": "Sad Face"
-            },
-            {
-              "type": "Emoji",
-              "content": "Red Heart"
-            }
+            "Rank Number (2)",
+            "Album Art Thumbnail",
+            "Song Title ('The Motto')",
+            "More Options icon (...)"
           ]
         },
         {
-          "type": "Post Media",
-          "content": "Image",
-          "description": "Image of a woman placing money into a pocket with children",
+          "name": "Top Song Item 3",
           "elements": [
-            {
-              "type": "Profile Picture Overlay",
-              "content": "Babuku",
-              "position": "Bottom Right"
-            }
+            "Rank Number (3)",
+            "Album Art Thumbnail",
+            "Song Title ('All of Me')",
+            "More Options icon (...)"
           ]
-        },
-        {
-          "type": "Post Text",
-          "content": "Text in Sinhala script (truncated, implied 'See More')"
         }
       ]
     },
     {
-      "name": "Bottom Navigation Bar",
+      "name": "Mini Music Player",
+      "type": "Persistent Bottom Bar",
       "elements": [
-        {
-          "type": "Navigation Item",
-          "label": "Home",
-          "icon": "House",
-          "status": "Active",
-          "color": "Blue"
-        },
-        {
-          "type": "Navigation Item",
-          "label": "Reels",
-          "icon": "Play"
-        },
-        {
-          "type": "Navigation Item",
-          "label": "Friends",
-          "icon": "People",
-          "badge": "1"
-        },
-        {
-          "type": "Navigation Item",
-          "label": "Marketplace",
-          "icon": "Shop"
-        },
-        {
-          "type": "Navigation Item",
-          "label": "Notifications",
-          "icon": "Bell",
-          "badge": "2"
-        },
-        {
-          "type": "Navigation Item",
-          "label": "Menu",
-          "icon": "Hamburger"
-        }
+        "Pause icon (||)",
+        "Currently Playing Song Title ('Closer (feat. Halsey)')",
+        "Currently Playing Artist Name ('The Chainsmokers')",
+        "Dislike icon (thumbs down)",
+        "Like icon (thumbs up)"
+      ]
+    },
+    {
+      "name": "App Background Header",
+      "type": "Text Label",
+      "elements": [
+        "Text: 'Millions of Free Songs'"
       ]
     }
   ],
-  "layout_structure": "The screen features a fixed top navigation bar and a fixed bottom navigation bar, with a vertically scrollable content area in between. The content area is structured as a vertical stack of sections: an 'What's on your mind?' input, followed by a horizontal carousel for 'Stories', and then a vertical stream of 'News Feed Posts' arranged in a card-like format. Each post is separated by a subtle background color change. Elements generally align to the left and right, maintaining consistent horizontal padding.",
+  "layout_structure": "The screen is primarily composed of a vertical stack of sections within a white application frame, set against a solid red background. \n- The top features the standard iOS status bar.\n- Below that is a navigation bar with left-aligned navigation and right-aligned action icons.\n- The main content area begins with a prominent artist profile header, featuring a circular avatar, name, and bio link. A large, circular play button overlays this section, suggesting a primary action.\n- Following the artist header, content is organized into scrollable vertical lists with distinct section headers ('LATEST RELEASE', 'TOP SONGS'). Each list item follows a consistent horizontal layout (thumbnail/rank, text details, action icon).\n- A persistent mini-player bar occupies the bottom of the screen, providing playback controls and current song information. This bar sits above the iPhone's home button area. All content appears to be left-aligned within its respective container.",
   "color_scheme": {
-    "primary_brand": "#1877F2 (Facebook Blue)",
-    "background_main": "#FFFFFF (White)",
-    "background_secondary": "#F0F2F5 (Light Gray, for separators and section backgrounds)",
-    "text_primary": "#050505 (Dark Gray/Black)",
-    "text_secondary": "#65676B (Medium Gray, for timestamps, placeholder text)",
-    "accents": {
-      "notification_badge": "#E42647 (Red)",
-      "selected_icon": "#1877F2 (Facebook Blue)"
+    "primary_background": {
+      "name": "Red",
+      "hex": "#E51A20"
+    },
+    "app_background": {
+      "name": "White",
+      "hex": "#FFFFFF"
+    },
+    "text_colors": {
+      "primary": {
+        "name": "Dark Gray/Black",
+        "hex": "#333333"
+      },
+      "secondary": {
+        "name": "Light Gray",
+        "hex": "#999999"
+      },
+      "on_dark_background": {
+        "name": "White",
+        "hex": "#FFFFFF"
+      }
+    },
+    "accent_colors": [
+      {
+        "name": "Vibrant Blue (Play Button)",
+        "hex": "#2196F3"
+      }
+    ],
+    "ui_elements": {
+      "mini_player_background": {
+        "name": "Dark Gray/Black",
+        "hex": "#212121"
+      },
+      "artist_header_background_gradient": "From dark blue/purple to lighter blue/teal",
+      "status_bar_icons_text": {
+        "name": "Dark Gray/Black (on white)",
+        "hex": "#333333"
+      }
     }
   },
   "typography": {
-    "font_family": "Sans-serif (likely system default or Facebook Sans/Roboto)",
-    "sizes": {
-      "status_bar_time": "Large (e.g., 17-18pt)",
-      "facebook_logo": "Large and Bold",
-      "input_placeholder": "Medium (e.g., 15-16pt)",
-      "story_names": "Medium-Small (e.g., 13-14pt)",
-      "post_username": "Medium-Large (e.g., 16pt)",
-      "post_timestamp": "Small (e.g., 12-13pt)",
-      "post_body_text": "Medium (e.g., 15-16pt)",
-      "bottom_nav_labels": "Small (e.g., 10-11pt)"
+    "font_family": "Sans-serif (likely system default like San Francisco or Helvetica Neue)",
+    "font_weights": {
+      "bold_semi_bold": "Artist Name, Section Headers",
+      "regular": "Song Titles, Secondary Text, Status Bar"
     },
-    "weights": {
-      "bold": [
-        "facebook logo"
-      ],
-      "semi_bold_medium": [
-        "Post Username"
-      ],
-      "regular": [
-        "Status Bar Time",
-        "Input Placeholder",
-        "Story Names",
-        "Post Timestamp",
-        "Post Body Text",
-        "Bottom Nav Labels"
-      ]
+    "font_sizes": {
+      "large": "Artist Name ('Drake')",
+      "medium": "Section Headers ('LATEST RELEASE'), Main Song Titles",
+      "small": "Secondary details (release date, 'Bio'), Mini-player artist name",
+      "system_small": "iOS Status Bar"
     },
-    "script": "Latin, Sinhala"
+    "text_alignment": "Predominantly left-aligned"
   },
   "spacing_and_density": {
-    "vertical_spacing": "Generous between main sections (header, stories, posts) and within posts for readability.",
-    "horizontal_padding": "Consistent padding on left and right edges for content within the main feed.",
-    "element_density": "High density in the stories carousel (horizontal scrolling implies many items). News feed posts are moderately dense, balancing content visibility with separation. Bottom navigation is compact but tappable.",
-    "visual_clutter": "Managed well with clear sectioning and use of whitespace. Notification badges add functional visual 'noise'."
+    "padding": "Consistent horizontal padding from screen edges for content (approximately 16-20px). Internal padding within list items provides clear separation.",
+    "margins": "Clear vertical margins between major sections (e.g., Artist Header to Latest Release, Latest Release to Top Songs).",
+    "line_height": "Standard, comfortable line spacing for readability, especially in list item details.",
+    "density": "Medium density. Information is well-organized without feeling cramped, balancing content visibility with adequate whitespace. The list items are compact enough to show multiple entries without being overwhelming."
   },
   "accessibility_observations": [
-    "Good color contrast for primary text on white backgrounds and for active elements (blue).",
-    "Interactive elements (icons, input fields, story cards, nav items) appear to have sufficient tap target sizes.",
-    "Standard and recognizable iconography is used, aiding comprehension.",
-    "The presence of Sinhala script indicates support for multiple languages.",
-    "Notification badges provide clear visual cues for unread items."
+    "Contrast for primary text on white background is good. However, secondary text (e.g., 'Oct. 2016', 'Bio') in light gray on white background might have insufficient contrast for users with certain visual impairments.",
+    "Tap targets for interactive elements like navigation icons, the floating play button, and mini-player controls appear adequately sized and spaced for easy interaction.",
+    "The use of standard iconography (back, heart, share, play/pause, thumbs up/down, info) helps with immediate understanding of functionality.",
+    "Hierarchical structure with clear section headers aids in content navigation and understanding for all users, including those using screen readers.",
+    "The overall font sizes are generally legible, though secondary text is on the smaller side."
   ],
   "notable_patterns": [
-    "Standard Social Media Feed layout (vertical scroll for posts, horizontal scroll for stories).",
-    "Top App Bar for global navigation and branding.",
-    "Bottom Navigation Bar (Tab Bar) for primary app navigation with clear active state.",
-    "Card-based UI for news feed posts and story previews.",
-    "Profile picture avatars used consistently across user-generated content.",
-    "Notification badges for unread counts.",
-    "Placeholder text in input fields for user guidance."
+    "Hero Section: A prominent artist image and name at the top to establish context for the profile.",
+    "Floating Action Button (FAB): A large, circular play button overlays the artist header, indicating the primary action (playing content from the artist).",
+    "List-Detail Pattern: Content is presented in scrollable lists of items (releases, songs), each potentially leading to a detail view or direct playback.",
+    "Persistent Mini Player: A common pattern in media apps, allowing continuous playback control while the user navigates other parts of the application.",
+    "Hierarchical Content Organization: Clear section headers (e.g., 'LATEST RELEASE', 'TOP SONGS') are used to structure and categorize content.",
+    "Standard iOS UI Elements: The screen utilizes a standard iOS status bar and navigation bar layout, providing a familiar user experience.",
+    "Skeuomorphic Device Frame: The application is presented within a detailed iPhone hardware frame, a common technique for showcasing mobile UIs."
   ]
 }

@@ -1,20 +1,20 @@
 from ux_feedback_crew.crew import UxFeedbackCrew
-from app.utils.hitl_handler import set_active_context, clear_active_context
 
+def run_full_ux_pipeline(image_path: str, client_id: str):
+    if image_path.startswith("http"):
+        image_source = image_path  # S3 URL
+    else:
+        image_source = image_path
 
-def run_full_ux_pipeline_raw(image_path: str, client_id: str, evaluation_id: str):
-    """
-    builtins.input is already patched globally (at hitl_handler import time).
-    We just set the active context so the patched input() knows which
-    evaluation/client to handle when CrewAI calls it.
-    """
-    crew_instance = UxFeedbackCrew(client_id=client_id, evaluation_id=evaluation_id)
+    inputs = {
+        "screenshot_path": image_source
+    }
+
+    crew_instance = UxFeedbackCrew(client_id)
     crew = crew_instance.full_flow_crew()
+    result = crew.kickoff(inputs=inputs)
+    
+    report = str(result.tasks_output[2].raw)
+    wireframe = str(result.tasks_output[3].raw)
 
-    set_active_context(evaluation_id, client_id)
-    try:
-        result = crew.kickoff(inputs={"screenshot_path": image_path})
-    finally:
-        clear_active_context()
-
-    return result
+    return report, wireframe
