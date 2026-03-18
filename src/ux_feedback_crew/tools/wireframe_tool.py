@@ -10,7 +10,11 @@ OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 @tool("create_wireframe")
-def create_wireframe(vision_analysis: str, feedback_result: str) -> str:
+def create_wireframe(vision_analysis: str, 
+    feedback_result: str, 
+    feedback_user_comment: str = "", 
+    wireframe_user_comment: str = ""
+) -> str:
     """
     Generate an improved UI wireframe based on UX feedback.
 
@@ -38,6 +42,12 @@ ORIGINAL DESIGN:
 
 IMPROVEMENTS TO IMPLEMENT:
 {feedback_result}
+
+USER COMMENTS ON THE FEEDBACK:
+{feedback_user_comment}
+
+USER REQUESTS FOR WIREFRAME CHANGES:
+{wireframe_user_comment}
 
 **Requirements:**
 

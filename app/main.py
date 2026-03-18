@@ -1,9 +1,6 @@
-# ══ CRITICAL: Must be the very first import ══
-
 import logging
 import time
 import sys
-import threading
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Header, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,12 +12,10 @@ from starlette.concurrency import run_in_threadpool
 from src.ws_manager import manager
 from app.services.s3_service import upload_image_to_s3
 from app.services.database import (
-    create_evaluation_document, complete_evaluation, fail_evaluation,
-    save_hitl_response, get_evaluation, get_user_evaluations, get_evaluations_for_analysis,
-)
-from app.utils.hitl_handler import (
-    register_hitl_session, submit_human_feedback, cleanup_hitl_session,
-    _sessions,
+    create_evaluation_document, complete_evaluation,
+    fail_evaluation, save_hitl_response,
+    update_wireframe, get_evaluation,
+    get_user_evaluations, get_evaluations_for_analysis,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
@@ -30,82 +25,30 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR  = ROOT_DIR / "src"
 sys.path.append(str(SRC_DIR))
 
-from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline_raw
+from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline_raw, run_wireframe_regen_raw
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
+                   allow_methods=["*"], allow_headers=["*"])
 os.makedirs("outputs", exist_ok=True)
 
 
-# Starting Panel in background thread on startup 
-
-def _start_panel():
-    """Runs Panel server on port 5006 in a daemon thread."""
-    import panel as pn
-    from app.utils.hitl_panel_app import create_app
-
-    logger.info("[PANEL] Starting Panel server on port 5006...")
-    pn.serve(
-        create_app,
-        port=5006,
-        show=False,
-        allow_websocket_origin=[
-            "localhost:3000",
-            "127.0.0.1:3000",
-            "localhost:8000",
-            "127.0.0.1:8000",
-            "localhost:5006",      # ← Panel needs its own origin
-            "127.0.0.1:5006",
-        ],
-        threaded=True,
-        verbose=False,
-    )
-
-
-@app.on_event("startup")
-async def startup_event():
-    t = threading.Thread(target=_start_panel, daemon=True)
-    t.start()
-    logger.info("[PANEL] Panel thread started")
-
-
-# Models
+# ─── Models ───────────────────────────────────────────────────────────────────
 
 class HITLFeedbackRequest(BaseModel):
     evaluation_id: str
-    agent_name: str
+    agent_name: str                  # "feedback_specialist" | "wireframe_designer"
     ai_suggestion: str = ""
-    user_action: str
+    user_action: str                 # "agree" | "disagree" | "modify"
     user_modified_suggestion: str = ""
 
 
-# Panel content endpoint 
-
-@app.get("/hitl-content/{evaluation_id}")
-async def get_hitl_content(evaluation_id: str):
-    """Panel fetches this to get the stored feedback JSON."""
-    import json
-    session = _sessions.get(evaluation_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="No active HITL session")
-    raw = session.get("agent_output", "")
-    if not raw:
-        raise HTTPException(status_code=404, detail="No agent output stored yet")
-    try:
-        return json.loads(raw)
-    except Exception:
-        return {"raw": raw}
+class WireframeRegenRequest(BaseModel):
+    feedback_user_comment: str = ""   # what user said about feedback report
+    wireframe_user_comment: str = ""  # what user said about wireframe
 
 
-# ─── Pipeline ─────────────────────────────────────────────────────────────────
+# ─── Full Pipeline ────────────────────────────────────────────────────────────
 
 @app.post("/analyze-and-wireframe-s3/{client_id}")
 async def analyze_and_wireframe_s3(
@@ -113,8 +56,6 @@ async def analyze_and_wireframe_s3(
     file: UploadFile = File(...),
     client_id: str = "",
     x_user_id: str = Header(default="anonymous"),
-    job_id = str(uuid.uuid4())
-
 ):
     job_id = str(uuid.uuid4())
     pipeline_start = time.time()
@@ -123,14 +64,11 @@ async def analyze_and_wireframe_s3(
         await manager.send_progress(client_id, "Uploading image to S3...", 5)
         image_url = await upload_image_to_s3(file)
         create_evaluation_document(evaluation_id=job_id, user_id=x_user_id, screenshot_url=image_url)
-        await manager.send_progress(client_id, f"JOB_ID:{job_id}", 8)
         await manager.send_progress(client_id, "Initializing Agents...", 10)
-        register_hitl_session(job_id)
         result = await run_in_threadpool(run_full_ux_pipeline_raw, image_url, client_id, job_id)
         duration = time.time() - pipeline_start
         logger.info(f"[PIPELINE] Completed in {duration:.2f}s")
         complete_evaluation(evaluation_id=job_id, tasks_output=result.tasks_output, pipeline_duration_seconds=duration)
-        background_tasks.add_task(cleanup_hitl_session, job_id)
         await manager.send_progress(client_id, "Pipeline Complete", 100)
         return {
             "evaluation_id": job_id,
@@ -144,27 +82,92 @@ async def analyze_and_wireframe_s3(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ─── HITL ─────────────────────────────────────────────────────────────────────
+# ─── Wireframe Regeneration ───────────────────────────────────────────────────
+
+@app.post("/regenerate-wireframe/{evaluation_id}/{client_id}")
+async def regenerate_wireframe(
+    evaluation_id: str,
+    client_id: str,
+    body: WireframeRegenRequest,
+    x_user_id: str = Header(default="anonymous"),
+):
+    """
+    Reruns ONLY the wireframe agent.
+    Called after user submits both HITL reviews (feedback + wireframe).
+
+    Uses cached vision + heuristic + original feedback from MongoDB.
+    Passes user's comments on both agents as context for improvement.
+    """
+    doc = get_evaluation(evaluation_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+
+    ai = doc.get("ai_results", {})
+    vision_analysis      = ai.get("vision_analysis", "")
+    heuristic_evaluation = ai.get("heuristic_evaluation", {}).get("raw_text", "")
+    original_feedback    = ai.get("feedback_report", {}).get("raw_text", "")
+    image_url            = doc.get("input", {}).get("screenshot_url", "")
+
+    if not vision_analysis:
+        raise HTTPException(status_code=400, detail="Vision analysis missing from evaluation")
+
+    logger.info(f"[REGEN] Starting wireframe regen for {evaluation_id}")
+    await manager.send_progress(client_id, "Regenerating wireframe...", 10)
+
+    try:
+        result = await run_in_threadpool(
+            run_wireframe_regen_raw,
+            client_id,
+            evaluation_id,
+            image_url,
+            vision_analysis,
+            heuristic_evaluation,
+            original_feedback,
+            body.feedback_user_comment,
+            body.wireframe_user_comment,
+        )
+
+        new_wireframe = str(result.tasks_output[0].raw)
+
+        # Update wireframe in MongoDB
+        update_wireframe(
+            evaluation_id=evaluation_id,
+            new_wireframe=new_wireframe,
+            feedback_comment=body.feedback_user_comment,
+            wireframe_comment=body.wireframe_user_comment,
+            regenerated_by=x_user_id,
+        )
+
+        await manager.send_progress(client_id, "Wireframe Regenerated", 100)
+        logger.info(f"[REGEN] Done for {evaluation_id}")
+
+        return {"evaluation_id": evaluation_id, "wireframe": new_wireframe}
+
+    except Exception as e:
+        logger.error(f"[REGEN ERROR] {evaluation_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Save HITL Review ─────────────────────────────────────────────────────────
 
 @app.post("/submit-feedback")
 async def submit_hitl_feedback(
     body: HITLFeedbackRequest,
     x_user_id: str = Header(default="anonymous"),
 ):
+    """Saves user review to MongoDB. No pipeline blocking."""
     if body.user_action not in ["agree", "disagree", "modify"]:
         raise HTTPException(status_code=400, detail="user_action must be: agree | disagree | modify")
-    unblocked = submit_human_feedback(
-        evaluation_id=body.evaluation_id,
-        rating=body.user_action,
-        suggestion=body.user_modified_suggestion,
-    )
     save_hitl_response(
-        evaluation_id=body.evaluation_id, agent_name=body.agent_name,
-        ai_suggestion=body.ai_suggestion, user_action=body.user_action,
-        user_modified_suggestion=body.user_modified_suggestion, reviewed_by=x_user_id,
+        evaluation_id=body.evaluation_id,
+        agent_name=body.agent_name,
+        ai_suggestion=body.ai_suggestion,
+        user_action=body.user_action,
+        user_modified_suggestion=body.user_modified_suggestion,
+        reviewed_by=x_user_id,
     )
-    logger.info(f"[HITL] {body.agent_name} | {body.user_action} | unblocked={unblocked}")
-    return {"message": "Feedback saved", "pipeline_unblocked": unblocked, "evaluation_id": body.evaluation_id}
+    logger.info(f"[HITL] {body.agent_name} | {body.user_action} | {body.evaluation_id}")
+    return {"message": "Feedback saved", "evaluation_id": body.evaluation_id}
 
 
 # ─── Fetch ────────────────────────────────────────────────────────────────────

@@ -1,350 +1,166 @@
 {
-  "screen_type": "Dashboard / Account Overview",
+  "screen_type": "Sign Up / Create Account",
   "components": [
     {
       "type": "Status Bar",
-      "elements": [
-        {
-          "name": "Time",
-          "value": "10:09"
-        },
-        {
-          "name": "Connectivity Status Icons",
-          "details": [
-            "Wi-Fi",
-            "Cellular Signal Strength"
-          ]
-        },
-        {
-          "name": "Battery Icon",
-          "value": "53%"
-        }
-      ]
+      "content": {
+        "time": "9:41",
+        "signal_strength": "Full",
+        "wifi_status": "Connected",
+        "battery_level": "Full"
+      },
+      "position": "Top"
     },
     {
-      "type": "Header",
-      "elements": [
-        {
-          "name": "Menu/Feature Icon",
-          "icon": "Brain/Chip"
-        },
-        {
-          "name": "Account Identifier",
-          "value": "011XXXXXXX",
-          "interactive": true,
-          "interaction_type": "Dropdown"
-        },
-        {
-          "name": "Settings Icon",
-          "icon": "Gear/Cog"
-        },
-        {
-          "name": "App Grid/More Options Icon",
-          "icon": "Square Grid"
-        }
-      ],
-      "background_elements": [
-        {
-          "name": "Abstract Geometric Pattern",
-          "colors": [
-            "Green",
-            "White"
-          ]
-        }
-      ]
+      "type": "Dynamic Island / Notch",
+      "position": "Top Center"
     },
     {
-      "type": "Primary Horizontal Navigation",
-      "elements": [
-        {
-          "name": "Navigation Item",
-          "label": "Internet",
-          "icon": "Router",
-          "status": "Active",
-          "highlight_color": "Green/Yellow"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "PEO TV",
-          "icon": "Monitor",
-          "status": "Inactive"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "Voice",
-          "icon": "Phone",
-          "status": "Inactive"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "Mobile",
-          "icon": "Mobile Phone",
-          "status": "Inactive"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "Promo",
-          "icon": "Megaphone",
-          "status": "Inactive"
-        }
-      ]
+      "type": "Header Title",
+      "text": "Create Account",
+      "typography_style": "Large, bold, white, sans-serif"
     },
     {
-      "type": "Hero Banner / Brand Advertisement",
-      "elements": [
-        {
-          "name": "SLTMobitel Logo",
-          "text": "SLTMOBITEL"
-        },
-        {
-          "name": "Tagline",
-          "text": "The Connection"
-        }
-      ]
+      "type": "Header Description",
+      "text": "Register your account today using a valid email and password",
+      "typography_style": "Medium, regular, white, sans-serif"
     },
     {
-      "type": "Information Card",
-      "title": "WEB FAMILY XTRA",
-      "elements": [
-        {
-          "name": "Status",
-          "value": "Normal"
-        },
-        {
-          "name": "Loyalty Data",
-          "value": "7.8GB"
-        },
-        {
-          "name": "Action Button",
-          "label": "Package Upgrade",
-          "icon": "Chevron Right",
-          "color": "Purple"
-        }
-      ]
+      "type": "Section Title",
+      "text": "Sign up",
+      "typography_style": "Large, bold, dark gray, sans-serif"
     },
     {
-      "type": "Information Card",
-      "title": "DATA Remaining",
-      "elements": [
-        {
-          "name": "Standard Data",
-          "value": "54.0GB"
-        },
-        {
-          "name": "Free Data",
-          "value": "95.00GB"
-        },
-        {
-          "name": "Action Button",
-          "label": "More",
-          "icon": "Chevron Right",
-          "color": "Blue"
-        }
-      ]
+      "type": "Text Field",
+      "placeholder": "Enter your email",
+      "icon": "Envelope",
+      "input_type": "email"
     },
     {
-      "type": "Chip Group / Segmented Buttons",
-      "elements": [
-        {
-          "name": "Chip Button",
-          "label": "SLT Go",
-          "highlight_color": "Blue"
-        },
-        {
-          "name": "Chip Button",
-          "label": "Data Add-on",
-          "highlight_color": "Green"
-        },
-        {
-          "name": "Chip Button",
-          "label": "Extra GB",
-          "highlight_color": "Cyan"
-        }
-      ]
+      "type": "Text Field",
+      "placeholder": "Enter your Password",
+      "icon": "Lock",
+      "input_type": "password"
     },
     {
-      "type": "Payment Summary Section",
-      "elements": [
-        {
-          "name": "Label",
-          "text": "Total Payable"
-        },
-        {
-          "name": "Amount",
-          "value": "Rs. 6,977.25"
-        },
-        {
-          "name": "Payment Button",
-          "label": "Pay",
-          "color": "Dark Blue"
-        },
-        {
-          "name": "Dropdown/Expand Icon",
-          "icon": "Chevron Down"
-        }
-      ]
+      "type": "Text Field",
+      "placeholder": "Conform your Password",
+      "icon": "Lock",
+      "input_type": "password",
+      "note": "Typo: Should be 'Confirm'"
     },
     {
-      "type": "Value Added Services Section",
-      "elements": [
-        {
-          "name": "Section Title",
-          "text": "VALUE ADDED SERVICES"
-        },
-        {
-          "name": "Service Item",
-          "label": "Storage",
-          "icon": "Folders/Grid",
-          "color": "Blue"
-        },
-        {
-          "name": "Service Item",
-          "label": "slt go",
-          "icon": "SLT Go Logo",
-          "color": "Blue/Yellow"
-        },
-        {
-          "name": "Service Item",
-          "label": "PEO TV GO",
-          "icon": "PEO TV GO Logo",
-          "color": "Blue"
-        },
-        {
-          "name": "Service Item",
-          "label": "Kaspersky",
-          "icon": "Kaspersky Bear Logo",
-          "color": "Green"
-        }
-      ]
+      "type": "Text Field",
+      "placeholder": "Enter referral ID (Optional)",
+      "icon": "ID Card / Person",
+      "input_type": "text"
     },
     {
-      "type": "Bottom Navigation Bar",
-      "elements": [
-        {
-          "name": "Navigation Item",
-          "label": "Digital Life",
-          "icon": "Phone with finger tap",
-          "status": "Active"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "Hot Devices",
-          "icon": "Tablet",
-          "status": "Inactive"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "New",
-          "icon": "Document",
-          "status": "Inactive"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "Bill",
-          "icon": "Bill",
-          "status": "Inactive"
-        },
-        {
-          "name": "Navigation Item",
-          "label": "Complaints",
-          "icon": "Exclamation Mark",
-          "status": "Inactive"
-        }
-      ],
-      "background_elements": [
-        {
-          "name": "Abstract Geometric Pattern",
-          "colors": [
-            "Blue",
-            "White"
-          ]
-        }
-      ]
+      "type": "Checkbox",
+      "label": "Remember me",
+      "status": "Checked"
+    },
+    {
+      "type": "Link",
+      "text": "Forgot password?",
+      "destination": "Password recovery flow"
+    },
+    {
+      "type": "Primary Button",
+      "text": "Sign up",
+      "action": "Submit registration form"
+    },
+    {
+      "type": "Informational Text",
+      "text": "Already have an account?"
+    },
+    {
+      "type": "Link",
+      "text": "Sign in",
+      "destination": "Login screen"
     }
   ],
-  "layout_structure": "The screen uses a vertical stacking layout, segmenting content into distinct blocks. From top to bottom:\n1.  System status bar.\n2.  Fixed header with global navigation/account info.\n3.  Horizontal, scrollable primary navigation for service categories.\n4.  Prominent brand banner.\n5.  Two-column grid for key data summary cards.\n6.  Horizontal row of action-oriented 'chip' buttons.\n7.  Payment summary section with a clear call-to-action.\n8.  Grid layout for 'Value Added Services' items.\n9.  Fixed bottom navigation bar for global app sections.\nEach section has internal layouts like key-value pairs, horizontal lists, or grids, creating a structured yet dynamic feel.",
+  "layout_structure": "The screen features a top-aligned, full-width dark blue gradient background acting as a hero section, containing the main title and description. A large white card with rounded corners overlaps the lower part of this hero section and extends to the bottom of the screen. This card houses the 'Sign up' section title, a vertically stacked form with four input fields, a checkbox, a horizontally aligned 'Forgot password?' link, and a primary action button. A centered text-and-link combination serves as a footer below the primary button, outside the main card.",
   "color_scheme": {
-    "primary_brand_colors": [
-      "#1A3B8A (Deep Blue)",
-      "#39B54A (Vibrant Green)",
-      "#00AFEF (Cyan/Light Blue)"
-    ],
-    "secondary_accent_colors": [
-      "#6A0DAD (Purple for text/accents)",
-      "#FFD700 (Yellow for highlights)",
-      "#E0E0E0 (Light Grey for card backgrounds)"
-    ],
-    "text_colors": {
-      "on_dark_backgrounds": "#FFFFFF (White)",
-      "on_light_backgrounds": [
-        "#333333 (Dark Grey/Black)",
-        "#6A0DAD (Purple)"
-      ],
-      "highlights": [
-        "#39B54A (Green)",
-        "#00AFEF (Cyan)"
-      ]
-    },
-    "background_colors": {
-      "main_content": "#F5F5F5 (Light Grey)",
-      "header_footer": "#1A3B8A (Deep Blue)",
-      "card_backgrounds": "#EFEFEF (Off-white/Light Grey)"
-    }
+    "primary_background": "Gradient from dark blue (#1D2C67 approx.) to medium blue (#2A58C0 approx.)",
+    "secondary_background": "White (#FFFFFF) for the form card",
+    "primary_text": "White (#FFFFFF) for header text, button text",
+    "secondary_text": "Dark Gray / Black (#333333 approx.) for 'Sign up' title, 'Remember me', 'Already have an account?'",
+    "placeholder_text": "Light Gray (#AAAAAA approx.)",
+    "primary_button": "Solid Medium Blue (#3478F6 approx.)",
+    "links": "Medium Blue (#3478F6 approx.)",
+    "icons": "Light Gray (#AAAAAA approx.)"
   },
   "typography": {
-    "font_family": "Sans-serif (likely a system default or common web font like Roboto/Open Sans)",
-    "font_weights": {
-      "bold": [
-        "Main data values (54.0GB, 95.00GB, Rs. 6,977.25)",
-        "Section titles (WEB FAMILY XTRA, DATA Remaining, VALUE ADDED SERVICES)"
-      ],
-      "regular": [
-        "Descriptive text (Status Normal, Loyalty Data)",
-        "Navigation labels"
-      ]
-    },
-    "font_sizes": {
-      "large": [
-        "SLTMOBITEL (banner)",
-        "Main data values"
-      ],
-      "medium": [
-        "Account ID",
-        "Section titles",
-        "Action button labels"
-      ],
-      "small": [
-        "Status bar text",
-        "Sub-labels",
-        "Bottom navigation labels"
-      ]
-    },
-    "text_alignment": "Mostly left-aligned for labels and descriptions, right-aligned for numerical values in the 'Total Payable' section."
+    "font_family": "Sans-serif (likely a system default like San Francisco or Roboto)",
+    "styles": [
+      {
+        "element": "Header Title",
+        "size": "Large",
+        "weight": "Bold",
+        "color": "White"
+      },
+      {
+        "element": "Header Description",
+        "size": "Medium",
+        "weight": "Regular",
+        "color": "White"
+      },
+      {
+        "element": "Section Title ('Sign up')",
+        "size": "Large (slightly smaller than Header Title)",
+        "weight": "Bold",
+        "color": "Dark Gray"
+      },
+      {
+        "element": "Text Field Placeholders",
+        "size": "Medium-Small",
+        "weight": "Regular",
+        "color": "Light Gray"
+      },
+      {
+        "element": "'Remember me' Label",
+        "size": "Medium-Small",
+        "weight": "Regular",
+        "color": "Dark Gray"
+      },
+      {
+        "element": "'Forgot password?' Link",
+        "size": "Medium-Small",
+        "weight": "Regular",
+        "color": "Medium Blue"
+      },
+      {
+        "element": "Primary Button Text",
+        "size": "Medium",
+        "weight": "Bold",
+        "color": "White"
+      },
+      {
+        "element": "Footer Text/Link",
+        "size": "Medium-Small",
+        "weight": "Regular",
+        "color": "Dark Gray (text), Medium Blue (link)"
+      }
+    ]
   },
   "spacing_and_density": {
-    "overall_density": "Moderate, with sufficient whitespace separating major sections and components.",
-    "padding_margins": "Consistent vertical padding between main sections (e.g., banner to data cards, data cards to chips). Internal padding within cards and buttons ensures readability and tapability.",
-    "element_spacing": {
-      "card_to_card": "Good horizontal spacing between the two data summary cards.",
-      "button_to_button": "Adequate horizontal spacing between 'chip' buttons.",
-      "icon_grid": "Generous spacing within the 'Value Added Services' grid, creating distinct tap targets.",
-      "header_elements": "Well-distributed elements in the header, balancing information with visual clarity."
-    },
-    "visual_hierarchy": "Achieved through varied font sizes, weights, and background contrasts. Important information like data remaining and total payable is given larger, bolder text."
+    "vertical_spacing": "Generous spacing between major sections (header, card, footer) and between form elements, creating an airy feel.",
+    "horizontal_padding": "Consistent horizontal padding within the form card for text fields and buttons, providing comfortable margins.",
+    "element_size": "Text fields and buttons appear to have ample height, suggesting good touch target sizes.",
+    "density": "Moderate density, leaning towards spaciousness, enhancing readability and usability."
   },
   "accessibility_observations": [
-    "**Color Contrast**: Generally good, especially for white text on deep blue backgrounds and dark text on light grey. Purple text on light grey backgrounds might be borderline for some users with color vision deficiencies, but appears acceptable.",
-    "**Tap Targets**: Most interactive elements (buttons, navigation icons, dropdowns) appear sufficiently large and well-spaced, which is good for touch interaction.",
-    "**Text Size**: Font sizes for key information are readable. Smaller text (e.g., bottom navigation labels) might be challenging for users with visual impairments without text scaling options.",
-    "**Labels & Icons**: Icons are consistently paired with text labels, enhancing comprehensibility for all users, including those using screen readers.",
-    "**Focus Management**: The visual highlight for the 'Internet' tab in the horizontal navigation and 'Digital Life' in the bottom navigation suggests clear focus indication, though keyboard navigation isn't explicitly tested in a screenshot."
+    "**Color Contrast**: White text on dark blue background in the header provides good contrast. Dark gray text on white background is also good. Light gray placeholder text might have insufficient contrast against the white background for users with low vision (WCAG AA might be borderline).",
+    "**Typo**: The placeholder 'Conform your Password' contains a typo and should be 'Confirm your Password', which can cause confusion for users.",
+    "**Touch Target Size**: Input fields, checkbox, and the main button appear to be sufficiently sized for easy interaction on mobile devices.",
+    "**Labels**: Placeholders are used as primary labels. While icons provide additional context, dedicated visible labels or at least properly implemented accessibility labels (for screen readers) would improve usability for some users."
   ],
   "notable_patterns": [
-    "**Dashboard Design**: Classic information dashboard presenting an overview of account status, data usage, and quick actions.",
-    "**Card-Based UI**: Utilizes cards to group related information (e.g., 'WEB FAMILY XTRA' and 'DATA Remaining'), improving scannability.",
-    "**Dual Navigation System**: Features both a scrollable horizontal category-based navigation (under header) and a fixed bottom tab bar for global app sections, offering comprehensive access.",
-    "**Brand-Centric Design**: Strong integration of brand colors (blue, green) and logo throughout the UI, reinforcing brand identity.",
-    "**Call-to-Action Emphasis**: Prominent 'Pay', 'Package Upgrade', and 'More' buttons guide users towards key actions.",
-    "**Chip/Pill-shaped buttons**: Used for secondary actions/filters, adding a modern touch and clear visual distinction."
+    "**Hero Header**: A distinct, branded top section used to convey the primary purpose of the screen.",
+    "**Card UI / Floating Sheet**: A common pattern where content (in this case, a form) is presented within a separate, elevated container, often with rounded corners, providing a visual separation from the background.",
+    "**Standard Form Layout**: Vertical stacking of input fields, clearly delineated by their backgrounds and placeholders, with a primary action button at the bottom.",
+    "**Contextual Links**: 'Forgot password?' and 'Sign in' links provide immediate access to related flows, enhancing user experience.",
+    "**Optional Field Indicator**: Clearly marking the 'Referral ID' field as '(Optional)' helps users understand what is required."
   ]
 }

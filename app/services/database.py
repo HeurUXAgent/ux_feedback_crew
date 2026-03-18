@@ -297,3 +297,50 @@ def get_evaluations_for_analysis(limit: int = 200) -> list:
     ).sort("timestamps.created_at", DESCENDING).limit(limit)
 
     return list(cursor)
+
+
+def update_wireframe(
+    evaluation_id: str,
+    new_wireframe: str,
+    feedback_comment: str,
+    wireframe_comment: str,
+    regenerated_by: str,
+    new_feedback: str = None
+):
+    """
+    Updates the improved_design in an existing evaluation when the user triggers regeneration.
+    Saves both the feedback report comment and the wireframe comment into the history.
+    """
+    from datetime import datetime, timezone
+
+    # Ensure we use the existing collection logic from your file
+    # If get_db() isn't defined in your helper section, use the global 'evaluations_collection'
+    collection = evaluations_collection 
+
+    # Prepare the update document
+    update_fields = {
+        "ai_results.improved_design.html_code": new_wireframe,
+        "status": "regenerated",
+        "timestamps.updated_at": datetime.now(timezone.utc)
+    }
+
+    # Only update the feedback text if new feedback was actually generated
+    if new_feedback:
+        update_fields["ai_results.feedback_report.raw_text"] = new_feedback
+
+    collection.update_one(
+        {"evaluation_id": evaluation_id},
+        {
+            "$set": update_fields,
+            "$push": {
+                "regeneration_history": {
+                    "feedback_user_comment": feedback_comment,
+                    "wireframe_user_comment": wireframe_comment,
+                    "regenerated_by": regenerated_by,
+                    "regenerated_at": datetime.now(timezone.utc),
+                    "new_feedback_preview": new_feedback[:200] if new_feedback else "N/A",
+                }
+            }
+        }
+    )
+    return True
