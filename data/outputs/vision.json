@@ -1,182 +1,350 @@
 {
-  "screen_type": "Artist Profile / Music Player Screen",
+  "screen_type": "Dashboard / Account Overview",
   "components": [
     {
-      "name": "iOS Status Bar",
-      "type": "System Component",
+      "type": "Status Bar",
       "elements": [
-        "Carrier (Verizon)",
-        "WiFi signal icon",
-        "Time (2:34 PM)",
-        "Battery percentage (100%)",
-        "Battery icon"
+        {
+          "name": "Time",
+          "value": "10:09"
+        },
+        {
+          "name": "Connectivity Status Icons",
+          "details": [
+            "Wi-Fi",
+            "Cellular Signal Strength"
+          ]
+        },
+        {
+          "name": "Battery Icon",
+          "value": "53%"
+        }
       ]
     },
     {
-      "name": "Navigation Bar",
       "type": "Header",
       "elements": [
-        "Back icon (<)",
-        "Heart icon (Like/Favorite)",
-        "Share icon"
-      ]
-    },
-    {
-      "name": "Artist Profile Header",
-      "type": "Section",
-      "elements": [
-        "Circular Artist Avatar (Drake)",
-        "Artist Name (Drake)",
-        "Bio Link with Info icon",
-        "Floating Play Button (circular, blue with white play icon)"
-      ]
-    },
-    {
-      "name": "Latest Release Section",
-      "type": "Content Section",
-      "elements": [
-        "Section Header: 'LATEST RELEASE'",
         {
-          "name": "Latest Release Item",
-          "elements": [
-            "Album Art Thumbnail",
-            "Song Title ('Two Birds, One Stone')",
-            "Release Date ('Oct. 2016')",
-            "Number of Songs ('1 song')",
-            "More Options icon (...)"
+          "name": "Menu/Feature Icon",
+          "icon": "Brain/Chip"
+        },
+        {
+          "name": "Account Identifier",
+          "value": "011XXXXXXX",
+          "interactive": true,
+          "interaction_type": "Dropdown"
+        },
+        {
+          "name": "Settings Icon",
+          "icon": "Gear/Cog"
+        },
+        {
+          "name": "App Grid/More Options Icon",
+          "icon": "Square Grid"
+        }
+      ],
+      "background_elements": [
+        {
+          "name": "Abstract Geometric Pattern",
+          "colors": [
+            "Green",
+            "White"
           ]
         }
       ]
     },
     {
-      "name": "Top Songs Section",
-      "type": "Content Section",
+      "type": "Primary Horizontal Navigation",
       "elements": [
-        "Section Header: 'TOP SONGS'",
         {
-          "name": "Top Song Item 1",
-          "elements": [
-            "Rank Number (1)",
-            "Album Art Thumbnail",
-            "Song Title ('One Dance')",
-            "More Options icon (...)"
-          ]
+          "name": "Navigation Item",
+          "label": "Internet",
+          "icon": "Router",
+          "status": "Active",
+          "highlight_color": "Green/Yellow"
         },
         {
-          "name": "Top Song Item 2",
-          "elements": [
-            "Rank Number (2)",
-            "Album Art Thumbnail",
-            "Song Title ('The Motto')",
-            "More Options icon (...)"
-          ]
+          "name": "Navigation Item",
+          "label": "PEO TV",
+          "icon": "Monitor",
+          "status": "Inactive"
         },
         {
-          "name": "Top Song Item 3",
-          "elements": [
-            "Rank Number (3)",
-            "Album Art Thumbnail",
-            "Song Title ('All of Me')",
-            "More Options icon (...)"
-          ]
+          "name": "Navigation Item",
+          "label": "Voice",
+          "icon": "Phone",
+          "status": "Inactive"
+        },
+        {
+          "name": "Navigation Item",
+          "label": "Mobile",
+          "icon": "Mobile Phone",
+          "status": "Inactive"
+        },
+        {
+          "name": "Navigation Item",
+          "label": "Promo",
+          "icon": "Megaphone",
+          "status": "Inactive"
         }
       ]
     },
     {
-      "name": "Mini Music Player",
-      "type": "Persistent Bottom Bar",
+      "type": "Hero Banner / Brand Advertisement",
       "elements": [
-        "Pause icon (||)",
-        "Currently Playing Song Title ('Closer (feat. Halsey)')",
-        "Currently Playing Artist Name ('The Chainsmokers')",
-        "Dislike icon (thumbs down)",
-        "Like icon (thumbs up)"
+        {
+          "name": "SLTMobitel Logo",
+          "text": "SLTMOBITEL"
+        },
+        {
+          "name": "Tagline",
+          "text": "The Connection"
+        }
       ]
     },
     {
-      "name": "App Background Header",
-      "type": "Text Label",
+      "type": "Information Card",
+      "title": "WEB FAMILY XTRA",
       "elements": [
-        "Text: 'Millions of Free Songs'"
+        {
+          "name": "Status",
+          "value": "Normal"
+        },
+        {
+          "name": "Loyalty Data",
+          "value": "7.8GB"
+        },
+        {
+          "name": "Action Button",
+          "label": "Package Upgrade",
+          "icon": "Chevron Right",
+          "color": "Purple"
+        }
+      ]
+    },
+    {
+      "type": "Information Card",
+      "title": "DATA Remaining",
+      "elements": [
+        {
+          "name": "Standard Data",
+          "value": "54.0GB"
+        },
+        {
+          "name": "Free Data",
+          "value": "95.00GB"
+        },
+        {
+          "name": "Action Button",
+          "label": "More",
+          "icon": "Chevron Right",
+          "color": "Blue"
+        }
+      ]
+    },
+    {
+      "type": "Chip Group / Segmented Buttons",
+      "elements": [
+        {
+          "name": "Chip Button",
+          "label": "SLT Go",
+          "highlight_color": "Blue"
+        },
+        {
+          "name": "Chip Button",
+          "label": "Data Add-on",
+          "highlight_color": "Green"
+        },
+        {
+          "name": "Chip Button",
+          "label": "Extra GB",
+          "highlight_color": "Cyan"
+        }
+      ]
+    },
+    {
+      "type": "Payment Summary Section",
+      "elements": [
+        {
+          "name": "Label",
+          "text": "Total Payable"
+        },
+        {
+          "name": "Amount",
+          "value": "Rs. 6,977.25"
+        },
+        {
+          "name": "Payment Button",
+          "label": "Pay",
+          "color": "Dark Blue"
+        },
+        {
+          "name": "Dropdown/Expand Icon",
+          "icon": "Chevron Down"
+        }
+      ]
+    },
+    {
+      "type": "Value Added Services Section",
+      "elements": [
+        {
+          "name": "Section Title",
+          "text": "VALUE ADDED SERVICES"
+        },
+        {
+          "name": "Service Item",
+          "label": "Storage",
+          "icon": "Folders/Grid",
+          "color": "Blue"
+        },
+        {
+          "name": "Service Item",
+          "label": "slt go",
+          "icon": "SLT Go Logo",
+          "color": "Blue/Yellow"
+        },
+        {
+          "name": "Service Item",
+          "label": "PEO TV GO",
+          "icon": "PEO TV GO Logo",
+          "color": "Blue"
+        },
+        {
+          "name": "Service Item",
+          "label": "Kaspersky",
+          "icon": "Kaspersky Bear Logo",
+          "color": "Green"
+        }
+      ]
+    },
+    {
+      "type": "Bottom Navigation Bar",
+      "elements": [
+        {
+          "name": "Navigation Item",
+          "label": "Digital Life",
+          "icon": "Phone with finger tap",
+          "status": "Active"
+        },
+        {
+          "name": "Navigation Item",
+          "label": "Hot Devices",
+          "icon": "Tablet",
+          "status": "Inactive"
+        },
+        {
+          "name": "Navigation Item",
+          "label": "New",
+          "icon": "Document",
+          "status": "Inactive"
+        },
+        {
+          "name": "Navigation Item",
+          "label": "Bill",
+          "icon": "Bill",
+          "status": "Inactive"
+        },
+        {
+          "name": "Navigation Item",
+          "label": "Complaints",
+          "icon": "Exclamation Mark",
+          "status": "Inactive"
+        }
+      ],
+      "background_elements": [
+        {
+          "name": "Abstract Geometric Pattern",
+          "colors": [
+            "Blue",
+            "White"
+          ]
+        }
       ]
     }
   ],
-  "layout_structure": "The screen is primarily composed of a vertical stack of sections within a white application frame, set against a solid red background. \n- The top features the standard iOS status bar.\n- Below that is a navigation bar with left-aligned navigation and right-aligned action icons.\n- The main content area begins with a prominent artist profile header, featuring a circular avatar, name, and bio link. A large, circular play button overlays this section, suggesting a primary action.\n- Following the artist header, content is organized into scrollable vertical lists with distinct section headers ('LATEST RELEASE', 'TOP SONGS'). Each list item follows a consistent horizontal layout (thumbnail/rank, text details, action icon).\n- A persistent mini-player bar occupies the bottom of the screen, providing playback controls and current song information. This bar sits above the iPhone's home button area. All content appears to be left-aligned within its respective container.",
+  "layout_structure": "The screen uses a vertical stacking layout, segmenting content into distinct blocks. From top to bottom:\n1.  System status bar.\n2.  Fixed header with global navigation/account info.\n3.  Horizontal, scrollable primary navigation for service categories.\n4.  Prominent brand banner.\n5.  Two-column grid for key data summary cards.\n6.  Horizontal row of action-oriented 'chip' buttons.\n7.  Payment summary section with a clear call-to-action.\n8.  Grid layout for 'Value Added Services' items.\n9.  Fixed bottom navigation bar for global app sections.\nEach section has internal layouts like key-value pairs, horizontal lists, or grids, creating a structured yet dynamic feel.",
   "color_scheme": {
-    "primary_background": {
-      "name": "Red",
-      "hex": "#E51A20"
-    },
-    "app_background": {
-      "name": "White",
-      "hex": "#FFFFFF"
-    },
-    "text_colors": {
-      "primary": {
-        "name": "Dark Gray/Black",
-        "hex": "#333333"
-      },
-      "secondary": {
-        "name": "Light Gray",
-        "hex": "#999999"
-      },
-      "on_dark_background": {
-        "name": "White",
-        "hex": "#FFFFFF"
-      }
-    },
-    "accent_colors": [
-      {
-        "name": "Vibrant Blue (Play Button)",
-        "hex": "#2196F3"
-      }
+    "primary_brand_colors": [
+      "#1A3B8A (Deep Blue)",
+      "#39B54A (Vibrant Green)",
+      "#00AFEF (Cyan/Light Blue)"
     ],
-    "ui_elements": {
-      "mini_player_background": {
-        "name": "Dark Gray/Black",
-        "hex": "#212121"
-      },
-      "artist_header_background_gradient": "From dark blue/purple to lighter blue/teal",
-      "status_bar_icons_text": {
-        "name": "Dark Gray/Black (on white)",
-        "hex": "#333333"
-      }
+    "secondary_accent_colors": [
+      "#6A0DAD (Purple for text/accents)",
+      "#FFD700 (Yellow for highlights)",
+      "#E0E0E0 (Light Grey for card backgrounds)"
+    ],
+    "text_colors": {
+      "on_dark_backgrounds": "#FFFFFF (White)",
+      "on_light_backgrounds": [
+        "#333333 (Dark Grey/Black)",
+        "#6A0DAD (Purple)"
+      ],
+      "highlights": [
+        "#39B54A (Green)",
+        "#00AFEF (Cyan)"
+      ]
+    },
+    "background_colors": {
+      "main_content": "#F5F5F5 (Light Grey)",
+      "header_footer": "#1A3B8A (Deep Blue)",
+      "card_backgrounds": "#EFEFEF (Off-white/Light Grey)"
     }
   },
   "typography": {
-    "font_family": "Sans-serif (likely system default like San Francisco or Helvetica Neue)",
+    "font_family": "Sans-serif (likely a system default or common web font like Roboto/Open Sans)",
     "font_weights": {
-      "bold_semi_bold": "Artist Name, Section Headers",
-      "regular": "Song Titles, Secondary Text, Status Bar"
+      "bold": [
+        "Main data values (54.0GB, 95.00GB, Rs. 6,977.25)",
+        "Section titles (WEB FAMILY XTRA, DATA Remaining, VALUE ADDED SERVICES)"
+      ],
+      "regular": [
+        "Descriptive text (Status Normal, Loyalty Data)",
+        "Navigation labels"
+      ]
     },
     "font_sizes": {
-      "large": "Artist Name ('Drake')",
-      "medium": "Section Headers ('LATEST RELEASE'), Main Song Titles",
-      "small": "Secondary details (release date, 'Bio'), Mini-player artist name",
-      "system_small": "iOS Status Bar"
+      "large": [
+        "SLTMOBITEL (banner)",
+        "Main data values"
+      ],
+      "medium": [
+        "Account ID",
+        "Section titles",
+        "Action button labels"
+      ],
+      "small": [
+        "Status bar text",
+        "Sub-labels",
+        "Bottom navigation labels"
+      ]
     },
-    "text_alignment": "Predominantly left-aligned"
+    "text_alignment": "Mostly left-aligned for labels and descriptions, right-aligned for numerical values in the 'Total Payable' section."
   },
   "spacing_and_density": {
-    "padding": "Consistent horizontal padding from screen edges for content (approximately 16-20px). Internal padding within list items provides clear separation.",
-    "margins": "Clear vertical margins between major sections (e.g., Artist Header to Latest Release, Latest Release to Top Songs).",
-    "line_height": "Standard, comfortable line spacing for readability, especially in list item details.",
-    "density": "Medium density. Information is well-organized without feeling cramped, balancing content visibility with adequate whitespace. The list items are compact enough to show multiple entries without being overwhelming."
+    "overall_density": "Moderate, with sufficient whitespace separating major sections and components.",
+    "padding_margins": "Consistent vertical padding between main sections (e.g., banner to data cards, data cards to chips). Internal padding within cards and buttons ensures readability and tapability.",
+    "element_spacing": {
+      "card_to_card": "Good horizontal spacing between the two data summary cards.",
+      "button_to_button": "Adequate horizontal spacing between 'chip' buttons.",
+      "icon_grid": "Generous spacing within the 'Value Added Services' grid, creating distinct tap targets.",
+      "header_elements": "Well-distributed elements in the header, balancing information with visual clarity."
+    },
+    "visual_hierarchy": "Achieved through varied font sizes, weights, and background contrasts. Important information like data remaining and total payable is given larger, bolder text."
   },
   "accessibility_observations": [
-    "Contrast for primary text on white background is good. However, secondary text (e.g., 'Oct. 2016', 'Bio') in light gray on white background might have insufficient contrast for users with certain visual impairments.",
-    "Tap targets for interactive elements like navigation icons, the floating play button, and mini-player controls appear adequately sized and spaced for easy interaction.",
-    "The use of standard iconography (back, heart, share, play/pause, thumbs up/down, info) helps with immediate understanding of functionality.",
-    "Hierarchical structure with clear section headers aids in content navigation and understanding for all users, including those using screen readers.",
-    "The overall font sizes are generally legible, though secondary text is on the smaller side."
+    "**Color Contrast**: Generally good, especially for white text on deep blue backgrounds and dark text on light grey. Purple text on light grey backgrounds might be borderline for some users with color vision deficiencies, but appears acceptable.",
+    "**Tap Targets**: Most interactive elements (buttons, navigation icons, dropdowns) appear sufficiently large and well-spaced, which is good for touch interaction.",
+    "**Text Size**: Font sizes for key information are readable. Smaller text (e.g., bottom navigation labels) might be challenging for users with visual impairments without text scaling options.",
+    "**Labels & Icons**: Icons are consistently paired with text labels, enhancing comprehensibility for all users, including those using screen readers.",
+    "**Focus Management**: The visual highlight for the 'Internet' tab in the horizontal navigation and 'Digital Life' in the bottom navigation suggests clear focus indication, though keyboard navigation isn't explicitly tested in a screenshot."
   ],
   "notable_patterns": [
-    "Hero Section: A prominent artist image and name at the top to establish context for the profile.",
-    "Floating Action Button (FAB): A large, circular play button overlays the artist header, indicating the primary action (playing content from the artist).",
-    "List-Detail Pattern: Content is presented in scrollable lists of items (releases, songs), each potentially leading to a detail view or direct playback.",
-    "Persistent Mini Player: A common pattern in media apps, allowing continuous playback control while the user navigates other parts of the application.",
-    "Hierarchical Content Organization: Clear section headers (e.g., 'LATEST RELEASE', 'TOP SONGS') are used to structure and categorize content.",
-    "Standard iOS UI Elements: The screen utilizes a standard iOS status bar and navigation bar layout, providing a familiar user experience.",
-    "Skeuomorphic Device Frame: The application is presented within a detailed iPhone hardware frame, a common technique for showcasing mobile UIs."
+    "**Dashboard Design**: Classic information dashboard presenting an overview of account status, data usage, and quick actions.",
+    "**Card-Based UI**: Utilizes cards to group related information (e.g., 'WEB FAMILY XTRA' and 'DATA Remaining'), improving scannability.",
+    "**Dual Navigation System**: Features both a scrollable horizontal category-based navigation (under header) and a fixed bottom tab bar for global app sections, offering comprehensive access.",
+    "**Brand-Centric Design**: Strong integration of brand colors (blue, green) and logo throughout the UI, reinforcing brand identity.",
+    "**Call-to-Action Emphasis**: Prominent 'Pay', 'Package Upgrade', and 'More' buttons guide users towards key actions.",
+    "**Chip/Pill-shaped buttons**: Used for secondary actions/filters, adding a modern touch and clear visual distinction."
   ]
 }

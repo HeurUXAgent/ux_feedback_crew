@@ -1,657 +1,907 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artist Profile / Music Player - Redesign</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Daraz E-commerce Home Screen Redesign</title>
     <style>
-        :root {
-            /* Original Colors */
-            --color-primary-background-red: #E51A20; /* Used for app frame border */
-            --color-app-background-white: #FFFFFF;
-            --color-dark-gray-black: #333333; /* Primary text */
-            --color-vibrant-blue: #2196F3; /* Play button */
-            --color-mini-player-background: #212121;
-            --color-on-dark: #FFFFFF; /* Text on dark backgrounds */
-
-            /* Improved Colors for Accessibility & UI */
-            --color-secondary-text-improved: #666666; /* Improved contrast for secondary text (was #999999) */
-            --color-status-bar-icons: #333333; /* For status bar on white background */
-            --color-annotation-text: #555555; /* Muted color for annotations */
-            --color-annotation-bg: #f5f5f5;
-            --color-annotation-border: #cccccc;
-
-
-            /* Typography */
-            --font-family-system: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-            --font-size-xs: 0.65rem; /* ~10px for annotations */
-            --font-size-small: 0.75rem; /* ~12px */
-            --font-size-medium: 0.9375rem; /* ~15px */
-            --font-size-regular: 1rem; /* ~16px */
-            --font-size-large: 1.25rem; /* ~20px */
-            --font-size-artist-name: 1.75rem; /* ~28px */
-            --font-size-section-header: 1.125rem; /* ~18px */
-            --font-size-mini-player-song: 0.9rem;
-            --font-size-mini-player-artist: 0.8rem;
-
-            /* Spacing */
-            --spacing-xs: 4px;
-            --spacing-s: 8px;
-            --spacing-m: 16px;
-            --spacing-l: 24px;
-            --spacing-xl: 32px;
-            --padding-horizontal: var(--spacing-m); /* Consistent screen edge padding */
-
-            /* Touch Target */
-            --min-touch-target: 44px; /* Minimum recommended touch target size */
-        }
-
-        /* Base Styles */
-        body {
+        /* Basic Reset & Font */
+        *, *::before, *::after {
+            box-sizing: border-box;
             margin: 0;
-            font-family: var(--font-family-system);
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', 'Open Sans', sans-serif; /* Modern sans-serif font */
+            background-color: #FFFFFF; /* Dominant background */
+            color: #333333; /* Default text color */
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: #f0f0f0; /* Light gray for outside the app frame */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Variables for consistent styling and easy updates */
+        :root {
+            --brand-orange: #F57224;
+            --brand-yellow: #FFDD00;
+            --text-dark: #333333;
+            --text-light: #FFFFFF;
+            --background-white: #FFFFFF;
+            --background-light-blue: #77E0EF;
+            --banner-dark-blue: #3f51b5; /* For ADD TO CART > button on blue banner */
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --fab-size: 56px;
+            --bottom-nav-height: 60px;
+            --header-height: 56px;
+            --status-bar-height: 24px; /* Approx standard mobile status bar height */
+            --tap-target-min-size: 44px; /* Minimum recommended tap target size */
+            --font-size-small: 0.75rem;
+            --font-size-medium: 0.9rem;
+            --font-size-large: 1.1rem;
+            --font-size-xl: 1.5rem;
+            --font-size-xxl: 1.8rem;
+        }
+
+        /* Utility Classes */
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .flex-between { display: flex; align-items: center; justify-content: space-between; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-bold { font-weight: bold; }
+        .text-orange { color: var(--brand-orange); }
+        .text-white { color: var(--text-light); }
+        .bg-orange { background-color: var(--brand-orange); }
+        .bg-white { background-color: var(--background-white); }
+        .round-sm { border-radius: var(--border-radius-sm); }
+        .round-md { border-radius: var(--border-radius-md); }
+
+        /* General Layout */
+        html { scroll-behavior: smooth; }
+        body {
             display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align to top for better screen display */
+            flex-direction: column;
             min-height: 100vh;
-            padding-top: var(--spacing-xl);
-            padding-bottom: var(--spacing-xl);
         }
 
-        /* App Frame (Simulating iPhone dimensions) */
-        .app-frame {
-            width: 375px; /* Mobile-first width (e.g., iPhone SE/X reference) */
-            background-color: var(--color-app-background-white);
-            border-radius: 2.5rem; /* iOS-like rounded corners */
-            box-shadow: 0 0 0 10px var(--color-primary-background-red),
-                        0 20px 40px rgba(0, 0, 0, 0.2); /* Device shadow */
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            min-height: 812px; /* Typical iPhone X height, for aspect ratio demonstration */
-        }
-
-        /* Scrollable content area, excluding status/nav bar and mini player */
-        .screen-content {
+        .main-content {
             flex-grow: 1;
-            overflow-y: auto;
+            overflow-y: auto; /* Enable vertical scrolling */
             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            padding-bottom: calc(var(--min-touch-target) * 2); /* Ensures mini player doesn't hide content */
+            padding-top: calc(var(--status-bar-height) + var(--header-height));
+            /* IMPROVEMENT: Increased bottom padding to prevent FAB overlap */
+            padding-bottom: calc(var(--bottom-nav-height) + var(--fab-size) + var(--spacing-md));
+            position: relative; /* Context for annotations and FAB */
         }
 
-        /* iOS Status Bar */
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-s) var(--spacing-m);
-            font-size: var(--font-size-small);
-            font-weight: 500;
-            color: var(--color-status-bar-icons);
-            background-color: var(--color-app-background-white);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .status-bar-left, .status-bar-right {
-            display: flex;
-            align-items: center;
-        }
-
-        .status-bar-left span:first-child { margin-right: var(--spacing-xs); }
-        .status-bar-right span { margin-left: var(--spacing-xs); }
-
-        /* Navigation Bar */
-        .navigation-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-s) var(--padding-horizontal);
-            background-color: var(--color-app-background-white);
-            position: sticky;
-            top: 0; /* Stays below status bar */
-            z-index: 9; /* Below status bar, above content */
-            min-height: var(--min-touch-target); /* Ensure minimum height */
-        }
-
-        .navigation-bar .icon-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: var(--min-touch-target);
-            height: var(--min-touch-target);
-            border-radius: 50%; /* Circular buttons */
-            background: none;
-            border: none;
-            color: var(--color-dark-gray-black);
-            font-size: var(--font-size-large);
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            position: relative; /* For annotation positioning */
-        }
-
-        .navigation-bar .icon-button:hover {
-            background-color: #f0f0f0; /* Subtle hover feedback */
-        }
-
-        .navigation-bar .icon-button:active {
-            background-color: #e0e0e0; /* Active state for tap feedback */
-        }
-
-        .navigation-bar .nav-right-icons {
-            display: flex;
-            gap: var(--spacing-xs);
-        }
-
-        /* Artist Profile Header (Hero Section) */
-        .artist-profile-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: var(--spacing-l) var(--padding-horizontal) var(--spacing-xl);
-            /* Original design mentioned a gradient for artist header */
-            background: linear-gradient(135deg, #4b0082 0%, #1e90ff 100%); /* Dark blue/purple to lighter blue/teal */
-            color: var(--color-on-dark);
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        .artist-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: #ccc; /* Placeholder */
-            margin-bottom: var(--spacing-m);
-            border: 3px solid var(--color-on-dark); /* White border around avatar */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            object-fit: cover;
-            object-position: center;
-        }
-
-        .artist-name {
-            font-size: var(--font-size-artist-name);
-            font-weight: 700;
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .bio-link {
-            font-size: var(--font-size-medium);
-            color: var(--color-on-dark);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            margin-bottom: var(--spacing-l);
-            opacity: 0.8; /* Slightly less prominent */
-            transition: opacity 0.2s ease;
-        }
-
-        .bio-link:hover {
-            opacity: 1; /* Full opacity on hover */
-        }
-
-        .bio-link .icon {
-            margin-left: var(--spacing-xs);
-            font-size: var(--font-size-medium);
-        }
-
-        .floating-play-button {
-            position: absolute;
-            bottom: -30px; /* Half outside the section for overlap effect */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: var(--color-vibrant-blue);
-            color: var(--color-on-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: var(--font-size-large);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            border: none;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            z-index: 5; /* Ensure it's above other content */
-        }
-
-        .floating-play-button:hover {
-            transform: translateX(-50%) scale(1.05);
-            background-color: #1a7fc5; /* Slightly darker blue on hover */
-        }
-
-        .floating-play-button:active {
-            transform: translateX(-50%) scale(0.95); /* Shrink on active for tactile feedback */
-        }
-
-        /* Content Sections (Latest Release & Top Songs) */
-        .content-section {
-            padding: var(--spacing-xl) var(--padding-horizontal) var(--spacing-m);
-            background-color: var(--color-app-background-white);
-            position: relative; /* For annotation positioning */
-        }
-
-        .content-section:first-of-type {
-             /* Adjust padding-top to compensate for the floating play button's overlap */
-             padding-top: calc(var(--spacing-xl) + 30px);
-        }
-
-        .section-header {
-            font-size: var(--font-size-section-header);
-            font-weight: 700;
-            color: var(--color-dark-gray-black);
-            margin-bottom: var(--spacing-m);
-            text-transform: uppercase;
-        }
-
-        /* List Items (Latest Release & Top Songs) */
-        .list-item {
-            display: flex;
-            align-items: center;
-            padding: var(--spacing-s) 0;
-            margin-bottom: var(--spacing-s);
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            position: relative; /* For annotations */
-            min-height: var(--min-touch-target); /* Ensure minimum height for touch */
-            border-radius: var(--spacing-xs);
-        }
-
-        .list-item:hover {
-            background-color: #f9f9f9; /* Subtle hover state */
-        }
-
-        .list-item-rank {
-            font-size: var(--font-size-medium);
-            font-weight: 500;
-            color: var(--color-dark-gray-black);
-            width: var(--spacing-xl); /* Fixed width for rank number */
-            text-align: center;
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-
-        .album-art-thumbnail {
-            width: 50px;
-            height: 50px;
-            border-radius: var(--spacing-xs);
-            background-color: #eee; /* Placeholder */
-            margin-right: var(--spacing-m);
-            flex-shrink: 0;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        .item-details {
-            flex-grow: 1; /* Allows it to take available space */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-width: 0; /* Important for text truncation */
-        }
-
-        .item-title {
-            font-size: var(--font-size-regular);
-            font-weight: 500;
-            color: var(--color-dark-gray-black);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; /* Truncate long titles */
-        }
-
-        .item-meta {
-            font-size: var(--font-size-small);
-            color: var(--color-secondary-text-improved); /* Improved contrast */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; /* Truncate long meta info */
-        }
-
-        .item-options-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: var(--min-touch-target);
-            height: var(--min-touch-target);
-            border-radius: 50%;
-            background: none;
-            border: none;
-            color: var(--color-dark-gray-black);
-            font-size: var(--font-size-large);
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: background-color 0.2s ease;
-        }
-
-        .item-options-button:hover {
-            background-color: #f0f0f0;
-        }
-
-        .item-options-button:active {
-            background-color: #e0e0e0;
-        }
-
-        /* Mini Music Player (Persistent Bottom Bar) */
-        .mini-music-player {
-            position: sticky;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background-color: var(--color-mini-player-background);
-            color: var(--color-on-dark);
-            padding: var(--spacing-s) var(--padding-horizontal);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 10;
-            min-height: var(--min-touch-target); /* Ensure sufficient height */
-        }
-
-        .mini-player-left {
-            display: flex;
-            align-items: center;
-            flex-grow: 1;
-            min-width: 0; /* Required for flexible item details to truncate */
-        }
-
-        .mini-player-play-pause-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: var(--min-touch-target);
-            height: var(--min-touch-target);
-            border-radius: 50%;
-            background: none;
-            border: none;
-            color: var(--color-on-dark);
-            font-size: var(--font-size-large);
-            cursor: pointer;
-            margin-right: var(--spacing-s);
-            flex-shrink: 0;
-            transition: background-color 0.2s ease;
-        }
-
-        .mini-player-play-pause-button:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .mini-player-play-pause-button:active {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .mini-player-song-info {
-            flex-grow: 1;
-            min-width: 0;
-        }
-
-        .mini-player-song-title {
-            font-size: var(--font-size-mini-player-song);
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .mini-player-artist-name {
-            font-size: var(--font-size-mini-player-artist);
-            color: rgba(255, 255, 255, 0.7); /* Slightly muted for secondary info */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .mini-player-actions {
-            display: flex;
-            gap: var(--spacing-xs);
-            flex-shrink: 0;
-        }
-
-        .mini-player-action-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: var(--min-touch-target);
-            height: var(--min-touch-target);
-            border-radius: 50%;
-            background: none;
-            border: none;
-            color: var(--color-on-dark);
-            opacity: 0.7; /* Slightly muted */
-            font-size: var(--font-size-large);
-            cursor: pointer;
-            transition: opacity 0.2s ease, background-color 0.2s ease;
-            position: relative; /* For annotation positioning */
-        }
-
-        .mini-player-action-button:hover {
-            opacity: 1;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .mini-player-action-button:active {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Annotations */
+        /* Annotation Styles */
         .annotation {
             position: absolute;
-            background-color: var(--color-annotation-bg);
-            border: 1px solid var(--color-annotation-border);
-            border-radius: var(--spacing-xs);
-            padding: var(--spacing-xs);
-            font-size: var(--font-size-xs);
-            color: var(--color-annotation-text);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: var(--text-light);
+            padding: 4px 8px;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.7rem;
             white-space: nowrap;
-            z-index: 20; /* Ensure annotations are on top */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            pointer-events: none; /* Do not interfere with clicks */
-            opacity: 0.95;
-            line-height: 1.3;
-            text-align: left; /* Default text align */
-            max-width: 180px; /* Limit annotation width */
+            z-index: 1000;
+            opacity: 0.9;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-
-        /* Annotation positioning helpers */
-        .annotation.top { bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-5px); }
-        .annotation.right { left: 100%; top: 50%; transform: translateY(-50%) translateX(5px); }
-        .annotation.bottom { top: 100%; left: 50%; transform: translateX(-50%) translateY(5px); }
-        .annotation.left { right: 100%; top: 50%; transform: translateY(-50%) translateX(-5px); }
-
-        /* Specific annotation adjustments */
-        .artist-profile-header .annotation {
-            top: var(--spacing-m);
-            right: var(--padding-horizontal);
-            transform: none; /* Override default positioning */
-            width: auto; /* Allow content to dictate width */
-            max-width: 150px;
-            white-space: normal;
-        }
-
-        .latest-release-section .annotation.contrast-fix {
-            top: var(--spacing-m);
-            left: var(--padding-horizontal);
-            transform: none;
-            width: auto;
-            max-width: 180px;
-            white-space: normal;
-        }
-
-        .top-songs-section .annotation.swipe-gesture {
-             top: 50%;
-             left: var(--padding-horizontal);
-             transform: translateY(-50%);
-             width: 120px;
-             white-space: normal;
-        }
-        .top-songs-section .annotation.help-link {
-            bottom: var(--spacing-m);
-            left: var(--padding-horizontal);
-            transform: translateY(100%);
-            white-space: normal;
-            width: 180px;
-        }
-
-
-        /* Icon fonts/SVGs for universal symbols */
-        .icon {
-            /* Basic icon styling */
+        .annotation-top-left { top: var(--spacing-md); left: var(--spacing-md); }
+        .annotation-top-right { top: var(--spacing-md); right: var(--spacing-md); }
+        .annotation-bottom-left { bottom: var(--spacing-md); left: var(--spacing-md); }
+        .annotation-bottom-right { bottom: var(--spacing-md); right: var(--spacing-md); }
+        .annotation-center-top { top: var(--spacing-md); left: 50%; transform: translateX(-50%); }
+        .annotation-center-bottom { bottom: var(--spacing-md); left: 50%; transform: translateX(-50%); }
+        .annotation-right { right: var(--spacing-md); top: 50%; transform: translateY(-50%); }
+        .annotation-left { left: var(--spacing-md); top: 50%; transform: translateY(-50%); }
+        .annotation-inline {
             display: inline-block;
-            font-style: normal;
-            font-variant: normal;
-            text-rendering: auto;
-            -webkit-font-smoothing: antialiased;
-            font-family: 'Material Icons'; /* Using Material Icons for consistent iconography */
-            font-weight: normal;
-            letter-spacing: normal;
-            text-transform: none;
-            word-wrap: normal;
-            white-space: nowrap;
-            direction: ltr;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: var(--brand-yellow); /* Muted yellow for inline annotations */
+            padding: 2px 6px;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.6rem;
+            margin-left: var(--spacing-xs);
+            vertical-align: middle;
+            line-height: 1;
         }
 
-        /* Material Icons Font - Embedded for self-containment */
-        @font-face {
-            font-family: 'Material Icons';
-            font-style: normal;
-            font-weight: 400;
-            src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+        /* System Status Bar */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--status-bar-height);
+            background-color: var(--background-white);
+            display: flex;
+            justify-content: flex-end; /* Align elements to the right mostly */
+            align-items: center;
+            padding: 0 var(--spacing-md);
+            font-size: var(--font-size-small);
+            z-index: 1000;
+            border-bottom: 1px solid #eee; /* Subtle separation */
+        }
+        .status-bar span:first-child { margin-right: auto; } /* Push time to left */
+        .status-bar .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-left: var(--spacing-sm);
+            vertical-align: middle;
+            fill: var(--text-dark);
+        }
+
+        /* App Header */
+        .app-header {
+            position: fixed;
+            top: var(--status-bar-height);
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--background-white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-sm); /* Adjusted padding for better fit */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            z-index: 999;
+        }
+        .app-header .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            min-width: var(--tap-target-min-size);
+            min-height: var(--tap-target-min-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xs); /* Visual padding */
+        }
+        .app-header .icon-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-dark);
+        }
+        .app-header .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            min-height: var(--tap-target-min-size); /* Ensure tappable */
+            padding: var(--spacing-xs);
+        }
+        .app-header .logo svg {
+            height: 28px;
+            width: auto;
+        }
+        .app-header .logo span {
+            font-size: var(--font-size-xl); /* Adjusted typography size */
+            font-weight: bold;
+            color: var(--brand-orange);
+        }
+
+        /* Call-to-Action Buttons (Standardized) */
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-medium); /* Standardized typography size */
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease; /* Smooth transitions */
+            min-height: var(--tap-target-min-size); /* Ensured tap target size */
+            white-space: nowrap;
+            border: none; /* Default to no border */
+            /* IMPROVEMENT: Standardized button styling - color contrast fix for 'Shop Now' */
+            background-color: var(--brand-orange);
+            color: var(--text-light);
+        }
+        .cta-button:hover { /* For desktop hover states */
+            background-color: #d1621f; /* Slightly darker orange */
+        }
+        .cta-button:active { /* IMPROVEMENT: Tap feedback */
+            transform: scale(0.98);
+            background-color: #c05a1d; /* Even darker orange on tap */
+        }
+
+        /* Promotional Banner Carousel (Top) */
+        .promo-carousel {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: var(--spacing-md);
+            min-height: 200px; /* Consistent height */
+        }
+        .promo-carousel .slide {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+        }
+        /* IMPROVEMENT: Skeleton loading state */
+        .promo-carousel .slide.loading {
+            background-color: #f0f0f0;
+            color: #666;
+            font-size: var(--font-size-large);
+            flex-direction: column;
+        }
+        .promo-carousel .slide.loading .skeleton-text {
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            height: 1.2em;
+            margin: var(--spacing-sm) auto;
+            animation: pulse 1.5s infinite ease-in-out;
+            opacity: 0.7;
+        }
+        .promo-carousel .slide.loading .skeleton-text.large { width: 70%; height: var(--font-size-xl); }
+        .promo-carousel .slide.loading .skeleton-text.medium { width: 50%; height: var(--font-size-large); }
+        .promo-carousel .slide.loading .skeleton-button {
+            background-color: #e0e0e0;
+            border-radius: var(--border-radius-sm);
+            height: var(--tap-target-min-size);
+            width: 120px;
+            margin-top: var(--spacing-md);
+            animation: pulse 1.5s infinite ease-in-out;
+            opacity: 0.7;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 0.4; }
+            100% { opacity: 0.7; }
+        }
+
+        .promo-carousel .slide.actual-content {
+            background-image: url('https://via.placeholder.com/375x200/F57224/FFFFFF?text=Freeshipping+Banner');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-light);
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: var(--spacing-md);
+        }
+        .promo-carousel .slide.actual-content h2 {
+            font-size: var(--font-size-xl); /* Adjusted typography size */
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .promo-carousel .slide.actual-content p {
+            font-size: var(--font-size-medium); /* Adjusted typography size */
+            margin-bottom: var(--spacing-md);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .promo-carousel .pagination {
+            position: absolute;
+            bottom: var(--spacing-sm);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+        .promo-carousel .pagination .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            transition: background-color 0.2s ease;
+        }
+        .promo-carousel .pagination .dot.active {
+            background-color: var(--text-light);
+        }
+
+        /* Feature/Service Category Grid (Hexagonal Icons - visually represented as round for simplicity) */
+        .feature-categories {
+            padding: var(--spacing-sm) 0;
+            margin-bottom: var(--spacing-md);
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+            -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+        }
+        .feature-categories::-webkit-scrollbar { /* Hide scrollbar for Chrome, Safari, Opera */
+            display: none;
+        }
+        .feature-categories-inner {
+            display: flex;
+            padding: 0 var(--spacing-md);
+            gap: var(--spacing-md);
+        }
+        .feature-category-item {
+            flex-shrink: 0;
+            width: 80px;
+            text-align: center;
+            position: relative;
+        }
+        .feature-category-item .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background-color: #f9f9f9;
+            border-radius: 50%; /* Visually round, approximating hexagonal feel */
+            margin: 0 auto var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+            min-width: var(--tap-target-min-size);
+            min-height: var(--tap-target-min-size);
+        }
+        .feature-category-item .icon-wrapper svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--text-dark);
+        }
+        .feature-category-item .label {
+            font-size: var(--font-size-small); /* Adjusted typography size */
+            color: var(--text-dark);
+            white-space: nowrap;
+            display: flex; /* For inline info icon */
+            align-items: center;
+            justify-content: center;
+            min-height: var(--tap-target-min-size); /* Ensure tappable label area */
+            padding: var(--spacing-xs) 0;
+        }
+
+        /* IMPROVEMENT: Contextual Help for Daraz Pay */
+        .info-icon-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin-left: var(--spacing-xs);
+        }
+        .info-icon-wrapper svg {
+            width: 14px;
+            height: 14px;
+            fill: #666;
+            cursor: pointer;
+            vertical-align: middle;
+            min-width: 24px; /* Even if smaller visually, make target larger */
+            min-height: 24px;
+        }
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the icon */
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: normal;
+            font-size: 0.7rem;
+            width: 160px;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .tooltip::after { /* Tooltip arrow */
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+        }
+        .info-icon-wrapper:hover .tooltip,
+        .info-icon-wrapper:focus-within .tooltip { /* For hover and keyboard focus */
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Promotional Banner (Middle) */
+        .women-of-wonder-banner {
+            position: relative;
+            margin: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            background-color: var(--background-light-blue); /* Light blue from original design */
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: var(--spacing-md);
+            color: var(--text-light);
+            text-align: left;
+            background-image: url('https://via.placeholder.com/375x150/77E0EF/FFFFFF?text=WOMEN+OF+WONDER');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .women-of-wonder-banner h3 {
+            font-size: var(--font-size-xl); /* Adjusted typography size */
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .women-of-wonder-banner p {
+            font-size: var(--font-size-medium); /* Adjusted typography size */
+            margin-bottom: var(--spacing-md);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .women-of-wonder-banner .cta-button {
+            /* This button is specifically dark blue as per original design details for 'ADD TO CART >' */
+            background-color: var(--banner-dark-blue);
+            color: var(--text-light);
+            padding: var(--spacing-xs) var(--spacing-md);
+            font-size: var(--font-size-medium);
+        }
+        .women-of-wonder-banner .cta-button:hover {
+            background-color: #303f9f; /* Darken for hover */
+        }
+        .women-of-wonder-banner .cta-button:active {
+            transform: scale(0.98);
+            background-color: #263238; /* Even darker on tap */
+        }
+
+
+        /* Section Header */
+        .section-header {
+            font-size: var(--font-size-large); /* Adjusted typography size */
+            font-weight: bold;
+            padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+            color: var(--text-dark);
+        }
+
+        /* Product/Sub-Category Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Two columns for mobile-first */
+            gap: var(--spacing-sm);
+            padding: 0 var(--spacing-md);
+        }
+        .product-grid-item {
+            background-color: var(--background-white);
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px; /* Ensure sufficient height for content/loading */
+            position: relative;
+        }
+        /* IMPROVEMENT: Skeleton loading state for grid items */
+        .product-grid-item.loading {
+            background-color: #f8f8f8;
+        }
+        .product-grid-item.loading .skeleton-image {
+            width: 100%;
+            padding-top: 100%; /* Aspect ratio 1:1 */
+            background-color: #e0e0e0;
+            animation: pulse 1.5s infinite ease-in-out;
+            margin-bottom: var(--spacing-xs);
+            opacity: 0.7;
+        }
+        .product-grid-item.loading .skeleton-label {
+            width: 70%;
+            height: var(--font-size-medium);
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            animation: pulse 1.5s infinite ease-in-out;
+            margin-bottom: var(--spacing-sm);
+            opacity: 0.7;
+        }
+        .product-grid-item .image-wrapper {
+            width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            position: relative;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+        .product-grid-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-grid-item .label {
+            font-size: var(--font-size-medium); /* Adjusted typography size */
+            color: var(--text-dark);
+            padding: var(--spacing-xs);
+            margin-top: var(--spacing-xs);
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--tap-target-min-size); /* Ensure tappable area */
+        }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            /* IMPROVEMENT: FAB positioned correctly, no content overlap */
+            bottom: calc(var(--bottom-nav-height) + var(--spacing-md));
+            right: var(--spacing-md);
+            width: var(--fab-size);
+            height: var(--fab-size);
+            border-radius: 50%;
+            background-color: var(--brand-orange);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 998;
+            border: none;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            min-width: var(--fab-size);
+            min-height: var(--fab-size);
+        }
+        .fab svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--text-light);
+        }
+        .fab:hover {
+            background-color: #d1621f;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .fab:active {
+            transform: scale(0.95);
+            background-color: #c05a1d;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--bottom-nav-height);
+            background-color: var(--background-white);
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom); /* For iPhone X safe area */
+            box-shadow: 0 -1px 2px rgba(0,0,0,0.05);
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #666;
+            font-size: var(--font-size-small); /* Adjusted typography size */
+            padding: var(--spacing-xs) 0;
+            min-width: var(--tap-target-min-size);
+            min-height: var(--tap-target-min-size);
+            position: relative;
+        }
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            fill: #666;
+            margin-bottom: var(--spacing-xs);
+            transition: fill 0.2s ease;
+        }
+        .nav-item.active {
+            color: var(--brand-orange);
+            font-weight: bold;
+        }
+        .nav-item.active svg {
+            fill: var(--brand-orange);
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 2px;
+            background-color: var(--brand-orange);
+            border-radius: 1px;
+        }
+        .nav-item:hover { /* Simple hover for desktop */
+            color: var(--brand-orange);
+        }
+        .nav-item:hover svg {
+            fill: var(--brand-orange);
+        }
+
+
+        /* Global Icon Style (for embedded SVGs) */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            fill: currentColor; /* Inherit color from parent by default */
+        }
+
+        /* Responsive Adjustments (Scaling up for display as per requirement) */
+        @media (min-width: 600px) {
+            body {
+                background-color: #f5f5f5; /* Light grey background for larger screens */
+            }
+            .app-header, .bottom-nav, .status-bar, .main-content {
+                max-width: 450px; /* Constrain width for tablet/desktop preview */
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .main-content {
+                border-left: 1px solid #eee;
+                border-right: 1px solid #eee;
+                box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            }
+            .fab {
+                right: calc(50% - 450px/2 + var(--spacing-md)); /* Adjust FAB position for centered layout */
+            }
+            .promo-carousel .slide, .promo-banner-middle {
+                min-height: 250px;
+            }
+            .promo-carousel .slide.actual-content h2 { font-size: var(--font-size-xxl); }
+            .promo-carousel .slide.actual-content p { font-size: var(--font-size-large); }
+            .women-of-wonder-banner h3 { font-size: var(--font-size-xxl); }
+            .women-of-wonder-banner p { font-size: var(--font-size-large); }
+            .feature-categories-inner {
+                justify-content: center; /* Center categories on wider screens */
+            }
+            .product-grid {
+                grid-template-columns: repeat(3, 1fr); /* More columns on wider screens */
+            }
+            .annotation {
+                font-size: 0.8rem; /* Slightly larger annotations */
+                padding: 6px 10px;
+            }
+            .annotation-inline {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="app-frame">
-        <!-- iOS Status Bar -->
-        <div class="status-bar">
-            <div class="status-bar-left">
-                <span>Verizon</span>
-                <span class="icon">wifi</span>
-            </div>
-            <span>2:34 PM</span>
-            <div class="status-bar-right">
-                <span>100%</span>
-                <span class="icon">battery_full</span>
-            </div>
-        </div>
 
-        <!-- Navigation Bar -->
-        <div class="navigation-bar">
-            <button class="icon-button" aria-label="Go Back">
-                <span class="icon">chevron_left</span>
-            </button>
-            <div class="nav-right-icons">
-                <button class="icon-button heart-icon" aria-label="Like/Favorite Artist">
-                    <span class="icon">favorite_border</span>
-                    <span class="annotation top">Visual feedback on tap (e.g., fill with color)</span>
-                </button>
-                <button class="icon-button" aria-label="Share Artist Profile">
-                    <span class="icon">share</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Main Scrollable Content Area -->
-        <div class="screen-content">
-            <!-- Artist Profile Header -->
-            <div class="artist-profile-header">
-                <img src="https://via.placeholder.com/120/cccccc/333333?text=Drake" alt="Artist Avatar of Drake" class="artist-avatar">
-                <h1 class="artist-name">Drake</h1>
-                <a href="#" class="bio-link" aria-label="Learn more about Drake">
-                    Bio Link
-                    <span class="icon">info</span>
-                </a>
-                <button class="floating-play-button" aria-label="Play all songs by Drake">
-                    <span class="icon">play_arrow</span>
-                </button>
-                <span class="annotation top">Removed promotional background text 'Millions of Free Songs' for improved focus.</span>
-            </div>
-
-            <!-- Latest Release Section -->
-            <div class="content-section latest-release-section">
-                <h2 class="section-header">LATEST RELEASE</h2>
-                <div class="list-item">
-                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
-                    <div class="item-details">
-                        <div class="item-title">Two Birds, One Stone</div>
-                        <div class="item-meta">Oct. 2016 • 1 song</div>
-                    </div>
-                    <button class="item-options-button" aria-label="More options for Two Birds, One Stone">
-                        <span class="icon">more_horiz</span>
-                    </button>
-                    <span class="annotation right swipe-gesture">Quick actions (Add to Playlist, Share) can be revealed via swipe/long-press.</span>
-                </div>
-                <span class="annotation contrast-fix">Secondary text color changed from #999999 to #666666 for improved contrast and accessibility.</span>
-            </div>
-
-            <!-- Top Songs Section -->
-            <div class="content-section top-songs-section">
-                <h2 class="section-header">TOP SONGS</h2>
-                <div class="list-item">
-                    <div class="list-item-rank">1</div>
-                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
-                    <div class="item-details">
-                        <div class="item-title">One Dance</div>
-                        <div class="item-meta">Drake</div>
-                    </div>
-                    <button class="item-options-button" aria-label="More options for One Dance">
-                        <span class="icon">more_horiz</span>
-                    </button>
-                </div>
-                <div class="list-item">
-                    <div class="list-item-rank">2</div>
-                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
-                    <div class="item-details">
-                        <div class="item-title">The Motto</div>
-                        <div class="item-meta">Drake</div>
-                    </div>
-                    <button class="item-options-button" aria-label="More options for The Motto">
-                        <span class="icon">more_horiz</span>
-                    </button>
-                </div>
-                <div class="list-item">
-                    <div class="list-item-rank">3</div>
-                    <img src="https://via.placeholder.com/50/cccccc/333333?text=Album" alt="Album Art Thumbnail" class="album-art-thumbnail">
-                    <div class="item-details">
-                        <div class="item-title">Hotline Bling</div>
-                        <div class="item-meta">Drake</div>
-                    </div>
-                    <button class="item-options-button" aria-label="More options for Hotline Bling">
-                        <span class="icon">more_horiz</span>
-                    </button>
-                    <span class="annotation right">Corrected song attribution: 'All of Me' changed to 'Hotline Bling' (a Drake song).</span>
-                </div>
-                <span class="annotation help-link">Consider adding an accessible 'Help' or 'Support' section linked from global navigation.</span>
-            </div>
-        </div>
-
-        <!-- Mini Music Player -->
-        <div class="mini-music-player">
-            <div class="mini-player-left">
-                <button class="mini-player-play-pause-button" aria-label="Pause Current Song">
-                    <span class="icon">pause</span>
-                </button>
-                <div class="mini-player-song-info">
-                    <div class="mini-player-song-title">Closer (feat. Halsey)</div>
-                    <div class="mini-player-artist-name">The Chainsmokers</div>
-                </div>
-            </div>
-            <div class="mini-player-actions">
-                <button class="mini-player-action-button" aria-label="Dislike Song">
-                    <span class="icon">thumb_down</span>
-                    <span class="annotation top">Visual feedback on tap (e.g., highlight/fill icon)</span>
-                </button>
-                <button class="mini-player-action-button" aria-label="Like Song">
-                    <span class="icon">thumb_up</span>
-                </button>
-            </div>
+    <!-- System Status Bar -->
+    <div class="status-bar">
+        <span class="annotation-inline" style="position: absolute; left: var(--spacing-md); top: 50%; transform: translateY(-50%);">ORIGINAL UI</span>
+        <span>9:41</span>
+        <div>
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17h2v-2h-2v2zm0-4h2V7h-2v8z"/></svg> <!-- Example network -->
+            <svg class="icon" viewBox="0 0 24 24"><path d="M1 9l2 2c2.28-2.28 4.93-3.8 7.66-4.48L9 5.89C6.18 6.55 3.51 7.97 1 9zm20-2l-2-2c-2.28 2.28-4.93 3.8-7.66 4.48L15 8.11C17.82 7.45 20.49 6.03 22 5v.01l-1 2zM9 12c0 1.66 1.34 3 3 3s3-1.34 3-3V3c0-1.66-1.34-3-3-3S9 1.34 9 3v9zm3-7c1.1 0 2 .9 2 2v5c0 1.1-.9 2-2 2s-2-.9-2-2V7c0-1.1.9-2 2-2z"/></svg> <!-- Wi-Fi -->
+            <svg class="icon" viewBox="0 0 24 24"><path d="M17 5h-2V3h-3V1H8v2H5v2H3v18h18V5h-4zM8 21H5v-2h3v2zm0-4H5v-2h3v2zm0-4H5v-2h3v2zm0-4H5V7h3v2zm6 12h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2zm6 12h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/></svg> <!-- Battery -->
         </div>
     </div>
+
+    <!-- App Header -->
+    <header class="app-header">
+        <button class="icon-btn" aria-label="Menu">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#F57224" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.5 17.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM12 10.5C9.79 10.5 8 8.71 8 6.5S9.79 2.5 12 2.5s4 1.79 4 4-1.79 4-4 4zm4.5 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            <span>Daraz</span>
+        </div>
+        <button class="icon-btn" aria-label="Search">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- Promotional Banner Carousel (Top) -->
+        <div class="promo-carousel">
+            <div class="annotation annotation-top-left">IMPROVEMENT: Loading State & Tap Feedback</div>
+            <div class="slide loading" id="promoLoading">
+                <div style="width: 100%;">
+                    <div class="skeleton-text large"></div>
+                    <div class="skeleton-text medium"></div>
+                    <div class="skeleton-button"></div>
+                </div>
+            </div>
+            <!-- This will replace the loading state after JS timeout -->
+            <div class="slide actual-content" id="promoActual" style="display: none;">
+                <h2>Freeshipping on orders above Rs. 2,999</h2>
+                <p>Till 2pm</p>
+                <a href="#" class="cta-button">Shop Now</a>
+            </div>
+            <div class="pagination">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- Feature/Service Category Grid (Hexagonal Icons) -->
+        <section class="feature-categories">
+            <div class="feature-categories-inner">
+                <div class="feature-category-item">
+                    <div class="icon-wrapper bg-white">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17h2v-2h-2v2zm0-4h2V7h-2v8z"/></svg> <!-- Example icon for Daraz Pay -->
+                    </div>
+                    <div class="label">
+                        Daraz Pay
+                        <span class="info-icon-wrapper" tabindex="0" role="button" aria-label="What is Daraz Pay?">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>
+                            <span class="tooltip">Daraz Pay allows you to make secure payments directly within the app.</span>
+                        </span>
+                        <span class="annotation-inline">IMPROVEMENT: Contextual Help</span>
+                    </div>
+                </div>
+                <div class="feature-category-item">
+                    <div class="icon-wrapper bg-white">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.5 17.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM12 10.5C9.79 10.5 8 8.71 8 6.5S9.79 2.5 12 2.5s4 1.79 4 4-1.79 4-4 4zm4.5 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    </div>
+                    <span class="label">Mart</span>
+                </div>
+                <div class="feature-category-item">
+                    <div class="icon-wrapper bg-white">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-10C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                    </div>
+                    <span class="label">Fashion</span>
+                </div>
+                <div class="feature-category-item">
+                    <div class="icon-wrapper bg-white">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v10c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM10 4h4v2h-4V4zm10 14H4V8h16v10zM9 13H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                    </div>
+                    <span class="label">Best Price</span>
+                </div>
+                <div class="feature-category-item">
+                    <div class="icon-wrapper bg-white">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm-2.5 12c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.86-5.46L13 9h-2l-1.36 1.54C9.28 9.71 8.87 9 8.28 9c-.94 0-1.72.76-1.72 1.7 0 .43.16.83.42 1.14l.87.97L12 17l4.15-4.64-.15-.16z"/></svg>
+                    </div>
+                    <span class="label">Beauty</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promotional Banner (Middle) -->
+        <section class="women-of-wonder-banner">
+            <h3>WOMEN OF WONDER</h3>
+            <p>26TH AUG - 1ST SEP <br> AMAZING DISCOUNTS EVERYDAY, JUST FOR YOU.</p>
+            <a href="#" class="cta-button">ADD TO CART ></a>
+            <span class="annotation annotation-right">IMPROVEMENT: Standardized CTA Styling & Tap Feedback</span>
+        </section>
+
+
+        <!-- Section Header: Categories -->
+        <h2 class="section-header">Categories</h2>
+
+        <!-- Product/Sub-Category Grid -->
+        <section class="product-grid" id="productGrid">
+            <div class="annotation annotation-center-top">IMPROVEMENT: Loading State for Dynamic Content</div>
+            <div class="product-grid-item loading">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="product-grid-item loading">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="product-grid-item loading">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="product-grid-item loading">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-label"></div>
+            </div>
+            <div class="product-grid-item actual-content" style="display: none;">
+                <div class="image-wrapper"><img src="https://via.placeholder.com/150x150/EEEEEE/333333?text=Brooms" alt="Brooms, Mops"></div>
+                <span class="label">Brooms, Mops</span>
+            </div>
+            <div class="product-grid-item actual-content" style="display: none;">
+                <div class="image-wrapper"><img src="https://via.placeholder.com/150x150/EEEEEE/333333?text=Gloves" alt="Cleaning Gloves"></div>
+                <span class="label">Cleaning Gloves</span>
+            </div>
+            <div class="product-grid-item actual-content" style="display: none;">
+                <div class="image-wrapper"><img src="https://via.placeholder.com/150x150/EEEEEE/333333?text=Groceries" alt="Groceries"></div>
+                <span class="label">Groceries</span>
+            </div>
+            <div class="product-grid-item actual-content" style="display: none;">
+                <div class="image-wrapper"><img src="https://via.placeholder.com/150x150/EEEEEE/333333?text=Underwater" alt="Underwater"></div>
+                <span class="label">Underwater</span>
+            </div>
+            <div class="product-grid-item actual-content" style="display: none;">
+                <div class="image-wrapper"><img src="https://via.placeholder.com/150x150/EEEEEE/333333?text=Smart+Phones" alt="Smart Phones"></div>
+                <span class="label">Smart Phones</span>
+            </div>
+            <div class="product-grid-item actual-content" style="display: none;">
+                <div class="image-wrapper"><img src="https://via.placeholder.com/150x150/EEEEEE/333333?text=Pumpkin" alt="Pumpkin"></div>
+                <span class="label">Pumpkin</span>
+            </div>
+            <!-- More items would follow -->
+        </section>
+
+    </main>
+
+    <!-- Floating Action Button (FAB) -->
+    <button class="fab" aria-label="Quick Action">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> <!-- Plus icon example -->
+        <span class="annotation annotation-right">IMPROVEMENT: FAB Spacing (no overlap)</span>
+    </button>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" aria-current="page">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Home
+        </a>
+        <a href="#" class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17h2v-2h-2v2zm0-4h2V7h-2v8z"/></svg>
+            Categories
+        </a>
+        <a href="#" class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-8.7-8.7L7 4.3c-.2-.4-.6-.6-.9-.3L4.2 5.6C3.9 6 4.1 6.4 4.5 6.5l2.7 1.2.9 2.2L6 14h10l2-8H6L5.6 7H4.4L3 9.4c-.4.8.1 1.7.9 1.7h11.7l-2.4 2.8H8.5l.8 2H16v2H7v-2l-.9-2.2-.6-1.5zM17 15H9.2l-.6-1.5L7.2 9H17v6z"/></svg>
+            Cart
+        </a>
+        <a href="#" class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            Favourite
+        </a>
+        <a href="#" class="nav-item">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.38 0 2.5 1.12 2.5 2.5S13.38 10.5 12 10.5 9.5 9.38 9.5 8s1.12-2.5 2.5-2.5zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08c-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            Profile
+        </a>
+    </nav>
+
+    <script>
+        // Simple JS to simulate content loading after a delay and show actual content
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingElements = document.querySelectorAll('.loading');
+            loadingElements.forEach(el => el.style.position = 'relative'); // Ensure relative for annotation
+
+            setTimeout(() => {
+                // Hide promo carousel loading, show actual content
+                const promoLoading = document.getElementById('promoLoading');
+                const promoActual = document.getElementById('promoActual');
+                if (promoLoading && promoActual) {
+                    promoLoading.style.display = 'none';
+                    promoActual.style.display = 'flex';
+                }
+
+                // Hide product grid loading items, show actual content
+                const productGridLoadingItems = document.querySelectorAll('#productGrid .loading');
+                productGridLoadingItems.forEach(item => {
+                    item.style.display = 'none';
+                });
+                const productGridActualItems = document.querySelectorAll('#productGrid .actual-content');
+                productGridActualItems.forEach(item => {
+                    item.style.display = 'flex'; // Use flex for column layout
+                });
+
+                // Remove loading-related annotations once content is loaded
+                document.querySelectorAll('.annotation').forEach(anno => {
+                    if (anno.textContent.includes('Loading State')) {
+                        anno.style.display = 'none';
+                    }
+                });
+
+            }, 2000); // Simulate 2-second loading time
+        });
+    </script>
 </body>
 </html>
