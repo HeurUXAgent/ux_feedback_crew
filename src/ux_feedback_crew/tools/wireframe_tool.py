@@ -8,6 +8,7 @@ load_dotenv()
 
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+model_name = os.getenv("GEMINI_WIREFRAME_MODEL")
 
 @tool("create_wireframe")
 def create_wireframe(vision_analysis: str, 
@@ -78,7 +79,7 @@ Return ONLY a single HTML document (no markdown).
 """
 
     response = client.models.generate_content(
-        model="gemini-3-flash-preview",
+        model=model_name,
         contents=prompt
     )
 

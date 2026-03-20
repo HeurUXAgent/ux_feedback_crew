@@ -10,6 +10,7 @@ load_dotenv()
 
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+model_name = os.getenv("GEMINI_HEURISTIC_MODEL")
 
 
 def _extract_json(text: str) -> dict:
@@ -99,7 +100,7 @@ Return ONLY valid JSON:
 
     for _ in range(2):
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=model_name,
             contents=prompt
         )
         raw = response.text.strip()

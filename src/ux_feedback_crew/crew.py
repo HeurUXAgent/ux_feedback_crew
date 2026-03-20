@@ -1,6 +1,8 @@
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from src.ws_manager import safe_emit
+import os
+from dotenv import load_dotenv 
 from .tools import (
     analyze_ui_screenshot,
     evaluate_heuristics,
@@ -8,6 +10,7 @@ from .tools import (
     create_wireframe,
 )
 
+load_dotenv()
 
 @CrewBase
 class UxFeedbackCrew():
@@ -18,31 +21,42 @@ class UxFeedbackCrew():
         self.client_id     = client_id
         self.evaluation_id = evaluation_id
 
+        # Load LLMs from .env once, reuse across agents
+        self.llm_vision     = LLM(model=f"gemini/{os.getenv('GEMINI_VISION_MODEL')}")
+        self.llm_heuristic  = LLM(model=f"gemini/{os.getenv('GEMINI_HEURISTIC_MODEL')}")
+        self.llm_feedback   = LLM(model=f"gemini/{os.getenv('GEMINI_FEEDBACK_MODEL')}")
+        self.llm_wireframe  = LLM(model=f"gemini/{os.getenv('GEMINI_WIREFRAME_MODEL')}")
+
     def _progress(self, label: str, step: int):
         def callback(_output):
             safe_emit(self.client_id, f"Completed: {label}", step)
         return callback
 
-    # ─── Agents ───────────────────────────────────────────────────────
+    # Agents 
 
     @agent
     def vision_analyst(self) -> Agent:
         return Agent(config=self.agents_config['vision_analyst'],
-                     tools=[analyze_ui_screenshot], verbose=True, allow_delegation=False)
+                     tools=[analyze_ui_screenshot], 
+                     llm=self.llm_vision,
+                     verbose=True, allow_delegation=False)
 
     @agent
     def heuristic_evaluator(self) -> Agent:
         return Agent(config=self.agents_config['heuristic_evaluator'],
+                     llm=self.llm_heuristic,
                      tools=[evaluate_heuristics], verbose=True, allow_delegation=False)
 
     @agent
     def feedback_specialist(self) -> Agent:
         return Agent(config=self.agents_config['feedback_specialist'],
+                     llm=self.llm_feedback,
                      tools=[generate_feedback], verbose=True, allow_delegation=False)
 
     @agent
     def wireframe_designer(self) -> Agent:
         return Agent(config=self.agents_config['wireframe_designer'],
+                     llm=self.llm_wireframe,
                      tools=[create_wireframe], verbose=True, allow_delegation=False)
 
     # ─── Tasks ────────────────────────────────────────────────────────

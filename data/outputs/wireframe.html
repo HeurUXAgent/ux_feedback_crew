@@ -3,316 +3,537 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern SaaS Login</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Improved E-commerce Discovery Screen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --text-main: #111827;
-            --text-muted: #6B7280;
-            --bg-page: #F9FAFB;
-            --bg-card: #FFFFFF;
-            --border: #E5E7EB;
-            --input-focus: #4F46E5;
-            --annotation-color: #7C3AED;
-            --radius: 8px;
-            --transition: all 0.2s ease;
+            --primary-orange: #FF772D;
+            --primary-bg: #FFFFFF;
+            --secondary-bg: #F5F5F5;
+            --text-main: #000000;
+            --text-secondary: #444444; /* Improved contrast from #666 */
+            --text-muted: #757575;
+            --skeleton-color: #E0E0E0;
+            --annotation-color: #6B46C1;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            background-color: #e0e0e0;
+            margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            padding: 20px;
+            padding: 20px 0;
         }
 
-        /* Mobile-First Container (375px default) */
-        .login-container {
-            width: 100%;
-            max-width: 375px;
-            background: var(--bg-card);
-            padding: 40px 32px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        /* Device Frame */
+        .iphone-canvas {
+            width: 375px;
+            background: var(--primary-bg);
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
             position: relative;
+            border: 8px solid #333;
         }
 
-        /* Annotations Styling */
-        .anno {
+        /* Annotation Style */
+        .annotation {
             position: absolute;
+            background: var(--annotation-color);
+            color: white;
             font-size: 10px;
-            font-weight: 600;
-            color: var(--annotation-color);
-            background: #F5F3FF;
             padding: 2px 6px;
             border-radius: 4px;
-            white-space: nowrap;
-            border: 1px solid #DDD6FE;
+            z-index: 100;
+            font-weight: 600;
             pointer-events: none;
-            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .logo-area {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: inline-flex;
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            color: white;
-            margin-bottom: 16px;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
             font-size: 14px;
-            color: var(--text-muted);
+            font-weight: 600;
         }
 
-        .form-group {
-            margin-bottom: 20px;
+        .dynamic-island {
+            width: 110px;
+            height: 30px;
+            background: #000;
+            border-radius: 20px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 10px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
             position: relative;
         }
 
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 6px;
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .icon-btn:active { transform: scale(0.9); }
+
+        /* Search Bar */
+        .search-section {
+            padding: 10px 20px;
+            display: flex;
+            gap: 12px;
+            position: relative;
+        }
+
+        .search-bar {
+            flex: 1;
+            background: var(--secondary-bg);
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            width: 100%;
             color: var(--text-main);
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 16px; /* Increased padding */
-            font-size: 16px; /* Prevents iOS zoom */
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
             outline: none;
-            transition: var(--transition);
-            background: #fff;
         }
 
-        input:focus {
-            border-color: var(--input-focus);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        .search-bar input::placeholder {
+            color: var(--text-secondary); /* High contrast placeholder */
         }
 
-        .forgot-link {
-            display: block;
-            text-align: right;
-            font-size: 13px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            margin-top: 8px;
+        .filter-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-orange);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
         }
 
-        .forgot-link:hover {
-            text-decoration: underline;
+        /* Hero Banner */
+        .hero-banner {
+            margin: 20px;
+            height: 160px;
+            background: #F0E6DD;
+            border-radius: 25px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-primary {
-            width: 100%;
-            height: 48px; /* Mobile touch target */
-            background-color: var(--primary);
+        .hero-banner img {
+            position: absolute;
+            right: -10px;
+            bottom: 0;
+            height: 110%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 60%;
+        }
+
+        .hero-headline { font-size: 18px; font-weight: 700; margin: 0; }
+        .hero-discount { font-size: 28px; font-weight: 800; color: var(--primary-orange); margin: 4px 0 12px 0; }
+        
+        .cta-btn {
+            background: var(--primary-orange);
             color: white;
             border: none;
-            border-radius: var(--radius);
-            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
+            font-size: 13px;
+            width: fit-content;
+        }
+
+        /* Categories */
+        .section-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            padding: 10px 20px;
+        }
+
+        .section-header h2 { font-size: 18px; font-weight: 700; margin: 0; }
+        .see-all { color: var(--text-secondary); font-size: 14px; text-decoration: none; font-weight: 500; }
+
+        .categories-scroll {
+            display: flex;
+            gap: 15px;
+            padding: 10px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             gap: 8px;
-            margin-top: 24px;
+            min-width: 65px;
         }
 
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* Loading Indicator State */
-        .loading-spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
+        .cat-img {
+            width: 56px;
+            height: 56px;
+            background: var(--secondary-bg);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .divider {
-            margin: 24px 0;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .divider::before { margin-right: 12px; }
-        .divider::after { margin-left: 12px; }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .btn-social {
-            height: 44px;
-            border: 1px solid var(--border);
-            background: white;
-            border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--text-main);
         }
 
-        .btn-social:hover {
-            background: #F9FAFB;
-            border-color: #D1D5DB;
+        .cat-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+
+        /* Skeleton States */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
         }
 
-        .footer-text {
-            text-align: center;
-            margin-top: 32px;
-            font-size: 14px;
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Product Cards */
+        .product-grid {
+            display: flex;
+            gap: 16px;
+            padding: 10px 20px 100px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .product-grid::-webkit-scrollbar { display: none; }
+
+        .product-card {
+            min-width: 160px;
+            position: relative;
+        }
+
+        .prod-img-box {
+            width: 160px;
+            height: 160px;
+            background: var(--secondary-bg);
+            border-radius: 20px;
+            margin-bottom: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fav-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            color: var(--primary-orange);
+            transition: all 0.2s;
+        }
+
+        .fav-btn.active {
+            background: var(--primary-orange);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .prod-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+        .prod-price { font-size: 16px; font-weight: 700; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 85px;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 15px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
             color: var(--text-muted);
-        }
-
-        .footer-text a {
-            color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
+            flex: 1;
         }
 
-        /* Annotation placements */
-        .anno-font { top: 45px; right: -20px; }
-        .anno-padding { top: 220px; right: -40px; }
-        .anno-forgot { top: 315px; left: -40px; }
-        .anno-btn { top: 380px; right: -30px; }
-        .anno-social { bottom: 85px; right: -20px; }
-        .anno-contrast { top: 110px; left: -30px; }
+        .nav-item.active { color: var(--primary-orange); }
 
-        /* Responsive scaling for desktop viewing */
-        @media (min-width: 768px) {
-            body {
-                background-image: radial-gradient(circle at 2px 2px, #E5E7EB 1px, transparent 0);
-                background-size: 24px 24px;
-            }
-            .login-container {
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            }
+        .nav-item span { font-size: 10px; font-weight: 600; }
+
+        .nav-fab {
+            background: var(--primary-orange);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            margin-top: -45px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 15px rgba(255, 119, 45, 0.3);
+            border: 4px solid white;
         }
+        .nav-fab span { font-size: 10px; font-weight: 600; margin-top: 2px; }
+
+        /* Feedback/Onboarding Elements */
+        .toast {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: 110px;
+            right: 20px;
+            background: var(--annotation-color);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            max-width: 120px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            animation: bounce 2s infinite;
+            z-index: 150;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 15px;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid var(--annotation-color);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* SVG Icons Styling */
+        svg { width: 20px; height: 20px; fill: currentColor; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <!-- Annotation Labels -->
-        <div class="anno anno-font">Modern Sans-Serif (Inter)</div>
-        <div class="anno anno-contrast">Improved Contrast Ratio</div>
-        <div class="anno anno-padding">Increased Input Padding</div>
-        <div class="anno anno-forgot">Added Forgot Link</div>
-        <div class="anno anno-btn">Full-width Primary Button</div>
-        <div class="anno anno-social">Social Auth Integration</div>
-
-        <div class="logo-area">
-            <div class="logo-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+    <div class="iphone-canvas">
+        <div class="dynamic-island"></div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>12:10</span>
+            <div style="display:flex; gap: 5px; align-items:center;">
+                <svg viewBox="0 0 24 24" style="width:16px"><path d="M12 21l-12-18h24z"/></svg>
+                <svg viewBox="0 0 24 24" style="width:16px"><path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10z"/></svg>
             </div>
-            <h1>Welcome back</h1>
-            <p class="subtitle">Enter your credentials to access your account</p>
         </div>
 
-        <form onsubmit="return false;">
-            <div class="form-group">
-                <label for="email">Email address</label>
-                <input type="email" id="email" placeholder="name@company.com" required>
+        <!-- Header -->
+        <header>
+            <div class="annotation" style="top: -10px; left: 20px;">Standardized Icon (Menu)</div>
+            <div class="icon-btn">
+                <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
             </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-                <a href="#" class="forgot-link">Forgot password?</a>
+            <div class="icon-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
             </div>
+        </header>
 
-            <button type="submit" class="btn-primary">
-                <span>Sign in</span>
-                <!-- Hidden by default, shown during interaction -->
-                <div class="loading-spinner" style="display:none;"></div>
-            </button>
-        </form>
-
-        <div class="divider">or continue with</div>
-
-        <div class="social-grid">
-            <button class="btn-social">
-                <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                Google
-            </button>
-            <button class="btn-social">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C4.1 16.78 3.52 9.39 6.34 7.5c1.4-.84 2.8-.46 3.6.04 1.02.6 1.8.58 2.94 0 .78-.42 2.38-.94 3.66.38 1.14.46 2.02 1.3 2.54 2.5-2.48 1.04-2.12 4.36.42 5.44-.56 1.44-1.34 2.86-2.45 4.42zM12.02 7.08c-.08-2.18 1.76-4.1 3.86-4.08.26 2.54-2.3 4.46-3.86 4.08z"/>
-                </svg>
-                Apple
-            </button>
+        <!-- Search -->
+        <div class="search-section">
+            <div class="search-bar">
+                <svg viewBox="0 0 24 24" fill="#757575"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" placeholder="Search products...">
+            </div>
+            <div class="annotation" style="top: -15px; right: 20px;">Standardized Icon (Funnel)</div>
+            <div class="filter-btn">
+                <svg viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+            </div>
+            <!-- Onboarding Tooltip -->
+            <div class="tooltip">Tap here to filter your search!</div>
         </div>
 
-        <p class="footer-text">
-            Don't have an account? <a href="#">Sign up for free</a>
-        </p>
+        <!-- Banner -->
+        <div class="hero-banner">
+            <div class="hero-content">
+                <p class="hero-headline">Super Sale</p>
+                <h1 class="hero-discount">Up to 50%</h1>
+                <button class="cta-btn">Shop Now</button>
+            </div>
+            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=200&q=80" alt="Shoes">
+        </div>
+
+        <!-- Categories -->
+        <div class="section-header">
+            <h2>Categories</h2>
+            <a href="#" class="see-all">See all</a>
+        </div>
+        <div class="categories-scroll">
+            <div class="category-item">
+                <div class="cat-img"><svg viewBox="0 0 24 24" style="width:28px"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 16l-5-5h10l-5 5z"/></svg></div>
+                <span class="cat-label">Shoes</span>
+            </div>
+            <div class="category-item">
+                <div class="cat-img"><svg viewBox="0 0 24 24" style="width:28px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div>
+                <span class="cat-label">Beauty</span>
+            </div>
+            <!-- Loading State Example -->
+            <div class="category-item">
+                <div class="annotation" style="bottom: 75px; left: 0;">Skeleton Loading</div>
+                <div class="cat-img skeleton"></div>
+                <div class="cat-label skeleton" style="width: 40px; height: 10px; border-radius: 4px;"></div>
+            </div>
+        </div>
+
+        <!-- Recommended -->
+        <div class="section-header">
+            <h2>Special For You</h2>
+            <a href="#" class="see-all">See all</a>
+        </div>
+        <div class="product-grid">
+            <!-- Real Card -->
+            <div class="product-card">
+                <div class="prod-img-box">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=120&q=80" style="width:100px" alt="Product">
+                    <div class="fav-btn" onclick="handleFavorite(this)">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    </div>
+                </div>
+                <div class="prod-name">Wireless Headphone</div>
+                <div class="prod-price">$120.00</div>
+            </div>
+
+            <!-- Skeleton Product Card -->
+            <div class="product-card">
+                <div class="annotation" style="top: 10px; left: 10px;">Skeleton Loader</div>
+                <div class="prod-img-box skeleton"></div>
+                <div class="skeleton" style="width: 80%; height: 14px; border-radius: 4px; margin-bottom: 6px;"></div>
+                <div class="skeleton" style="width: 40%; height: 16px; border-radius: 4px;"></div>
+            </div>
+        </div>
+
+        <!-- Toast Feedback -->
+        <div id="toast" class="toast">Added to Wishlist!</div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="annotation" style="bottom: 85px; width: 200px; left: 10px;">Nav Text Labels Added for Accessibility</div>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm7 0h5v-6h-5v6zm0-13v6h5V5h-5z"/></svg>
+                <span>Categories</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span>Favorites</span>
+            </a>
+            <a href="#" class="nav-item active nav-fab">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                <span>Cart</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Profile</span>
+            </a>
+        </nav>
     </div>
 
+    <script>
+        function handleFavorite(el) {
+            el.classList.toggle('active');
+            const toast = document.getElementById('toast');
+            
+            if(el.classList.contains('active')) {
+                toast.style.opacity = '1';
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                }, 2000);
+            }
+        }
+
+        // Hide tooltip after some time to simulate user exploration
+        setTimeout(() => {
+            const tooltip = document.querySelector('.tooltip');
+            if(tooltip) tooltip.style.display = 'none';
+        }, 8000);
+    </script>
 </body>
 </html>

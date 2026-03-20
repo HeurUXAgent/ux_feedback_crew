@@ -13,6 +13,7 @@ load_dotenv()
 
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+model_name = os.getenv("GEMINI_VISION_MODEL")
 
 
 def _extract_json(text: str) -> dict:
@@ -94,7 +95,7 @@ Return ONLY valid JSON in this structure:
 
     for attempt in range(2):  # 🔒 one retry for stability
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=model_name,
             contents=[prompt, img]
         )
 

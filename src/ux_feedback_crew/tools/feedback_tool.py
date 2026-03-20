@@ -12,6 +12,7 @@ load_dotenv()
 
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+model_name = os.getenv("GEMINI_FEEDBACK_MODEL")
 
 # --- HELPER METHODS ---
 
@@ -158,7 +159,7 @@ Return ONLY valid JSON in this structure:
 
     # Generate content
     response = client.models.generate_content(
-        model="gemini-2.5-flash", # Note: Changed to 2.0 unless you have specific access to a 2.5/3.0 preview
+        model=model_name, # Note: Changed to 2.0 unless you have specific access to a 2.5/3.0 preview
         contents=prompt
     )
     
