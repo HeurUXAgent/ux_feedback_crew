@@ -1,17 +1,37 @@
-import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))
-from src.ux_feedback_crew.crew import UxFeedbackCrew
+from ux_feedback_crew.crew import UxFeedbackCrew
 
-def run_full_ux_pipeline(image_path: str):
-    inputs = {'screenshot_path': image_path}
-    crew_obj = UxFeedbackCrew()
-    
-    # Kicks off the crew (added 'full_flow_crew' to crew.py)
-    result = crew_obj.full_flow_crew().kickoff(inputs=inputs)
-    
-    # Accessing results using the singular 'tasks_output' list
-    report = str(result.tasks_output[2].raw)
-    wireframe = str(result.tasks_output[3].raw)
-    
-    return report, wireframe
+
+def run_full_ux_pipeline_raw(image_path: str, client_id: str, evaluation_id: str = ""):
+    """Full pipeline: Vision → Heuristics → Feedback → Wireframe."""
+    crew_instance = UxFeedbackCrew(client_id=client_id, evaluation_id=evaluation_id)
+    result = crew_instance.full_flow_crew().kickoff(
+        inputs={"screenshot_path": image_path}
+    )
+    return result
+
+
+def run_wireframe_regen_raw(
+    client_id: str,
+    evaluation_id: str,
+    image_path: str,
+    vision_analysis: str,
+    heuristic_evaluation: str,
+    original_feedback: str,
+    feedback_user_comment: str,   # what user said about the feedback report
+    wireframe_user_comment: str,  # what user said about the wireframe
+):
+    """
+    Wireframe-only regeneration.
+    Passes all context to the wireframe agent so it can produce
+    an improved design incorporating the user's specific comments.
+    """
+    crew_instance = UxFeedbackCrew(client_id=client_id, evaluation_id=evaluation_id)
+    result = crew_instance.wireframe_regen_crew().kickoff(inputs={
+        "screenshot_path": image_path,
+        "vision_analysis": vision_analysis,
+        "heuristic_evaluation": heuristic_evaluation,
+        "original_feedback": original_feedback,
+        "feedback_user_comment": feedback_user_comment,
+        "wireframe_user_comment": wireframe_user_comment,
+    })
+    return result

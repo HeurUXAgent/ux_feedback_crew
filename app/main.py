@@ -1,63 +1,200 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-import uuid
-import os
-import json
-from pathlib import Path
-# Import from your pipeline bridge
-from src.ux_feedback_crew.crew_pipeline import run_full_ux_pipeline
-# (
-#     run_evaluation_pipeline,
-#     run_wireframe_pipeline
-# )
+import logging
+import time
 import sys
 from pathlib import Path
+from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Header, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import uuid
+import os
+from starlette.concurrency import run_in_threadpool
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(ROOT_DIR))
-
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+from src.ws_manager import manager
+from app.services.s3_service import upload_image_to_s3
+from app.services.database import (
+    create_evaluation_document, complete_evaluation,
+    fail_evaluation, save_hitl_response,
+    update_wireframe, get_evaluation,
+    get_user_evaluations, get_evaluations_for_analysis,
 )
 
-UPLOAD_DIR = Path("uploads")
-OUTPUT_DIR = Path("outputs")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
+logger = logging.getLogger(__name__)
 
-@app.post("/analyze-and-wireframe/")
-async def analyze_and_wireframe(file: UploadFile = File(...)):
+ROOT_DIR = Path(__file__).resolve().parent.parent
+SRC_DIR  = ROOT_DIR / "src"
+sys.path.append(str(SRC_DIR))
+
+from ux_feedback_crew.crew_pipeline import run_full_ux_pipeline_raw, run_wireframe_regen_raw
+
+app = FastAPI()
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
+                   allow_methods=["*"], allow_headers=["*"])
+os.makedirs("outputs", exist_ok=True)
+
+
+# ─── Models ───────────────────────────────────────────────────────────────────
+
+class HITLFeedbackRequest(BaseModel):
+    evaluation_id: str
+    agent_name: str                  # "feedback_specialist" | "wireframe_designer"
+    ai_suggestion: str = ""
+    user_action: str                 # "agree" | "disagree" | "modify"
+    user_modified_suggestion: str = ""
+
+
+class WireframeRegenRequest(BaseModel):
+    feedback_user_comment: str = ""   # what user said about feedback report
+    wireframe_user_comment: str = ""  # what user said about wireframe
+
+
+# ─── Full Pipeline ────────────────────────────────────────────────────────────
+
+@app.post("/analyze-and-wireframe-s3/{client_id}")
+async def analyze_and_wireframe_s3(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    client_id: str = "",
+    x_user_id: str = Header(default="anonymous"),
+):
+    job_id = str(uuid.uuid4())
+    pipeline_start = time.time()
     try:
-        # 1. Save the Dialog app screenshot
-        job_id = str(uuid.uuid4())
-        upload_path = UPLOAD_DIR / f"{job_id}.png"
-
-        with open(upload_path, "wb") as f:
-            f.write(await file.read())
-
-        # 2. Run the Consolidated Pipeline (All 4 Agents)
-        # This returns the report and the wireframe in one execution
-        feedback_report, wireframe_output = run_full_ux_pipeline(str(upload_path))
-
-        # 3. Save everything to a single JSON for records
-        final_data = {
+        logger.info(f"[JOB START] {job_id} | user: {x_user_id}")
+        await manager.send_progress(client_id, "Uploading image to S3...", 5)
+        image_url = await upload_image_to_s3(file)
+        create_evaluation_document(evaluation_id=job_id, user_id=x_user_id, screenshot_url=image_url)
+        await manager.send_progress(client_id, "Initializing Agents...", 10)
+        result = await run_in_threadpool(run_full_ux_pipeline_raw, image_url, client_id, job_id)
+        duration = time.time() - pipeline_start
+        logger.info(f"[PIPELINE] Completed in {duration:.2f}s")
+        complete_evaluation(evaluation_id=job_id, tasks_output=result.tasks_output, pipeline_duration_seconds=duration)
+        await manager.send_progress(client_id, "Pipeline Complete", 100)
+        return {
             "evaluation_id": job_id,
-            "feedback": feedback_report,
-            "wireframe": wireframe_output
+            "image_url": image_url,
+            "feedback":  str(result.tasks_output[2].raw),
+            "wireframe": str(result.tasks_output[3].raw),
         }
-        
-        output_path = OUTPUT_DIR / f"{job_id}_result.json"
-        with open(output_path, "w") as f:
-            json.dump(final_data, f, indent=2)
-
-        # 4. Return everything to Flutter in one response
-        return final_data
-    
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"System Error: {str(e)}")
+        fail_evaluation(job_id, str(e))
+        logger.error(f"[ERROR] {job_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Wireframe Regeneration ───────────────────────────────────────────────────
+
+@app.post("/regenerate-wireframe/{evaluation_id}/{client_id}")
+async def regenerate_wireframe(
+    evaluation_id: str,
+    client_id: str,
+    body: WireframeRegenRequest,
+    x_user_id: str = Header(default="anonymous"),
+):
+    """
+    Reruns ONLY the wireframe agent.
+    Called after user submits both HITL reviews (feedback + wireframe).
+
+    Uses cached vision + heuristic + original feedback from MongoDB.
+    Passes user's comments on both agents as context for improvement.
+    """
+    doc = get_evaluation(evaluation_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+
+    ai = doc.get("ai_results", {})
+    vision_analysis      = ai.get("vision_analysis", "")
+    heuristic_evaluation = ai.get("heuristic_evaluation", {}).get("raw_text", "")
+    original_feedback    = ai.get("feedback_report", {}).get("raw_text", "")
+    image_url            = doc.get("input", {}).get("screenshot_url", "")
+
+    if not vision_analysis:
+        raise HTTPException(status_code=400, detail="Vision analysis missing from evaluation")
+
+    logger.info(f"[REGEN] Starting wireframe regen for {evaluation_id}")
+    await manager.send_progress(client_id, "Regenerating wireframe...", 10)
+
+    try:
+        result = await run_in_threadpool(
+            run_wireframe_regen_raw,
+            client_id,
+            evaluation_id,
+            image_url,
+            vision_analysis,
+            heuristic_evaluation,
+            original_feedback,
+            body.feedback_user_comment,
+            body.wireframe_user_comment,
+        )
+
+        new_wireframe = str(result.tasks_output[0].raw)
+
+        # Update wireframe in MongoDB
+        update_wireframe(
+            evaluation_id=evaluation_id,
+            new_wireframe=new_wireframe,
+            feedback_comment=body.feedback_user_comment,
+            wireframe_comment=body.wireframe_user_comment,
+            regenerated_by=x_user_id,
+        )
+
+        await manager.send_progress(client_id, "Wireframe Regenerated", 100)
+        logger.info(f"[REGEN] Done for {evaluation_id}")
+
+        return {"evaluation_id": evaluation_id, "wireframe": new_wireframe}
+
+    except Exception as e:
+        logger.error(f"[REGEN ERROR] {evaluation_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Save HITL Review ─────────────────────────────────────────────────────────
+
+@app.post("/submit-feedback")
+async def submit_hitl_feedback(
+    body: HITLFeedbackRequest,
+    x_user_id: str = Header(default="anonymous"),
+):
+    """Saves user review to MongoDB. No pipeline blocking."""
+    if body.user_action not in ["agree", "disagree", "modify"]:
+        raise HTTPException(status_code=400, detail="user_action must be: agree | disagree | modify")
+    save_hitl_response(
+        evaluation_id=body.evaluation_id,
+        agent_name=body.agent_name,
+        ai_suggestion=body.ai_suggestion,
+        user_action=body.user_action,
+        user_modified_suggestion=body.user_modified_suggestion,
+        reviewed_by=x_user_id,
+    )
+    logger.info(f"[HITL] {body.agent_name} | {body.user_action} | {body.evaluation_id}")
+    return {"message": "Feedback saved", "evaluation_id": body.evaluation_id}
+
+
+# ─── Fetch ────────────────────────────────────────────────────────────────────
+
+@app.get("/evaluation/{evaluation_id}")
+async def get_single_evaluation(evaluation_id: str):
+    doc = get_evaluation(evaluation_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+    return doc
+
+@app.get("/evaluations/user/{user_id}")
+async def get_user_history(user_id: str):
+    return {"evaluations": get_user_evaluations(user_id)}
+
+@app.get("/evaluations/analysis/export")
+async def export_for_analysis():
+    docs = get_evaluations_for_analysis()
+    return {"total": len(docs), "evaluations": docs}
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: str):
+    await manager.connect(client_id, websocket)
+    logger.info(f"[WS] Connected: {client_id}")
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(client_id)
+        logger.info(f"[WS] Disconnected: {client_id}")
