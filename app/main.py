@@ -119,7 +119,6 @@ async def regenerate_wireframe(
             run_wireframe_regen_raw,
             client_id,
             evaluation_id,
-            image_url,
             vision_analysis,
             heuristic_evaluation,
             original_feedback,

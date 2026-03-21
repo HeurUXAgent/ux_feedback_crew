@@ -17,8 +17,8 @@ def run_wireframe_regen_raw(
     vision_analysis: str,
     heuristic_evaluation: str,
     original_feedback: str,
-    feedback_user_comment: str,   # what user said about the feedback report
-    wireframe_user_comment: str,  # what user said about the wireframe
+    feedback_user_comment: str,   
+    wireframe_user_comment: str,  
 ):
     """
     Wireframe-only regeneration.

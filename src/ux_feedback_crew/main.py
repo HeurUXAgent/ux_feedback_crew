@@ -43,17 +43,14 @@ app.add_middleware(
 os.makedirs("outputs", exist_ok=True)
 
 
-# ─── Models ───────────────────────────────────────────────────────────────────
+# Models 
 
 class HITLFeedbackRequest(BaseModel):
     evaluation_id: str
-    agent_name: str                     # "feedback_specialist" | "wireframe_designer"
+    agent_name: str                   
     ai_suggestion: str = ""
-    user_action: str                    # "agree" | "disagree" | "modify"
+    user_action: str                  
     user_modified_suggestion: str = ""
-
-
-# ─── Pipeline ─────────────────────────────────────────────────────────────────
 
 @app.post("/analyze-and-wireframe-s3/{client_id}")
 async def analyze_and_wireframe_s3(
@@ -111,8 +108,6 @@ async def analyze_and_wireframe_s3(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ─── Post-execution HITL ──────────────────────────────────────────────────────
-
 @app.post("/submit-feedback")
 async def submit_hitl_feedback(
     body: HITLFeedbackRequest,
@@ -140,8 +135,6 @@ async def submit_hitl_feedback(
     return {"message": "Feedback saved", "evaluation_id": body.evaluation_id}
 
 
-# ─── Fetch ────────────────────────────────────────────────────────────────────
-
 @app.get("/evaluation/{evaluation_id}")
 async def get_single_evaluation(evaluation_id: str):
     doc = get_evaluation(evaluation_id)
@@ -158,8 +151,6 @@ async def export_for_analysis():
     docs = get_evaluations_for_analysis()
     return {"total": len(docs), "evaluations": docs}
 
-
-# ─── WebSocket ────────────────────────────────────────────────────────────────
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):

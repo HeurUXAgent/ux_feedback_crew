@@ -59,7 +59,7 @@ class UxFeedbackCrew():
                      llm=self.llm_wireframe,
                      tools=[create_wireframe], verbose=True, allow_delegation=False)
 
-    # ─── Tasks ────────────────────────────────────────────────────────
+    # Tasks
 
     @task
     def analyze_ui(self) -> Task:

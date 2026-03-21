@@ -1,140 +1,172 @@
 {
-  "screen_type": "Home Screen",
+  "screen_type": "Home Feed",
   "components": [
     {
       "name": "Status Bar",
-      "description": "Standard iOS status bar displaying time (9:41), network signal, Wi-Fi status, and battery level."
+      "type": "System UI",
+      "elements": [
+        "Time (21:05)",
+        "Network Status (4G)",
+        "Wi-Fi Icon",
+        "Battery Indicator (42%)"
+      ]
     },
     {
-      "name": "Top Navigation Bar (Header)",
+      "name": "App Header",
+      "type": "Navigation Bar",
       "elements": [
-        "Hamburger menu icon (left)",
-        "Daraz logo (center, text 'Daraz' with an orange polygon icon)",
-        "Search icon (right)"
-      ],
-      "description": "Fixed header providing global navigation access and a search function."
+        "Facebook Logo (text)",
+        "Add Post Icon (+)",
+        "Search Icon (magnifying glass)",
+        "Messenger Icon (chat bubble with '9+' notification badge)"
+      ]
     },
     {
-      "name": "Promotional Carousel Banner 1",
+      "name": "Post Creation Module",
+      "type": "Input Area",
       "elements": [
-        "Large image featuring a smiling woman using a mobile phone on a couch.",
-        "Orange overlay with white text: 'Freeshipping on orders above Rs. 2,999', 'Till 2pm'.",
-        "Call-to-action button: 'Shop Now' (yellow text on an orange background, rounded rectangle).",
-        "Small, grey pagination dots below the banner (indicating multiple items in a carousel)."
-      ],
-      "description": "A prominent, full-width banner used to showcase ongoing promotions, likely part of a horizontally scrollable carousel."
+        "User Profile Picture (circular)",
+        "Text Input Field ('What's on your mind?')",
+        "Photo/Gallery Icon"
+      ]
     },
     {
-      "name": "Campaign Banner 2",
+      "name": "Stories Section",
+      "type": "Horizontal Scroll View",
       "elements": [
-        "Vibrant graphic with large orange text 'WOMEN OF WONDER' and dates '26th AUG - 1st SEP'.",
-        "Image of a cheerful woman holding a box filled with products.",
-        "Smaller text: 'AMAZING DISCOUNTS EVERYDAY, JUST FOR YOU.'",
-        "Call-to-action button: 'ADD TO CART >' (dark grey background, white text, arrow icon)."
-      ],
-      "description": "A visually striking banner highlighting a specific themed campaign, designed to capture immediate attention."
+        {
+          "name": "Create Story Card",
+          "type": "Card",
+          "content": [
+            "User Profile Picture",
+            "Large Plus Icon",
+            "Text: 'Create story'"
+          ]
+        },
+        {
+          "name": "Story Card (multiple instances)",
+          "type": "Card",
+          "content": [
+            "Background Image/Video Thumbnail",
+            "Profile Picture (circular, some with blue border)",
+            "User Name/Description Overlay"
+          ]
+        }
+      ]
     },
     {
-      "name": "Primary Category Grid (Hexagonal Icons)",
+      "name": "Feed Post",
+      "type": "Card",
       "elements": [
-        "Daraz Pay (wallet icon)",
-        "Mart (juice bottles icon)",
-        "Fashion (stylized woman's profile icon)",
-        "Best Price (percentage tag icon)",
-        "Beauty (makeup brushes icon)"
-      ],
-      "description": "A horizontal row of 5 hexagonal icons, each representing a top-level product category with an illustrative image and text label below."
-    },
-    {
-      "name": "Section Header 'Categories'",
-      "elements": [
-        "Text: 'Categories'"
-      ],
-      "description": "A bold text label serving as a clear heading for the subsequent category listing."
-    },
-    {
-      "name": "Product/Sub-Category Grid",
-      "elements": [
-        "Brooms, Mops (image of mop)",
-        "Cleaning Gloves (image of gloves)",
-        "Groceries (image of packaged goods)",
-        "Underwater (image of snorkel/mask)",
-        "Gloves (image of sports gloves)",
-        "Smart Phones (image of a smartphone)",
-        "Constipation (image of medicine bottle)",
-        "Pumpkin (image of a pumpkin)"
-      ],
-      "description": "A two-row, four-column grid displaying product images and their corresponding text labels, likely for specific product types or sub-categories."
-    },
-    {
-      "name": "Floating Action Button (FAB)",
-      "elements": [
-        "Circular button with a multi-color gradient icon"
-      ],
-      "description": "A small, circular button positioned in the bottom-right corner, potentially for quick actions, filters, or customer support. Its function is not explicitly labeled."
+        {
+          "name": "Post Header",
+          "content": [
+            "Author Profile Picture (circular)",
+            "Author Name ('Babuku - බබුකු')",
+            "Timestamp ('5h')",
+            "Privacy Icon (globe)",
+            "More Options Icon (three dots)",
+            "Close/Dismiss Icon (X)"
+          ]
+        },
+        "Reaction Emojis ('🥺 ❤️')",
+        "Post Media (large image of a woman with children and money)",
+        "Overlay Profile Picture (small, circular, of the post author on the media)",
+        "Text Content (multi-line Sinhala text)"
+      ]
     },
     {
       "name": "Bottom Navigation Bar",
+      "type": "Tab Bar",
       "elements": [
-        "Home (highlighted with orange icon, text, and underline)",
-        "Categories (icon and text)",
-        "Cart (icon and text)",
-        "Favourite (icon and text)",
-        "Profile (icon and text)"
-      ],
-      "description": "A fixed bottom navigation bar providing quick access to five core sections of the application, with 'Home' currently selected."
+        "Home Tab (icon: house, text: 'Home', active/blue)",
+        "Reels Tab (icon: reel, text: 'Reels')",
+        "Friends Tab (icon: two people, text: 'Friends', with '1' notification badge)",
+        "Marketplace Tab (icon: storefront, text: 'Marketplace')",
+        "Notifications Tab (icon: bell, text: 'Notifications', with '2' notification badge)",
+        "Menu Tab (icon: hamburger, text: 'Menu')"
+      ]
     }
   ],
-  "layout_structure": "The screen adheres to a standard mobile application layout, featuring a fixed top navigation bar and a fixed bottom navigation bar, enclosing a vertically scrollable content area. The content is organized into distinct horizontal sections: two prominent promotional banners (the first likely part of a carousel), followed by a horizontal grid of five primary categories (hexagonal icons). Below this, a section header 'Categories' introduces a denser two-row, four-column grid for specific products or sub-categories. Elements within the top bar are distributed with left, center, and right alignment. The content sections utilize varying grid structures to optimize space for different types of information.",
+  "layout_structure": "The screen features a top-down hierarchical layout:\n1.  A fixed Status Bar at the very top.\n2.  A fixed App Header below the status bar for global navigation and branding.\n3.  A Post Creation Module acting as a quick entry point for user-generated content.\n4.  A horizontally scrollable Stories Section presenting ephemeral content.\n5.  A vertically scrollable main content area for the user Feed, displaying individual posts in a card-like format.\n6.  A fixed Bottom Navigation Bar for primary app navigation.\nElements are generally aligned to a vertical grid, with consistent padding and margins separating distinct sections and components. Stories are arranged in a horizontal grid within their section.",
   "color_scheme": {
-    "primary_brand_color": "#FF6B00",
-    "secondary_accent_colors": [
-      "#FFD700",
-      "#C8F5FA",
-      "#9932CC",
-      "#FFFFFF"
-    ],
-    "neutral_colors": [
-      "#FFFFFF",
-      "#000000",
-      "#333333",
-      "#808080"
-    ],
-    "usage_notes": "Orange (#FF6B00) is the predominant brand color, used for the Daraz logo, 'Shop Now' button background, and the active 'Home' tab highlight. Yellow (#FFD700) is used for the 'Shop Now' button text. Campaign banners introduce vibrant secondary accents like light blue/cyan (#C8F5FA) and purple (#9932CC) to create visual appeal. White (#FFFFFF) serves as the main background and for high-contrast text on dark backgrounds. Black (#000000) and dark grey (#333333) are used for most text, icons, and inactive navigation items, ensuring readability against white."
+    "primary_brand_color": "#1877F2",
+    "neutral_background": "#FFFFFF",
+    "text_colors": {
+      "primary": "#000000",
+      "secondary": "#8A8A8E",
+      "placeholder": "#606770"
+    },
+    "accent_colors": {
+      "notification_badge": "#FF0000"
+    },
+    "icon_colors": {
+      "active": "#1877F2",
+      "inactive": "#000000"
+    },
+    "separators": "#E5E5E5"
   },
   "typography": {
-    "font_family": "A clean, modern sans-serif typeface appears to be used throughout the UI (e.g., system default font like SF Pro Text on iOS, or similar fonts like Roboto/Open Sans).",
-    "font_sizes_weights": [
-      "Extra Large, Bold: 'WOMEN OF WONDER' (orange)",
-      "Large, Bold: 'Freeshipping on orders above Rs. 2,999' (white)",
-      "Medium, Bold: 'Categories' section header, 'Daraz' logo text",
-      "Medium, Regular: 'Shop Now', 'ADD TO CART', hexagonal category labels, 'Till 2pm'",
-      "Small, Regular: Product/sub-category grid labels, bottom navigation labels",
-      "Small, Light: 'AMAZING DISCOUNTS EVERYDAY, JUST FOR YOU.'"
-    ],
-    "hierarchy_notes": "A clear typographic hierarchy is established using variations in font size, weight, and color. The largest and boldest text is reserved for primary headlines and calls-to-action, drawing immediate attention. Medium-sized text is used for section headers and button labels, while smaller, regular text is used for descriptive labels and secondary information, guiding the user's eye and indicating information importance."
+    "font_family": "Sans-serif (appears to be a system default or custom font like Roboto/Helvetica Neue)",
+    "font_weights": {
+      "bold": [
+        "Facebook Logo",
+        "Author Name ('Babuku - බබුකු')",
+        "Active Navigation Label ('Home')"
+      ],
+      "regular": [
+        "Time",
+        "Text Input Placeholder",
+        "Story Names",
+        "Timestamps",
+        "Navigation Labels (inactive)",
+        "Post Body Text"
+      ]
+    },
+    "font_sizes": {
+      "large": [
+        "Facebook Logo",
+        "Author Name"
+      ],
+      "medium": [
+        "Time",
+        "Navigation Labels",
+        "Story Names",
+        "Post Creation Placeholder"
+      ],
+      "small": [
+        "Timestamps",
+        "Notification Badges"
+      ]
+    },
+    "languages_present": [
+      "English",
+      "Sinhala"
+    ]
   },
   "spacing_and_density": {
-    "padding_margins": "Generous vertical padding separates major content blocks (banners, category grids), providing clear visual distinctions. Horizontal spacing within category grids is consistent, preventing items from feeling cramped. The top and bottom navigation bars also feature adequate internal padding for their elements.",
-    "item_density": "The screen balances areas of low density (large promotional banners) with areas of moderate to high density (category grids). The hexagonal category grid maintains good spacing between items, while the product/sub-category grid packs more items into a smaller vertical space, indicating an efficient use of screen real estate for browsing.",
-    "visual_clutter": "Despite the significant amount of content, the use of clear section dividers, distinct visual styles for different content types, and ample white space around banners helps to manage visual clutter and maintain a relatively clean aesthetic."
+    "overall_density": "Moderate",
+    "vertical_spacing": "Generous spacing between major sections (header, post creation, stories, feed). Standard spacing between elements within a post.",
+    "horizontal_spacing": "Compact within the app header and bottom navigation. Stories are tightly packed horizontally.",
+    "padding": "Consistent padding around content blocks (e.g., post creation module, individual posts) and within interactive elements. Good use of whitespace for readability."
   },
   "accessibility_observations": [
-    "Most text elements exhibit good color contrast against their backgrounds, enhancing readability for users with various visual capabilities.",
-    "Interactive elements like buttons ('Shop Now', 'ADD TO CART') and navigation icons have sufficiently large tap targets, improving usability for touch interactions.",
-    "All navigation and category icons (bottom navigation, hexagonal categories, product categories) are accompanied by clear text labels, which is beneficial for users who may not recognize icons and for screen reader users.",
-    "The chosen sans-serif font is generally considered highly legible.",
-    "The Floating Action Button (FAB) lacks an explicit text label, which could make its purpose ambiguous for screen reader users or those unfamiliar with common FAB conventions."
+    "High color contrast for most text and interactive elements (dark text/blue on white background) generally aids readability.",
+    "Icons are standard and generally recognizable, enhancing intuitive navigation.",
+    "Notification badges are clearly visible due to contrasting red color and white text.",
+    "Tap targets for main interactive elements (buttons, navigation tabs, story cards) appear sufficiently large.",
+    "Potential for low contrast on text overlays on user-generated story/post images, which might affect readability for some users.",
+    "The small privacy icon in the post header might be difficult to discern or tap for users with fine motor skill challenges or visual impairments."
   ],
   "notable_patterns": [
-    "Standard Header-Content-Footer layout common in mobile applications.",
-    "Hamburger menu for accessing extensive navigation or settings.",
-    "Persistent Search icon in the header for universal search functionality.",
-    "Image carousels/banners with pagination dots for dynamic promotional content.",
-    "Grid layouts for efficient display and organization of product categories.",
-    "Floating Action Button (FAB) for a prominent, context-sensitive action.",
-    "Bottom Navigation Bar for intuitive and quick access to core application sections.",
-    "Clear Call-to-Action (CTA) buttons ('Shop Now', 'ADD TO CART') with contrasting styles.",
-    "Consistent brand identity maintained through the Daraz logo and primary orange color."
+    "Standard social media Home Feed layout (header, story carousel, main feed).",
+    "Top App Bar for global actions and branding.",
+    "Persistent Bottom Navigation Bar for primary app navigation.",
+    "Horizontal Story Carousel for ephemeral content display.",
+    "Card-based UI for organizing feed posts and stories.",
+    "Notification Badges for indicating unread counts.",
+    "'What's on your mind?' text input as a common pattern for user content creation.",
+    "Circular Profile Pictures for user identification.",
+    "Emoji reactions for social interaction."
   ]
 }
