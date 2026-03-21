@@ -24,7 +24,7 @@ class UxFeedbackCrew():
         # Load LLMs from .env once, reuse across agents
         self.llm_vision     = LLM(model=f"gemini/{os.getenv('GEMINI_VISION_MODEL')}")
         self.llm_heuristic  = LLM(model=f"gemini/{os.getenv('GEMINI_HEURISTIC_MODEL')}")
-        self.llm_feedback   = LLM(model=f"gemini/{os.getenv('GEMINI_FEEDBACK_MODEL')}")
+        self.llm_feedback   = LLM(model=f"{os.getenv('GEMINI_FEEDBACK_MODEL')}")
         self.llm_wireframe  = LLM(model=f"gemini/{os.getenv('GEMINI_WIREFRAME_MODEL')}")
 
     def _progress(self, label: str, step: int):
