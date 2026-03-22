@@ -18,6 +18,7 @@ model_name ="projects/75094798515/locations/us-central1/models/17877069507172761
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
+
 vertexai.init(
     project="heuruxagent",
     location="us-central1"
@@ -103,7 +104,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
 
 
 @tool("generate_feedback")
-def generate_feedback(vision_analysis: dict, heuristic_evaluation: dict) -> dict:
+def generate_feedback(vision_analysis: str, heuristic_evaluation: str) -> str:
     """
     Convert UX violations into developer-friendly feedback JSON and save report.
     Also estimate an overall UX score from 0–100 based on the severity and number of usability issues.
@@ -129,10 +130,10 @@ def generate_feedback(vision_analysis: dict, heuristic_evaluation: dict) -> dict
 TASK: Convert UX violations into developer-friendly feedback.
 
 VISION ANALYSIS:
-{json.dumps(vision_analysis, indent=2)}
+{vision_analysis}
 
 HEURISTIC EVALUATION:
-{json.dumps(heuristic_evaluation, indent=2)}
+{heuristic_evaluation}
 
 Return ONLY valid JSON in this structure:
 {{
@@ -200,4 +201,4 @@ Return ONLY valid JSON in this structure:
     print(f"✓ Feedback saved successfully → {json_path}, {md_path}")
 
     # Return for the next agent
-    return parsed_data
+    return json.dumps(parsed_data)

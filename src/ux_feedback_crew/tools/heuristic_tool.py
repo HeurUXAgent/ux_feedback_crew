@@ -38,7 +38,7 @@ def _extract_json(text: str) -> dict:
 
 
 @tool("evaluate_heuristics")
-def evaluate_heuristics(vision_analysis: dict) -> dict:
+def evaluate_heuristics(vision_analysis: str) -> str:
     """
     Evaluate UI design against Nielsen's heuristics and return structured JSON.
 
@@ -64,7 +64,7 @@ def evaluate_heuristics(vision_analysis: dict) -> dict:
 TASK: Evaluate this mobile UI against Nielsen's 10 Usability Heuristics
 
 UI ANALYSIS:
-{json.dumps(vision_analysis, indent=2)}
+{vision_analysis}
 
 NIELSEN HEURISTICS:
 {json.dumps(heuristics_list, indent=2)}
@@ -118,4 +118,4 @@ Return ONLY valid JSON:
     path.write_text(json.dumps(parsed, indent=2, ensure_ascii=False))
     print(f"✓ Heuristics saved → {path}")
 
-    return parsed
+    return json.dumps(parsed)

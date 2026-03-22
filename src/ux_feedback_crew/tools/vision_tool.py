@@ -44,7 +44,7 @@ def _extract_json(text: str) -> dict:
 
 
 @tool("analyze_ui_screenshot")
-def analyze_ui_screenshot(image_path: str) -> dict:
+def analyze_ui_screenshot(image_path: str) -> str:
     """
     Analyze a mobile UI screenshot and extract structured UX information.
 
@@ -115,4 +115,4 @@ Return ONLY valid JSON in this structure:
         json.dump(parsed, f, indent=2, ensure_ascii=False)
 
     print(f"✓ Vision analysis saved → {path}")
-    return parsed
+    return json.dumps(parsed)
