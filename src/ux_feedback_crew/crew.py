@@ -50,7 +50,7 @@ class UxFeedbackCrew():
     @agent
     def feedback_specialist(self) -> Agent:
         return Agent(config=self.agents_config['feedback_specialist'],
-                     llm=None,
+                     llm=self.llm_feedback,
                      tools=[generate_feedback], verbose=True, allow_delegation=False)
 
     @agent
