@@ -14,6 +14,15 @@ OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 model_name = os.getenv("GEMINI_FEEDBACK_MODEL")
 
+import vertexai
+from vertexai.generative_models import GenerativeModel
+
+
+vertexai.init(
+    project="heuruxagent",
+    location="us-central1"
+)
+
 # --- HELPER METHODS ---
 
 def _extract_json(text: str) -> dict:
@@ -162,10 +171,12 @@ Return ONLY valid JSON in this structure:
 """
 
     # Generate content
-    response = client.models.generate_content(
-        model=model_name, # Note: Changed to 2.0 unless you have specific access to a 2.5/3.0 preview
-        contents=prompt
-    )
+    model = GenerativeModel(model_name)
+
+    try:
+        response = model.generate_content(prompt)
+    except Exception as e:
+        return json.dumps({"error": str(e)})
     
     raw_text = response.text.strip()
     
