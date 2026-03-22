@@ -12,7 +12,8 @@ load_dotenv()
 
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-model_name = "vertex_ai/projects/heuruxagent/locations/us-central1/endpoints/2041925583931179008"
+# model_name = "vertex_ai/projects/heuruxagent/locations/us-central1/endpoints/2041925583931179008"
+model_name ="vertex_ai/projects/75094798515/locations/us-central1/models/178770695071727616@1"
 # model_name = os.getenv("GEMINI_FEEDBACK_MODEL")
 
 import vertexai
