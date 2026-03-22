@@ -110,7 +110,11 @@ def generate_feedback(vision_analysis: str, heuristic_evaluation: str) -> str:
     if not api_key:
         raise ValueError("GEMINI_API_KEY not set")
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(
+        vertexai=True, 
+        project="heuruxagent", # From your log: projects/heuruxagent
+        location="us-central1"
+    )
 
     prompt = f"""
 TASK: Convert UX violations into developer-friendly feedback.
