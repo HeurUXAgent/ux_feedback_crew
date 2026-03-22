@@ -121,7 +121,11 @@ VISION ANALYSIS:
 HEURISTIC EVALUATION:
 {heuristic_evaluation}
 
-Return ONLY valid JSON in this structure:
+Return ONLY a JSON object.
+Do not include explanations.
+Do not include markdown.
+Do not wrap the JSON in ``` blocks.
+
 {{
   "feedback_items": [
     {{
@@ -170,7 +174,27 @@ Return ONLY valid JSON in this structure:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
         print(f"Error parsing feedback JSON: {e}")
-        return f"Error: Could not parse JSON. Raw output: {raw_text[:200]}"
+
+        fallback = {
+            "feedback_items": [],
+            "quick_wins": [],
+            "ux_score": {
+                "score": 0,
+                "grade": "unknown",
+                "severity": "unknown",
+                "reasoning": "Model output could not be parsed."
+            },
+            "summary": {
+                "total_issues": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0,
+                "estimated_total_effort": "Unknown"
+            },
+            "implementation_order": []
+        }
+
+        return json.dumps(fallback)
 
     # Save the files
     json_path = OUTPUT_DIR / "feedback.json"
@@ -185,4 +209,4 @@ Return ONLY valid JSON in this structure:
     print(f"✓ Feedback saved successfully → {json_path}, {md_path}")
 
     # Return for the next agent
-    return json.dumps(parsed_data)
+    return parsed_data

@@ -18,7 +18,8 @@ generate_feedback:
   description: >
     Generate actionable developer feedback.
   expected_output: >
-    JSON feedback report.
+    A valid JSON object matching the feedback schema.
+    Do not include markdown or explanations.
   agent: feedback_specialist
   context:
     - analyze_ui
