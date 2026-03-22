@@ -4,6 +4,7 @@ import re
 import io
 from pathlib import Path
 from dotenv import load_dotenv
+from google import genai
 from PIL import Image
 from crewai.tools import tool
 
