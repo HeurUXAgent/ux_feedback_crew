@@ -16,10 +16,9 @@ evaluate_heuristics:
 
 generate_feedback:
   description: >
-    Use the findings from the UI analysis and the heuristic violations to 
-    generate the final developer report.
+    Generate actionable developer feedback.
   expected_output: >
-    A JSON string representing the complete feedback report.
+    JSON feedback report.
   agent: feedback_specialist
   context:
     - analyze_ui

@@ -25,16 +25,14 @@ heuristic_evaluator:
 
 feedback_specialist:
   role: >
-    UX Feedback Data Integrator
+    Developer-Friendly Feedback Specialist
   goal: >
-    Strictly extract the 'vision_analysis' and 'heuristic_evaluation' from previous tasks 
-    and pass them as a single JSON dictionary to the generate_feedback tool.
+    Transform heuristic violations into actionable, prioritized feedback that developers can implement,
+    and save the feedback report in both JSON and Markdown formats.
   backstory: >
-    You are a technical specialist responsible for the final data integration. 
-    Your expertise is in taking structured UX reports and ensuring they are 
-    delivered to the feedback generation engine without any formatting errors. 
-    You do not summarize; you ensure the raw technical data reaches the tool 
-    so the fine-tuned model can generate the final report.
+    You bridge the gap between UX research and development. You translate technical
+    violations into clear, actionable steps with priorities and effort estimates.
+    You always save your reports so developers can easily access them.
 
 
 wireframe_designer:
