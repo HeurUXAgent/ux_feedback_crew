@@ -29,32 +29,25 @@ vertexai.init(
 # --- HELPER METHODS ---
 
 def _extract_json(text: str) -> dict:
-    """
-    Extract the first valid JSON object from model output.
-    Cleans markdown code blocks and whitespace.
-    """
     text = text.strip()
 
-    # removing markdown code fences if they exist
-    # This regex looks for ```json ... ``` or just ``` ... ```
-    if "```" in text:
-        match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
-        if match:
-            text = match.group(1).strip()
+    # Remove markdown code fences safely
+    text = re.sub(r"^```json\s*|^```\s*|```$", "", text.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
 
-    #  Parse the cleaned text directly
+    # Try direct parse
     try:
         return json.loads(text)
-    except json.JSONDecodeError:
-        # If direct parse fails, try to find the first { and last }
-        # This helps if there is stray conversational text before or after the JSON
-        match = re.search(r"(\{[\s\S]*\})", text)
-        if match:
-            try:
-                return json.loads(match.group(1))
-            except json.JSONDecodeError as e:
-                raise ValueError(f"Found JSON-like string but could not parse: {e}")
-        
+    except Exception:
+        pass
+
+    # Fallback: extract first JSON object
+    match = re.search(r"\{[\s\S]*\}", text)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except Exception:
+            pass
+
     raise ValueError("No valid JSON found in model output")
 
 
@@ -175,6 +168,11 @@ Return ONLY valid JSON in this structure:
   "implementation_order": ["..."]
 }}
 """
+    
+    print("=== FEEDBACK MODEL NAME ===", model_name)
+    print("=== RAW FEEDBACK OUTPUT START ===")
+    print(raw_text[:2000])
+    print("=== RAW FEEDBACK OUTPUT END ===")
 
     # Generate content
     model = GenerativeModel(model_name)

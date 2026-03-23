@@ -15,19 +15,18 @@ model_name = os.getenv("GEMINI_HEURISTIC_MODEL")
 
 
 def _extract_json(text: str) -> dict:
-    """
-    Extract the first valid JSON object from model output.
-    """
     text = text.strip()
 
-    if "```" in text:
-        text = re.split(r"```(?:json)?", text)[1].strip()
+    # Remove markdown code fences safely
+    text = re.sub(r"^```json\s*|^```\s*|```$", "", text.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
 
+    # Try direct parse
     try:
         return json.loads(text)
     except Exception:
         pass
 
+    # Fallback: extract first JSON object
     match = re.search(r"\{[\s\S]*\}", text)
     if match:
         try:
