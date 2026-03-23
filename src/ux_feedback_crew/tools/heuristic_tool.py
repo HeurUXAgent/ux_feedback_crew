@@ -55,9 +55,16 @@ def evaluate_heuristics(vision_analysis: str) -> str:
 
     client = genai.Client(api_key=api_key)
 
+    # normalize input (can be str or dict)
+    if isinstance(vision_analysis, str):
+        vision_data = json.loads(vision_analysis)
+    else:
+        vision_data = vision_analysis
+
     # compress vision input
-    vision_data = json.loads(vision_analysis)
     vision_data = compress_vision(vision_data)
+
+    # convert back to string for prompt
     vision_analysis = truncate_text(json.dumps(vision_data), 6000)
 
     heuristics_path = Path(__file__).parent.parent / "config" / "nielsen_heuristics.json"
@@ -90,7 +97,11 @@ Return ONLY JSON:
     for _ in range(2):
         response = client.models.generate_content(
             model=model_name,
-            contents=prompt
+            contents=prompt,
+            generation_config={
+                "max_output_tokens": 1500,
+                "temperature": 0.2
+            }
         )
         raw = response.text.strip()
 
