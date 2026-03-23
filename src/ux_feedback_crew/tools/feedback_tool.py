@@ -194,10 +194,21 @@ Return ONLY valid JSON in this structure:
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
+        return json.dumps({"error": str(e)})
+
+    raw_text = (response.text or "").strip()
+
+    print("=== FEEDBACK MODEL NAME ===", model_name)
+    print("=== RAW FEEDBACK OUTPUT START ===")
+    print(raw_text[:2000])
+    print("=== RAW FEEDBACK OUTPUT END ===")
+
+    try:
+        parsed_data = _extract_json(raw_text)
+    except Exception as e:
         print(f"Error parsing feedback JSON: {e}")
         return f"Error: Could not parse JSON. Raw output: {raw_text[:200]}"
 
-    # Save the files
     json_path = OUTPUT_DIR / "feedback.json"
     md_path = OUTPUT_DIR / "feedback.md"
 
@@ -210,5 +221,4 @@ Return ONLY valid JSON in this structure:
 
     print(f"✓ Feedback saved → {json_path}, {md_path}")
 
-    # Return markdown instead of JSON
-    return md_content  # ← was: return json.dumps(parsed_data)
+    return md_content 
