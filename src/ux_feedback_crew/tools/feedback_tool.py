@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from google import genai
 from PIL import Image
 from crewai.tools import tool
+from src.utils.context_guard import truncate_text
 
 load_dotenv()
 
@@ -120,6 +121,9 @@ def generate_feedback(vision_analysis: str, heuristic_evaluation: str) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY not set")
+    
+    vision_analysis = truncate_text(vision_analysis, 6000)
+    heuristic_evaluation = truncate_text(heuristic_evaluation, 6000)
 
     client = genai.Client(
         vertexai=True, 
@@ -176,11 +180,17 @@ Return ONLY valid JSON in this structure:
     model = GenerativeModel(model_name)
 
     try:
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+    prompt,
+    generation_config={
+        "max_output_tokens": 2048,
+        "temperature": 0.2
+    }
+)
     except Exception as e:
         return json.dumps({"error": str(e)})
     
-    raw_text = response.text.strip()
+    raw_text = (response.text or "").strip()
     
     # Extract and parse using the helper above
     try:

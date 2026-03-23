@@ -31,7 +31,7 @@ class UxFeedbackCrew():
         def callback(_output):
             safe_emit(self.client_id, f"Completed: {label}", step)
         return callback
-
+    
     # Agents 
 
     @agent
@@ -51,6 +51,8 @@ class UxFeedbackCrew():
     def feedback_specialist(self) -> Agent:
         return Agent(config=self.agents_config['feedback_specialist'],
                      llm=self.llm_feedback,
+                        temperature=0.2,
+                    max_tokens=2048,
                      tools=[generate_feedback], verbose=True, allow_delegation=False)
 
     @agent
