@@ -15,7 +15,7 @@ OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Use the ENDPOINT path (not the model resource path)
-model_name = "projects/heuruxagent/locations/us-central1/endpoints/2041925583931179008@1"
+model_name = "projects/heuruxagent/locations/us-central1/endpoints/2041925583931179008"
 
 vertexai.init(
     project="heuruxagent",
