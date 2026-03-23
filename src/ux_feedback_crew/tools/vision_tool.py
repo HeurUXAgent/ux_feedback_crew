@@ -8,7 +8,6 @@ import io
 import json
 import re
 import requests
-from src.utils.context_guard import compress_vision
 
 load_dotenv()
 
@@ -116,7 +115,4 @@ Return ONLY valid JSON in this structure:
         json.dump(parsed, f, indent=2, ensure_ascii=False)
 
     print(f"✓ Vision analysis saved → {path}")
-
-    compressed = compress_vision(parsed)
-
-    return json.dumps(compressed)
+    return json.dumps(parsed)
