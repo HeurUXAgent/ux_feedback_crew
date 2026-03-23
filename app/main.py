@@ -105,7 +105,8 @@ async def regenerate_wireframe(
     ai = doc.get("ai_results", {})
     vision_analysis      = ai.get("vision_analysis", "")
     heuristic_evaluation = ai.get("heuristic_evaluation", {}).get("raw_text", "")
-    original_feedback    = ai.get("feedback_report", {}).get("raw_text", "")
+    original_feedback = ai.get("feedback_report", {}).get("markdown", "") \
+                        or ai.get("feedback_report", {}).get("raw_text", "")
     image_url            = doc.get("input", {}).get("screenshot_url", "")
 
     if not vision_analysis:

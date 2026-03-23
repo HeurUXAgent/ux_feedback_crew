@@ -204,10 +204,11 @@ Return ONLY valid JSON in this structure:
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(parsed_data, f, indent=2, ensure_ascii=False)
 
+    md_content = convert_feedback_to_markdown(parsed_data)
     with open(md_path, "w", encoding="utf-8") as f:
-        f.write(convert_feedback_to_markdown(parsed_data))
+        f.write(md_content)
 
-    print(f"✓ Feedback saved successfully → {json_path}, {md_path}")
+    print(f"✓ Feedback saved → {json_path}, {md_path}")
 
-    # Return for the next agent
-    return json.dumps(parsed_data)
+    # Return markdown instead of JSON
+    return md_content  # ← was: return json.dumps(parsed_data)
