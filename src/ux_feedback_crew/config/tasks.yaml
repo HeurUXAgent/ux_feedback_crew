@@ -1,24 +1,50 @@
 analyze_ui:
   description: >
-    Analyze the mobile UI screenshot at {screenshot_path}.
+    Analyze the mobile UI screenshot at {screenshot_path} using the analyze_ui_screenshot tool.
+
+    You must return the tool output exactly as-is.
+
+    Do not add explanations, reasoning, summaries, markdown fences, or any extra text.
   expected_output: >
-    JSON vision analysis.
+    The exact raw output returned by the analyze_ui_screenshot tool only.
   agent: vision_analyst
 
 evaluate_heuristics:
   description: >
-    Evaluate UI against usability heuristics.
+    Evaluate the UI against usability heuristics using the evaluate_heuristics tool.
+
+    Use the context from analyze_ui.
+
+    You must return the tool output exactly as-is.
+
+    Do not add explanations, reasoning, summaries, markdown fences, or any extra text.
   expected_output: >
-    JSON heuristic evaluation.
+    The exact raw output returned by the evaluate_heuristics tool only.
   agent: heuristic_evaluator
   context:
     - analyze_ui
 
 generate_feedback:
   description: >
-    Generate actionable developer feedback.
+    Generate actionable developer feedback using the generate_feedback tool.
+
+    Use the context from analyze_ui and evaluate_heuristics.
+
+    The generate_feedback tool output is already the final answer.
+
+    You must return the tool output exactly as-is.
+
+    Do not:
+    - reconstruct JSON
+    - convert markdown back into JSON
+    - add "Thought" text
+    - add explanations
+    - add summaries
+    - wrap the result in code fences
+    - repeat the content
+    - modify field names
   expected_output: >
-    JSON feedback report.
+    The exact raw output returned by the generate_feedback tool only.
   agent: feedback_specialist
   context:
     - analyze_ui
@@ -26,9 +52,23 @@ generate_feedback:
 
 create_wireframe:
   description: >
-    Create improved UI wireframe HTML.
+    Create the improved UI wireframe using the create_wireframe tool.
+
+    Use the context from analyze_ui and generate_feedback.
+
+    The create_wireframe tool output is already the final answer.
+
+    You must return the tool output exactly as-is.
+
+    Do not:
+    - explain the wireframe
+    - add "Thought" text
+    - add summaries
+    - wrap the HTML in markdown fences
+    - prepend or append any text
+    - rewrite the HTML
   expected_output: >
-    HTML wireframe.
+    The exact raw output returned by the create_wireframe tool only.
   agent: wireframe_designer
   context:
     - analyze_ui
