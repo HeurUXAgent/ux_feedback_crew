@@ -37,21 +37,153 @@ def _extract_json(text: str) -> dict:
     raise ValueError("No valid JSON found in model output")
 
 
+def _normalize_feedback(data: dict) -> dict:
+    """
+    Normalize inconsistent keys that the model sometimes returns
+    instead of the schema we defined in the prompt.
+
+    Handles:
+      - actionable_steps / how_to_fix / action_steps / technical_steps → what_to_do
+      - overall_ux_score (flat int) → ux_score { score, grade, severity, reasoning }
+      - summary as a plain string → leave as-is (frontend handles both)
+      - missing priority → default to "low"
+      - missing effort_estimate → default to "N/A"
+    """
+    # ── Normalize feedback_items ──────────────────────────────────────────────
+    for item in data.get("feedback_items", []):
+
+        # Steps key normalization
+        STEP_KEY_ALIASES = (
+            "actionable_steps",
+            "how_to_fix",
+            "action_steps",
+            "technical_steps",
+            "steps",
+        )
+        if "what_to_do" not in item:
+            for alias in STEP_KEY_ALIASES:
+                if alias in item:
+                    item["what_to_do"] = item.pop(alias)
+                    break
+
+        # Ensure what_to_do is always a list
+        if "what_to_do" in item and isinstance(item["what_to_do"], str):
+            item["what_to_do"] = [item["what_to_do"]]
+
+        # Priority default
+        if "priority" not in item or not item["priority"]:
+            item["priority"] = "low"
+        else:
+            item["priority"] = item["priority"].lower().strip()
+
+        # Effort default
+        if "effort_estimate" not in item or not item["effort_estimate"]:
+            item["effort_estimate"] = "N/A"
+
+        # why_it_matters default
+        if "why_it_matters" not in item:
+            item["why_it_matters"] = item.pop("why", "") or ""
+
+        # wireframe_changes default
+        if "wireframe_changes" not in item:
+            item["wireframe_changes"] = None
+
+    # ── Normalize ux_score ────────────────────────────────────────────────────
+    # Model sometimes returns overall_ux_score as a flat int instead of the
+    # nested ux_score object we asked for.
+    if "ux_score" not in data and "overall_ux_score" in data:
+        raw_score = data.pop("overall_ux_score")
+        score_int = int(raw_score) if isinstance(raw_score, (int, float)) else 0
+        # Normalize 0-10 scale to 0-100
+        if score_int <= 10:
+            score_int = score_int * 10
+        data["ux_score"] = {
+            "score": score_int,
+            "grade": _score_to_grade(score_int),
+            "severity": _score_to_severity(score_int),
+            "reasoning": data.get("summary", "") if isinstance(data.get("summary"), str) else "",
+        }
+    elif "ux_score" in data and isinstance(data["ux_score"], (int, float)):
+        # Edge case: ux_score was set as a bare number
+        score_int = int(data["ux_score"])
+        if score_int <= 10:
+            score_int = score_int * 10
+        data["ux_score"] = {
+            "score": score_int,
+            "grade": _score_to_grade(score_int),
+            "severity": _score_to_severity(score_int),
+            "reasoning": "",
+        }
+    elif "ux_score" in data and isinstance(data["ux_score"], dict):
+        # Normalize scale inside the object if needed
+        s = data["ux_score"]
+        if isinstance(s.get("score"), (int, float)) and s["score"] <= 10:
+            s["score"] = int(s["score"]) * 10
+
+    # ── Normalize summary ─────────────────────────────────────────────────────
+    # If summary is a string that was produced by the model as a paragraph,
+    # wrap it so the frontend can use it as summaryText directly.
+    # (Frontend _ParseResult.tryParse already handles both string and Map.)
+
+    # ── Ensure summary counts match actual items ──────────────────────────────
+    items = data.get("feedback_items", [])
+    high   = sum(1 for i in items if i.get("priority") == "high")
+    medium = sum(1 for i in items if i.get("priority") == "medium")
+    low    = sum(1 for i in items if i.get("priority") == "low")
+
+    if isinstance(data.get("summary"), dict):
+        data["summary"]["total_issues"] = len(items)
+        data["summary"]["high"]         = high
+        data["summary"]["medium"]       = medium
+        data["summary"]["low"]          = low
+    elif isinstance(data.get("summary"), str):
+        # Keep the string summary as-is; Flutter handles it fine.
+        pass
+    else:
+        # No summary at all — synthesize a minimal one
+        data["summary"] = {
+            "total_issues": len(items),
+            "high": high,
+            "medium": medium,
+            "low": low,
+            "estimated_total_effort": "N/A",
+        }
+
+    return data
+
+
+def _score_to_grade(score: int) -> str:
+    if score >= 85: return "excellent"
+    if score >= 70: return "good"
+    if score >= 50: return "average"
+    return "poor"
+
+
+def _score_to_severity(score: int) -> str:
+    if score >= 75: return "low"
+    if score >= 50: return "moderate"
+    return "high"
+
+
 def convert_feedback_to_markdown(feedback_data: dict) -> str:
     md = "# 📋 UX Feedback Report\n\n---\n\n"
 
     # ── Summary ──
     if "summary" in feedback_data:
         s = feedback_data["summary"]
-        total  = s.get('total_issues', 0)
-        high   = s.get('high', 0)
-        med    = s.get('medium', 0)
-        low    = s.get('low', 0)
-        effort = s.get('estimated_total_effort', 'N/A')
-        md += "## 📊 Summary\n\n"
-        md += f"> 🔢 **{total} issues found** — "
-        md += f"🔴 {high} High · 🟡 {med} Medium · 🟢 {low} Low\n"
-        md += f"> ⏱ Estimated Effort: **{effort}**\n\n---\n\n"
+        if isinstance(s, dict):
+            total  = s.get('total_issues', 0)
+            high   = s.get('high', 0)
+            med    = s.get('medium', 0)
+            low    = s.get('low', 0)
+            effort = s.get('estimated_total_effort', 'N/A')
+            md += "## 📊 Summary\n\n"
+            md += f"> 🔢 **{total} issues found** — "
+            md += f"🔴 {high} High · 🟡 {med} Medium · 🟢 {low} Low\n"
+            md += f"> ⏱ Estimated Effort: **{effort}**\n\n---\n\n"
+        elif isinstance(s, str) and s.strip():
+            md += "## 📊 Summary\n\n"
+            md += f"{s}\n\n---\n\n"
 
     # ── UX Score ──
     if "ux_score" in feedback_data:
@@ -60,7 +192,6 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
         grade     = str(score_data.get('grade', 'N/A')).upper()
         severity  = score_data.get('severity', 'N/A')
         reasoning = score_data.get('reasoning', 'N/A')
-        # normalize if model returns 0-10 scale instead of 0-100
         if isinstance(score, (int, float)) and score <= 10:
             score = int(score * 10)
         md += "## 🎯 Overall UX Score\n\n"
@@ -100,7 +231,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
             title  = item.get('title', 'Recommendation')
             effort = item.get('effort_estimate', 'N/A')
             why    = item.get('why_it_matters', 'N/A')
-            steps  = item.get('what_to_do', [])
+            steps  = item.get('what_to_do', [])   # already normalized
             wf     = item.get('wireframe_changes', 'N/A')
 
             md += f"#### `[{tag}]` {title}\n\n"
@@ -145,7 +276,7 @@ VISION ANALYSIS:
 HEURISTIC EVALUATION:
 {heuristic_evaluation}
 
-Return ONLY valid JSON in this structure:
+Return ONLY valid JSON. Use EXACTLY these key names — do not rename them:
 {{
   "feedback_items": [
     {{
@@ -179,6 +310,11 @@ Return ONLY valid JSON in this structure:
   }},
   "implementation_order": ["..."]
 }}
+
+IMPORTANT:
+- The steps field MUST be called "what_to_do" — not "actionable_steps", not "steps", not "how_to_fix".
+- "what_to_do" must be a JSON array of strings, never a single string.
+- Do not add any explanation, markdown, or text outside the JSON object.
 """
 
     # ── Generate ──
@@ -203,6 +339,9 @@ Return ONLY valid JSON in this structure:
     except Exception as e:
         print(f"JSON parse error: {e}")
         return f"Error: Could not parse JSON. Raw: {raw_text[:300]}"
+
+    # ── Normalize inconsistent model output ──
+    parsed_data = _normalize_feedback(parsed_data)
 
     # ── Save files (named by evaluation_id if provided) ──
     file_id   = evaluation_id if evaluation_id else "latest"
