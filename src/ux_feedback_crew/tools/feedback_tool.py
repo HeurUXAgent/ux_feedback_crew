@@ -1,134 +1,140 @@
 import os
 import json
 import re
-import io
 from pathlib import Path
 from dotenv import load_dotenv
-from google import genai
-from PIL import Image
 from crewai.tools import tool
 from src.utils.context_guard import truncate_text
-import uuid
 
 load_dotenv()
 
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-# model_name = "vertex_ai/projects/heuruxagent/locations/us-central1/endpoints/2041925583931179008"
-model_name ="projects/75094798515/locations/us-central1/endpoints/6160467443161497600"
-# model_name = os.getenv("GEMINI_FEEDBACK_MODEL")
+
+model_name = "projects/75094798515/locations/us-central1/endpoints/6160467443161497600"
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
+vertexai.init(project="heuruxagent", location="us-central1")
 
-vertexai.init(
-    project="heuruxagent",
-    location="us-central1"
-)
 
-# --- HELPER METHODS ---
+# ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def _extract_json(text: str) -> dict:
     text = text.strip()
-
-    # Remove markdown code fences safely
-    text = re.sub(r"^```json\s*|^```\s*|```$", "", text.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
-
-    # Try direct parse
+    text = re.sub(r"^```json\s*|^```\s*|```$", "", text, flags=re.IGNORECASE | re.MULTILINE).strip()
     try:
         return json.loads(text)
     except Exception:
         pass
-
-    # Fallback: extract first JSON object
     match = re.search(r"\{[\s\S]*\}", text)
     if match:
         try:
             return json.loads(match.group(0))
         except Exception:
             pass
-
     raise ValueError("No valid JSON found in model output")
 
 
 def convert_feedback_to_markdown(feedback_data: dict) -> str:
-    """
-    Converts the structured JSON feedback into a clean Markdown report.
-    """
     md = "# 📋 UX Feedback Report\n\n---\n\n"
 
+    # ── Summary ──
     if "summary" in feedback_data:
         s = feedback_data["summary"]
-        md += f"## 📊 Summary\n"
-        md += f"- **Total Issues:** {s.get('total_issues', 0)}\n"
-        md += f"- **High Priority:** {s.get('high', 0)}\n"
-        md += f"- **Medium Priority:** {s.get('medium', 0)}\n"
-        md += f"- **Low Priority:** {s.get('low', 0)}\n"
-        md += f"- **Estimated Effort:** {s.get('estimated_total_effort', 'N/A')}\n\n---\n\n"
+        total  = s.get('total_issues', 0)
+        high   = s.get('high', 0)
+        med    = s.get('medium', 0)
+        low    = s.get('low', 0)
+        effort = s.get('estimated_total_effort', 'N/A')
+        md += "## 📊 Summary\n\n"
+        md += f"> 🔢 **{total} issues found** — "
+        md += f"🔴 {high} High · 🟡 {med} Medium · 🟢 {low} Low\n"
+        md += f"> ⏱ Estimated Effort: **{effort}**\n\n---\n\n"
 
+    # ── UX Score ──
+    if "ux_score" in feedback_data:
+        score_data = feedback_data["ux_score"]
+        score     = score_data.get('score', 0)
+        grade     = str(score_data.get('grade', 'N/A')).upper()
+        severity  = score_data.get('severity', 'N/A')
+        reasoning = score_data.get('reasoning', 'N/A')
+        # normalize if model returns 0-10 scale instead of 0-100
+        if isinstance(score, (int, float)) and score <= 10:
+            score = int(score * 10)
+        md += "## 🎯 Overall UX Score\n\n"
+        md += f"> ### {score} / 100 — {grade}\n"
+        md += f"> **Severity:** {severity}\n\n"
+        md += f"{reasoning}\n\n---\n\n"
+
+    # ── Quick Wins ──
     if feedback_data.get("quick_wins"):
         md += "## ⚡ Quick Wins\n\n"
         for w in feedback_data["quick_wins"]:
-            md += f"- **{w.get('change', 'N/A')}** — {w.get('impact', 'N/A')} (Effort: {w.get('effort', 'N/A')})\n"
+            md += f"- ✅ **{w.get('change', 'N/A')}**\n"
+            md += f"  - 💡 {w.get('impact', 'N/A')}\n"
+            md += f"  - ⏱ Effort: `{w.get('effort', 'N/A')}`\n"
         md += "\n---\n\n"
-    
-    if "ux_score" in feedback_data:
-        score = feedback_data["ux_score"]
-        score_inreport = feedback_data.get("ux_score", {}).get("score", 0)
 
-        # normalize if model misbehaves
-        if score_inreport <= 10:
-            score_inreport = int(score * 10)
+    # ── Recommendations grouped by priority ──
+    items = feedback_data.get("feedback_items", [])
+    grouped = {"high": [], "medium": [], "low": []}
+    for item in items:
+        p = (item.get("priority") or "low").lower()
+        grouped.setdefault(p, []).append(item)
 
-        md += "## 🎯 Overall UX Score\n"
-        md += f"- **Score:** {score_inreport} / 100\n"
-        md += f"- **Grade:** {score.get('grade', 'N/A')}\n"
-        md += f"- **Severity Level:** {score.get('severity', 'N/A')}\n"
-        md += f"- **Reason:** {score.get('reasoning', 'N/A')}\n\n---\n\n"
+    priority_config = [
+        ("high",   "🔴 High Priority",   "HIGH"),
+        ("medium", "🟡 Medium Priority", "MEDIUM"),
+        ("low",    "🟢 Low Priority",    "LOW"),
+    ]
 
     md += "## 🔧 Detailed Recommendations\n\n"
-    for item in feedback_data.get("feedback_items", []):
-        md += f"### {item.get('title', 'Recommendation')}\n"
-        md += f"**Priority:** {item.get('priority', 'N/A')} | **Effort:** {item.get('effort_estimate', 'N/A')}\n\n"
-        md += f"**Why it matters:**\n{item.get('why_it_matters', 'N/A')}\n\n"
-        md += "**Implementation Steps:**\n"
-        steps = item.get('what_to_do', [])
-        if isinstance(steps, list):
-            for step in steps:
-                md += f"- {step}\n"
-        else:
-            md += f"- {steps}\n"
-        md += f"\n**Wireframe changes:** {item.get('wireframe_changes', 'N/A')}\n\n---\n\n"
+    for key, section_title, tag in priority_config:
+        bucket = grouped.get(key, [])
+        if not bucket:
+            continue
+        md += f"### {section_title}\n\n"
+        for item in bucket:
+            title  = item.get('title', 'Recommendation')
+            effort = item.get('effort_estimate', 'N/A')
+            why    = item.get('why_it_matters', 'N/A')
+            steps  = item.get('what_to_do', [])
+            wf     = item.get('wireframe_changes', 'N/A')
+
+            md += f"#### `[{tag}]` {title}\n\n"
+            md += f"> ⏱ Effort: **{effort}**\n\n"
+            md += f"**💬 Why it matters**\n\n{why}\n\n"
+            md += "**🛠 Implementation Steps**\n\n"
+            if isinstance(steps, list):
+                for i, step in enumerate(steps, 1):
+                    md += f"{i}. {step}\n"
+            else:
+                md += f"1. {steps}\n"
+            md += f"\n**✏️ Wireframe Changes**\n\n{wf}\n\n---\n\n"
 
     return md
 
+
+# ─── Tool ─────────────────────────────────────────────────────────────────────
 
 @tool("generate_feedback")
 def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluation_id: str = "") -> str:
     """
     Convert UX violations into developer-friendly feedback JSON and save report.
-    Also estimate an overall UX score from 0–100 based on the severity and number of usability issues.
+    Also estimate an overall UX score from 0-100 based on the severity and number of usability issues.
 
     Args:
         vision_analysis: JSON string from vision tool.
         heuristic_evaluation: JSON string from heuristic tool.
+        evaluation_id: Optional ID used to name the saved files.
 
     Returns:
-        JSON string containing structured feedback recommendations.
+        Markdown string of the feedback report.
     """
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY not set")
-    
-    vision_analysis = truncate_text(vision_analysis, 6000)
+    vision_analysis      = truncate_text(vision_analysis, 6000)
     heuristic_evaluation = truncate_text(heuristic_evaluation, 6000)
-
-    client = genai.Client(
-        vertexai=True, 
-        project="heuruxagent", # From your log: projects/heuruxagent
-        location="us-central1"
-    )
 
     prompt = f"""
 TASK: Convert UX violations into developer-friendly feedback.
@@ -159,7 +165,7 @@ Return ONLY valid JSON in this structure:
     }}
   ],
   "ux_score": {{
-    "score": 0,
+    "score": 75,
     "grade": "excellent|good|average|poor",
     "severity": "low|moderate|high",
     "reasoning": "short explanation"
@@ -174,48 +180,32 @@ Return ONLY valid JSON in this structure:
   "implementation_order": ["..."]
 }}
 """
-    
-    print("=== FEEDBACK MODEL NAME ===", model_name)
-    print("=== RAW FEEDBACK OUTPUT START ===")
-    print(raw_text[:2000])
-    print("=== RAW FEEDBACK OUTPUT END ===")
 
-    # Generate content
+    # ── Generate ──
     model = GenerativeModel(model_name)
-
     try:
         response = model.generate_content(
-    prompt,
-    generation_config={
-        "max_output_tokens": 2048,
-        "temperature": 0.2
-    }
-)
+            prompt,
+            generation_config={"max_output_tokens": 2048, "temperature": 0.2}
+        )
     except Exception as e:
-        return json.dumps({"error": str(e)})
-    
-    raw_text = (response.text or "").strip()
-    
-    # Extract and parse using the helper above
-    try:
-        parsed_data = _extract_json(raw_text)
-    except Exception as e:
-        return json.dumps({"error": str(e)})
+        return f"Error calling model: {e}"
 
     raw_text = (response.text or "").strip()
 
-    print("=== FEEDBACK MODEL NAME ===", model_name)
-    print("=== RAW FEEDBACK OUTPUT START ===")
-    print(raw_text[:2000])
-    print("=== RAW FEEDBACK OUTPUT END ===")
+    print("=== FEEDBACK MODEL ===", model_name)
+    print("=== RAW OUTPUT (first 1000 chars) ===")
+    print(raw_text[:1000])
 
+    # ── Parse ──
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
-        print(f"Error parsing feedback JSON: {e}")
-        return f"Error: Could not parse JSON. Raw output: {raw_text[:200]}"
+        print(f"JSON parse error: {e}")
+        return f"Error: Could not parse JSON. Raw: {raw_text[:300]}"
 
-    file_id = evaluation_id
+    # ── Save files (named by evaluation_id if provided) ──
+    file_id   = evaluation_id if evaluation_id else "latest"
     json_path = OUTPUT_DIR / f"feedback_{file_id}.json"
     md_path   = OUTPUT_DIR / f"feedback_{file_id}.md"
 
@@ -223,12 +213,11 @@ Return ONLY valid JSON in this structure:
         json.dump(parsed_data, f, indent=2, ensure_ascii=False)
 
     md_content = convert_feedback_to_markdown(parsed_data)
+
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(md_content)
 
-    print(f"✓ Feedback saved → {json_path}, {md_path}")
+    print(f"✓ Saved → {json_path} | {md_path}")
 
-    return json.dumps({
-        "json": parsed_data,
-        "markdown": convert_feedback_to_markdown(parsed_data)
-    })
+    # ── Return markdown directly (not JSON, not a dict) ──
+    return md_content
