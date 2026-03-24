@@ -268,7 +268,9 @@ def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluatio
     heuristic_evaluation = truncate_text(heuristic_evaluation, 6000)
 
     prompt = f"""
-TASK: Convert UX violations into developer-friendly feedback.
+TASK: Convert UX violations into structured UX feedback.
+
+You are a UX expert. Based on the given inputs, generate a structured JSON report.
 
 VISION ANALYSIS:
 {vision_analysis}
@@ -276,45 +278,68 @@ VISION ANALYSIS:
 HEURISTIC EVALUATION:
 {heuristic_evaluation}
 
-Return ONLY valid JSON. Use EXACTLY these key names — do not rename them:
+Return ONLY valid JSON. No explanations. No markdown. No extra text.
+
+Use EXACTLY this structure:
+
 {{
   "feedback_items": [
     {{
       "title": "...",
       "priority": "high|medium|low",
-      "effort_estimate": "...",
+      "effort_estimate": "low|medium|high",
       "why_it_matters": "...",
       "what_to_do": ["step 1", "step 2"],
       "wireframe_changes": "..."
     }}
   ],
-  "quick_wins": [
-    {{
-      "change": "...",
-      "impact": "...",
-      "effort": "..."
-    }}
-  ],
   "ux_score": {{
-    "score": 75,
-    "grade": "excellent|good|average|poor",
-    "severity": "low|moderate|high",
-    "reasoning": "short explanation"
+    "score": 7.5,
+    "grade": "A|B|C|D|F"
   }},
   "summary": {{
     "total_issues": 10,
     "high": 2,
     "medium": 5,
-    "low": 3,
-    "estimated_total_effort": "Medium"
-  }},
-  "implementation_order": ["..."]
+    "low": 3
+  }}
 }}
 
-IMPORTANT:
-- The steps field MUST be called "what_to_do" — not "actionable_steps", not "steps", not "how_to_fix".
-- "what_to_do" must be a JSON array of strings, never a single string.
-- Do not add any explanation, markdown, or text outside the JSON object.
+STRICT RULES:
+
+1. Do NOT include any fields other than:
+   - feedback_items
+   - ux_score
+   - summary
+
+2. Each feedback item MUST include:
+   - title
+   - priority
+   - effort_estimate
+   - why_it_matters
+   - what_to_do (array of strings)
+   - wireframe_changes
+
+3. "what_to_do" MUST always be a list of strings.
+
+4. Keep recommendations practical and UI-specific.
+
+5. Avoid generic phrases like "apply best practices".
+
+6. UX score MUST be between 0–10 (can include decimals).
+
+7. Grade mapping:
+   - 8.5–10 → A
+   - 7–8.4 → B
+   - 5–6.9 → C
+   - 3–4.9 → D
+   - <3 → F
+
+8. Summary counts MUST match feedback_items exactly.
+
+9. DO NOT wrap JSON in ``` or add any explanation.
+
+RETURN ONLY JSON.
 """
 
     # ── Generate ──
@@ -322,7 +347,10 @@ IMPORTANT:
     try:
         response = model.generate_content(
             prompt,
-            generation_config={"max_output_tokens": 2048, "temperature": 0.2}
+            generation_config={
+                "max_output_tokens": 1024,  # reduce from 2048
+                "temperature": 0.1          # more deterministic
+            }
         )
     except Exception as e:
         return f"Error calling model: {e}"
