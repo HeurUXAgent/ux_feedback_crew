@@ -70,18 +70,11 @@ async def analyze_and_wireframe_s3(
         logger.info(f"[PIPELINE] Completed in {duration:.2f}s")
         complete_evaluation(evaluation_id=job_id, tasks_output=result.tasks_output, pipeline_duration_seconds=duration)
         await manager.send_progress(client_id, "Pipeline Complete", 100)
-        feedback_md = Path(f"data/outputs/feedback_{job_id}.md").read_text(encoding="utf-8")
-        feedback_json = Path(f"data/outputs/feedback_{job_id}.json").read_text(encoding="utf-8")
-        print("TASK RAW:")
-        print(result.tasks_output[2].raw)
-        print("FEEDBACK JSON ----->>>>>>>",feedback_json)
-
-        print("FILE MD:")
-        print(Path("data/outputs/feedback.md").read_text(encoding="utf-8")[:500])
+        feedback_md = Path("data/outputs/feedback.md").read_text(encoding="utf-8")
         return {
             "evaluation_id": job_id,
             "image_url": image_url,
-            "feedback": feedback_md,
+            "feedback":  str(result.tasks_output[2].raw),
             "wireframe": str(result.tasks_output[3].raw),
         }
     except Exception as e:

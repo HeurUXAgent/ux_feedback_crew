@@ -8,7 +8,6 @@ from google import genai
 from PIL import Image
 from crewai.tools import tool
 from src.utils.context_guard import truncate_text
-import uuid
 
 load_dotenv()
 
@@ -75,14 +74,9 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
     
     if "ux_score" in feedback_data:
         score = feedback_data["ux_score"]
-        score_inreport = feedback_data.get("ux_score", {}).get("score", 0)
-
-        # normalize if model misbehaves
-        if score_inreport <= 10:
-            score_inreport = int(score * 10)
 
         md += "## 🎯 Overall UX Score\n"
-        md += f"- **Score:** {score_inreport} / 100\n"
+        md += f"- **Score:** {score.get('score', 'N/A')} / 100\n"
         md += f"- **Grade:** {score.get('grade', 'N/A')}\n"
         md += f"- **Severity Level:** {score.get('severity', 'N/A')}\n"
         md += f"- **Reason:** {score.get('reasoning', 'N/A')}\n\n---\n\n"
@@ -105,7 +99,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
 
 
 @tool("generate_feedback")
-def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluation_id: str = "") -> str:
+def generate_feedback(vision_analysis: str, heuristic_evaluation: str) -> str:
     """
     Convert UX violations into developer-friendly feedback JSON and save report.
     Also estimate an overall UX score from 0–100 based on the severity and number of usability issues.
@@ -200,35 +194,20 @@ Return ONLY valid JSON in this structure:
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
-        return json.dumps({"error": str(e)})
-
-    raw_text = (response.text or "").strip()
-
-    print("=== FEEDBACK MODEL NAME ===", model_name)
-    print("=== RAW FEEDBACK OUTPUT START ===")
-    print(raw_text[:2000])
-    print("=== RAW FEEDBACK OUTPUT END ===")
-
-    try:
-        parsed_data = _extract_json(raw_text)
-    except Exception as e:
         print(f"Error parsing feedback JSON: {e}")
         return f"Error: Could not parse JSON. Raw output: {raw_text[:200]}"
 
-    file_id = evaluation_id or str(uuid.uuid4())
-    json_path = OUTPUT_DIR / f"feedback_{file_id}.json"
-    md_path   = OUTPUT_DIR / f"feedback_{file_id}.md"
+    # Save the files
+    json_path = OUTPUT_DIR / "feedback.json"
+    md_path = OUTPUT_DIR / "feedback.md"
 
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(parsed_data, f, indent=2, ensure_ascii=False)
 
-    md_content = convert_feedback_to_markdown(parsed_data)
     with open(md_path, "w", encoding="utf-8") as f:
-        f.write(md_content)
+        f.write(convert_feedback_to_markdown(parsed_data))
 
-    print(f"✓ Feedback saved → {json_path}, {md_path}")
+    print(f"✓ Feedback saved successfully → {json_path}, {md_path}")
 
-    return json.dumps({
-        "json": parsed_data,
-        "markdown": convert_feedback_to_markdown(parsed_data)
-    })
+    # Return for the next agent
+    return json.dumps(parsed_data)
