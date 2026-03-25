@@ -496,7 +496,7 @@ def generate_feedback(
     heuristic_evaluation = truncate_text(heuristic_evaluation or "", 6000)
 
     prompt = _build_prompt(vision_analysis, heuristic_evaluation)
-    model = GenerativeModel(MODEL_NAME)
+    model = GenerativeModel("projects/75094798515/locations/us-central1/endpoints/4869200987501363200")
 
     try:
         response = model.generate_content(
