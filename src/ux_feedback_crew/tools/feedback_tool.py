@@ -11,7 +11,7 @@ load_dotenv()
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-model_name = "projects/75094798515/locations/us-central1/endpoints/6160467443161497600"
+model_name = "projects/75094798515/locations/us-central1/endpoints/3613259641418416128"
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
