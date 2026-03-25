@@ -14,99 +14,16 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 model_name = "projects/75094798515/locations/us-central1/endpoints/4869200987501363200"
 
 import vertexai
-from vertexai.generative_models import GenerativeModel, GenerationConfig
-from vertexai.generative_models import Schema, Type
+from vertexai.generative_models import GenerativeModel
 
 vertexai.init(project="heuruxagent", location="us-central1")
-
-
-# ─── Response schema (constrained decoding) ───────────────────────────────────
-# Enforced at the token level — the model physically cannot generate keys or
-# enum values that are not listed here.
-
-RESPONSE_SCHEMA = Schema(
-    type=Type.OBJECT,
-    required=["feedback_items", "ux_score", "summary"],
-    properties={
-        "feedback_items": Schema(
-            type=Type.ARRAY,
-            items=Schema(
-                type=Type.OBJECT,
-                required=[
-                    "title",
-                    "priority",
-                    "effort_estimate",
-                    "why_it_matters",
-                    "what_to_do",
-                    "wireframe_changes",
-                ],
-                properties={
-                    "title":            Schema(type=Type.STRING),
-                    "priority":         Schema(
-                                            type=Type.STRING,
-                                            enum=["high", "medium", "low"],
-                                        ),
-                    "effort_estimate":  Schema(
-                                            type=Type.STRING,
-                                            enum=["low", "medium", "high"],
-                                        ),
-                    "why_it_matters":   Schema(type=Type.STRING),
-                    "what_to_do":       Schema(
-                                            type=Type.ARRAY,
-                                            items=Schema(type=Type.STRING),
-                                        ),
-                    "wireframe_changes": Schema(type=Type.STRING),
-                },
-            ),
-        ),
-        "ux_score": Schema(
-            type=Type.OBJECT,
-            required=["score", "grade"],
-            properties={
-                "score": Schema(type=Type.NUMBER),        # 0–10, decimals OK
-                "grade": Schema(
-                    type=Type.STRING,
-                    enum=["A", "B", "C", "D", "F"],
-                ),
-            },
-        ),
-        "summary": Schema(
-            type=Type.OBJECT,
-            required=["total_issues", "high", "medium", "low"],
-            properties={
-                "total_issues":           Schema(type=Type.INTEGER),
-                "high":                   Schema(type=Type.INTEGER),
-                "medium":                 Schema(type=Type.INTEGER),
-                "low":                    Schema(type=Type.INTEGER),
-                "estimated_total_effort": Schema(
-                    type=Type.STRING,
-                    enum=["low", "medium", "high", "N/A"],
-                ),
-            },
-        ),
-    },
-)
-
-GENERATION_CONFIG = GenerationConfig(
-    response_mime_type="application/json",
-    response_schema=RESPONSE_SCHEMA,
-    max_output_tokens=1024,
-    temperature=0.1,
-)
-
-FALLBACK_CONFIG = GenerationConfig(
-    max_output_tokens=1024,
-    temperature=0.1,
-)
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def _extract_json(text: str) -> dict:
-    """Strip markdown fences and extract the first valid JSON object."""
     text = text.strip()
-    text = re.sub(r"^```[a-zA-Z]*\s*", "", text, flags=re.IGNORECASE | re.MULTILINE)
-    text = re.sub(r"```\s*$", "", text, flags=re.MULTILINE).strip()
+    text = re.sub(r"^```json\s*|^```\s*|```$", "", text, flags=re.IGNORECASE | re.MULTILINE).strip()
     try:
         return json.loads(text)
     except Exception:
@@ -122,136 +39,115 @@ def _extract_json(text: str) -> dict:
 
 def _normalize_feedback(data: dict) -> dict:
     """
-    Safety-net normalization that runs even after constrained decoding.
-    This covers the fallback path where the endpoint ignores response_schema
-    and produces free-form output with aliased or extra keys.
-    """
-    _STEP_ALIASES   = (
-        "actionable_steps", "how_to_fix", "action_steps", "technical_steps",
-        "steps", "developer_steps", "recommendations", "technical_solution",
-        "implementation_steps", "fixes", "suggestions",
-    )
-    _EFFORT_ALIASES = ("effort", "effort_level", "implementation_effort")
-    _WHY_ALIASES    = ("why", "description", "rationale", "reason")
-    _ALLOWED_ITEM   = {
-        "title", "priority", "effort_estimate",
-        "why_it_matters", "what_to_do", "wireframe_changes",
-    }
+    Normalize inconsistent keys that the model sometimes returns
+    instead of the schema we defined in the prompt.
 
-    # ── feedback_items ────────────────────────────────────────────────────────
+    Handles:
+      - actionable_steps / how_to_fix / action_steps / technical_steps → what_to_do
+      - overall_ux_score (flat int) → ux_score { score, grade, severity, reasoning }
+      - summary as a plain string → leave as-is (frontend handles both)
+      - missing priority → default to "low"
+      - missing effort_estimate → default to "N/A"
+    """
+    # ── Normalize feedback_items ──────────────────────────────────────────────
     for item in data.get("feedback_items", []):
 
-        # steps → what_to_do
+        # Steps key normalization
+        STEP_KEY_ALIASES = (
+            "actionable_steps",
+            "how_to_fix",
+            "action_steps",
+            "technical_steps",
+            "steps",
+        )
         if "what_to_do" not in item:
-            for alias in _STEP_ALIASES:
+            for alias in STEP_KEY_ALIASES:
                 if alias in item:
                     item["what_to_do"] = item.pop(alias)
                     break
 
-        raw = item.get("what_to_do")
-        if raw is None:
-            item["what_to_do"] = []
-        elif isinstance(raw, str):
-            item["what_to_do"] = [raw] if raw.strip() else []
-        elif isinstance(raw, list):
-            flat = []
-            for s in raw:
-                if isinstance(s, str):
-                    flat.append(s)
-                elif isinstance(s, dict):
-                    parts = [str(v) for k in ("step","action","description","details") if (v := s.get(k))]
-                    flat.append(" — ".join(parts) if parts else str(s))
-            item["what_to_do"] = flat
-        else:
-            item["what_to_do"] = [str(raw)]
+        # Ensure what_to_do is always a list
+        if "what_to_do" in item and isinstance(item["what_to_do"], str):
+            item["what_to_do"] = [item["what_to_do"]]
 
-        # effort_estimate
-        if "effort_estimate" not in item:
-            for alias in _EFFORT_ALIASES:
-                if alias in item:
-                    item["effort_estimate"] = item.pop(alias)
-                    break
-        if not item.get("effort_estimate"):
+        # Priority default
+        if "priority" not in item or not item["priority"]:
+            item["priority"] = "low"
+        else:
+            item["priority"] = item["priority"].lower().strip()
+
+        # Effort default
+        if "effort_estimate" not in item or not item["effort_estimate"]:
             item["effort_estimate"] = "N/A"
 
-        # priority
-        p = str(item.get("priority") or "low").strip().lower()
-        item["priority"] = p if p in ("high", "medium", "low") else "low"
+        # why_it_matters default
+        if "why_it_matters" not in item:
+            item["why_it_matters"] = item.pop("why", "") or ""
 
-        # why_it_matters
-        if not item.get("why_it_matters"):
-            for alias in _WHY_ALIASES:
-                if item.get(alias):
-                    item["why_it_matters"] = str(item[alias])
-                    break
-            else:
-                item["why_it_matters"] = ""
+        # wireframe_changes default
+        if "wireframe_changes" not in item:
+            item["wireframe_changes"] = None
 
-        # wireframe_changes
-        item.setdefault("wireframe_changes", None)
-
-        # strip unknown keys
-        for k in list(item.keys()):
-            if k not in _ALLOWED_ITEM:
-                del item[k]
-
-    # ── ux_score ──────────────────────────────────────────────────────────────
-    def _build_score(raw) -> dict:
-        try:
-            v = int(float(str(raw)))
-        except (ValueError, TypeError):
-            v = 50
-        if v <= 10:
-            v *= 10
-        v = max(0, min(100, v))
-        return {
-            "score":     v,
-            "grade":     _score_to_grade(v),
-            "severity":  _score_to_severity(v),
+    # ── Normalize ux_score ────────────────────────────────────────────────────
+    # Model sometimes returns overall_ux_score as a flat int instead of the
+    # nested ux_score object we asked for.
+    if "ux_score" not in data and "overall_ux_score" in data:
+        raw_score = data.pop("overall_ux_score")
+        score_int = int(raw_score) if isinstance(raw_score, (int, float)) else 0
+        # Normalize 0-10 scale to 0-100
+        if score_int <= 10:
+            score_int = score_int * 10
+        data["ux_score"] = {
+            "score": score_int,
+            "grade": _score_to_grade(score_int),
+            "severity": _score_to_severity(score_int),
+            "reasoning": data.get("summary", "") if isinstance(data.get("summary"), str) else "",
+        }
+    elif "ux_score" in data and isinstance(data["ux_score"], (int, float)):
+        # Edge case: ux_score was set as a bare number
+        score_int = int(data["ux_score"])
+        if score_int <= 10:
+            score_int = score_int * 10
+        data["ux_score"] = {
+            "score": score_int,
+            "grade": _score_to_grade(score_int),
+            "severity": _score_to_severity(score_int),
             "reasoning": "",
         }
-
-    if "ux_score" not in data:
-        data["ux_score"] = _build_score(data.pop("overall_ux_score", 50))
-    elif isinstance(data["ux_score"], (int, float)):
-        data["ux_score"] = _build_score(data["ux_score"])
-    elif isinstance(data["ux_score"], dict):
+    elif "ux_score" in data and isinstance(data["ux_score"], dict):
+        # Normalize scale inside the object if needed
         s = data["ux_score"]
-        try:
-            v = int(float(str(s.get("score", 50))))
-        except (ValueError, TypeError):
-            v = 50
-        if v <= 10:
-            v *= 10
-        s["score"] = max(0, min(100, v))
-        s.setdefault("grade",     _score_to_grade(s["score"]))
-        s.setdefault("severity",  _score_to_severity(s["score"]))
-        s.setdefault("reasoning", "")
+        if isinstance(s.get("score"), (int, float)) and s["score"] <= 10:
+            s["score"] = int(s["score"]) * 10
 
-    # ── summary ───────────────────────────────────────────────────────────────
-    items  = data.get("feedback_items", [])
+    # ── Normalize summary ─────────────────────────────────────────────────────
+    # If summary is a string that was produced by the model as a paragraph,
+    # wrap it so the frontend can use it as summaryText directly.
+    # (Frontend _ParseResult.tryParse already handles both string and Map.)
+
+    # ── Ensure summary counts match actual items ──────────────────────────────
+    items = data.get("feedback_items", [])
     high   = sum(1 for i in items if i.get("priority") == "high")
     medium = sum(1 for i in items if i.get("priority") == "medium")
     low    = sum(1 for i in items if i.get("priority") == "low")
 
     if isinstance(data.get("summary"), dict):
-        data["summary"].update(
-            total_issues=len(items), high=high, medium=medium, low=low
-        )
-        data["summary"].setdefault("estimated_total_effort", "N/A")
-    elif isinstance(data.get("summary"), str) and data["summary"].strip():
-        pass  # keep narrative; Flutter handles both
+        data["summary"]["total_issues"] = len(items)
+        data["summary"]["high"]         = high
+        data["summary"]["medium"]       = medium
+        data["summary"]["low"]          = low
+    elif isinstance(data.get("summary"), str):
+        # Keep the string summary as-is; Flutter handles it fine.
+        pass
     else:
+        # No summary at all — synthesize a minimal one
         data["summary"] = {
             "total_issues": len(items),
-            "high": high, "medium": medium, "low": low,
+            "high": high,
+            "medium": medium,
+            "low": low,
             "estimated_total_effort": "N/A",
         }
-
-    # strip unknown top-level keys
-    for k in list(data.keys()):
-        if k not in {"feedback_items", "ux_score", "summary"}:
-            del data[k]
 
     return data
 
@@ -272,52 +168,81 @@ def _score_to_severity(score: int) -> str:
 def convert_feedback_to_markdown(feedback_data: dict) -> str:
     md = "# 📋 UX Feedback Report\n\n---\n\n"
 
+    # ── Summary ──
     if "summary" in feedback_data:
         s = feedback_data["summary"]
         if isinstance(s, dict):
+            total  = s.get('total_issues', 0)
+            high   = s.get('high', 0)
+            med    = s.get('medium', 0)
+            low    = s.get('low', 0)
+            effort = s.get('estimated_total_effort', 'N/A')
             md += "## 📊 Summary\n\n"
-            md += f"> 🔢 **{s.get('total_issues',0)} issues found** — "
-            md += f"🔴 {s.get('high',0)} High · 🟡 {s.get('medium',0)} Medium · 🟢 {s.get('low',0)} Low\n"
-            md += f"> ⏱ Estimated Effort: **{s.get('estimated_total_effort','N/A')}**\n\n---\n\n"
+            md += f"> 🔢 **{total} issues found** — "
+            md += f"🔴 {high} High · 🟡 {med} Medium · 🟢 {low} Low\n"
+            md += f"> ⏱ Estimated Effort: **{effort}**\n\n---\n\n"
         elif isinstance(s, str) and s.strip():
-            md += f"## 📊 Summary\n\n{s}\n\n---\n\n"
+            md += "## 📊 Summary\n\n"
+            md += f"{s}\n\n---\n\n"
 
+    # ── UX Score ──
     if "ux_score" in feedback_data:
-        sc = feedback_data["ux_score"]
-        score = sc.get("score", 0)
+        score_data = feedback_data["ux_score"]
+        score     = score_data.get('score', 0)
+        grade     = str(score_data.get('grade', 'N/A')).upper()
+        severity  = score_data.get('severity', 'N/A')
+        reasoning = score_data.get('reasoning', 'N/A')
         if isinstance(score, (int, float)) and score <= 10:
             score = int(score * 10)
         md += "## 🎯 Overall UX Score\n\n"
-        md += f"> ### {score} / 100 — {str(sc.get('grade','N/A')).upper()}\n"
-        md += f"> **Severity:** {sc.get('severity','N/A')}\n\n"
-        if sc.get("reasoning"):
-            md += f"{sc['reasoning']}\n\n"
-        md += "---\n\n"
+        md += f"> ### {score} / 100 — {grade}\n"
+        md += f"> **Severity:** {severity}\n\n"
+        md += f"{reasoning}\n\n---\n\n"
 
-    items   = feedback_data.get("feedback_items", [])
-    grouped: dict[str, list] = {"high": [], "medium": [], "low": []}
+    # ── Quick Wins ──
+    if feedback_data.get("quick_wins"):
+        md += "## ⚡ Quick Wins\n\n"
+        for w in feedback_data["quick_wins"]:
+            md += f"- ✅ **{w.get('change', 'N/A')}**\n"
+            md += f"  - 💡 {w.get('impact', 'N/A')}\n"
+            md += f"  - ⏱ Effort: `{w.get('effort', 'N/A')}`\n"
+        md += "\n---\n\n"
+
+    # ── Recommendations grouped by priority ──
+    items = feedback_data.get("feedback_items", [])
+    grouped = {"high": [], "medium": [], "low": []}
     for item in items:
-        grouped.setdefault((item.get("priority") or "low").lower(), []).append(item)
+        p = (item.get("priority") or "low").lower()
+        grouped.setdefault(p, []).append(item)
 
-    md += "## 🔧 Detailed Recommendations\n\n"
-    for key, section_title, tag in [
+    priority_config = [
         ("high",   "🔴 High Priority",   "HIGH"),
         ("medium", "🟡 Medium Priority", "MEDIUM"),
         ("low",    "🟢 Low Priority",    "LOW"),
-    ]:
+    ]
+
+    md += "## 🔧 Detailed Recommendations\n\n"
+    for key, section_title, tag in priority_config:
         bucket = grouped.get(key, [])
         if not bucket:
             continue
         md += f"### {section_title}\n\n"
         for item in bucket:
-            steps = item.get("what_to_do", [])
-            md += f"#### `[{tag}]` {item.get('title','Recommendation')}\n\n"
-            md += f"> ⏱ Effort: **{item.get('effort_estimate','N/A')}**\n\n"
-            md += f"**💬 Why it matters**\n\n{item.get('why_it_matters','N/A')}\n\n"
+            title  = item.get('title', 'Recommendation')
+            effort = item.get('effort_estimate', 'N/A')
+            why    = item.get('why_it_matters', 'N/A')
+            steps  = item.get('what_to_do', [])   # already normalized
+            wf     = item.get('wireframe_changes', 'N/A')
+
+            md += f"#### `[{tag}]` {title}\n\n"
+            md += f"> ⏱ Effort: **{effort}**\n\n"
+            md += f"**💬 Why it matters**\n\n{why}\n\n"
             md += "**🛠 Implementation Steps**\n\n"
-            for i, step in enumerate(steps if isinstance(steps, list) else [steps], 1):
-                md += f"{i}. {step}\n"
-            wf = item.get("wireframe_changes") or "N/A"
+            if isinstance(steps, list):
+                for i, step in enumerate(steps, 1):
+                    md += f"{i}. {step}\n"
+            else:
+                md += f"1. {steps}\n"
             md += f"\n**✏️ Wireframe Changes**\n\n{wf}\n\n---\n\n"
 
     return md
@@ -326,20 +251,15 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
 # ─── Tool ─────────────────────────────────────────────────────────────────────
 
 @tool("generate_feedback")
-def generate_feedback(
-    vision_analysis: str,
-    heuristic_evaluation: str,
-    evaluation_id: str = "",
-) -> str:
+def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluation_id: str = "") -> str:
     """
     Convert UX violations into developer-friendly feedback JSON and save report.
-    Uses constrained decoding (response_schema) so the model output is always
-    structurally valid — no key aliases, no rogue fields.
+    Also estimate an overall UX score from 0-100 based on the severity and number of usability issues.
 
     Args:
-        vision_analysis:      JSON string from vision tool.
+        vision_analysis: JSON string from vision tool.
         heuristic_evaluation: JSON string from heuristic tool.
-        evaluation_id:        Optional ID used to name the saved files.
+        evaluation_id: Optional ID used to name the saved files.
 
     Returns:
         Markdown string of the feedback report.
@@ -347,10 +267,10 @@ def generate_feedback(
     vision_analysis      = truncate_text(vision_analysis, 6000)
     heuristic_evaluation = truncate_text(heuristic_evaluation, 6000)
 
-    # With response_schema active the prompt only needs to describe the TASK —
-    # the schema enforces the output shape at the token level.
-    prompt = f"""You are a senior UX engineer. Analyze the inputs below and produce a
-structured UX feedback report.
+    prompt = f"""
+TASK: Convert UX violations into structured UX feedback.
+
+You are a UX expert. Based on the given inputs, generate a structured JSON report.
 
 VISION ANALYSIS:
 {vision_analysis}
@@ -358,50 +278,82 @@ VISION ANALYSIS:
 HEURISTIC EVALUATION:
 {heuristic_evaluation}
 
-Instructions:
-- Identify every usability issue present in the inputs.
-- For each issue create one feedback item with a clear action-oriented title.
-- priority   → rate by user impact: high / medium / low.
-- effort_estimate → implementation cost: low / medium / high.
-- what_to_do → list of concrete, UI-specific steps. No generic phrases.
-- wireframe_changes → exact visual change needed in the wireframe.
-- ux_score.score → decimal 0–10 reflecting overall usability.
-- summary counts must exactly match the feedback_items you produce.
+Return ONLY valid JSON. No explanations. No markdown. No extra text.
+
+Use EXACTLY this structure:
+
+{{
+  "feedback_items": [
+    {{
+      "title": "...",
+      "priority": "high|medium|low",
+      "effort_estimate": "low|medium|high",
+      "why_it_matters": "...",
+      "what_to_do": ["step 1", "step 2"],
+      "wireframe_changes": "..."
+    }}
+  ],
+  "ux_score": {{
+    "score": 7.5,
+    "grade": "A|B|C|D|F"
+  }},
+  "summary": {{
+    "total_issues": 10,
+    "high": 2,
+    "medium": 5,
+    "low": 3
+  }}
+}}
+
+STRICT RULES:
+
+1. Do NOT include any fields other than:
+   - feedback_items
+   - ux_score
+   - summary
+
+2. Each feedback item MUST include:
+   - title
+   - priority
+   - effort_estimate
+   - why_it_matters
+   - what_to_do (array of strings)
+   - wireframe_changes
+
+3. "what_to_do" MUST always be a list of strings.
+
+4. Keep recommendations practical and UI-specific.
+
+5. Avoid generic phrases like "apply best practices".
+
+6. UX score MUST be between 0–10 (can include decimals).
+
+7. Grade mapping:
+   - 8.5–10 → A
+   - 7–8.4 → B
+   - 5–6.9 → C
+   - 3–4.9 → D
+   - <3 → F
+
+8. Summary counts MUST match feedback_items exactly.
+
+9. DO NOT wrap JSON in ``` or add any explanation.
+
+RETURN ONLY JSON.
 """
 
+    # ── Generate ──
     model = GenerativeModel(model_name)
-    response = None
-
-    # ── Primary: constrained decoding ─────────────────────────────────────────
     try:
-        response = model.generate_content(prompt, generation_config=GENERATION_CONFIG)
-        print("[INFO] Used constrained decoding (response_schema)")
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 1024,  # reduce from 2048
+                "temperature": 0.1          # more deterministic
+            }
+        )
     except Exception as e:
-        # Older or non-Gemini endpoints may not support response_schema.
-        print(f"[WARN] response_schema unsupported ({e}), falling back to free-form...")
-
-    # ── Fallback: free-form + normalization ────────────────────────────────────
-    if response is None:
-        # Append explicit schema instructions for the fallback path
-        fallback_prompt = prompt + """
-Return ONLY a valid JSON object. No markdown fences. No extra text.
-Schema:
-{
-  "feedback_items": [{"title":"...","priority":"high|medium|low",
-    "effort_estimate":"low|medium|high","why_it_matters":"...",
-    "what_to_do":["step 1","step 2"],"wireframe_changes":"..."}],
-  "ux_score": {"score": 7.5, "grade": "A|B|C|D|F"},
-  "summary": {"total_issues":3,"high":1,"medium":1,"low":1,
-               "estimated_total_effort":"low|medium|high"}
-}
-"""
-        try:
-            response = model.generate_content(
-                fallback_prompt, generation_config=FALLBACK_CONFIG
-            )
-            print("[INFO] Used fallback free-form generation")
-        except Exception as e2:
-            return f"Error calling model: {e2}"
+        return f"Error calling model: {e}"
 
     raw_text = (response.text or "").strip()
 
@@ -409,17 +361,17 @@ Schema:
     print("=== RAW OUTPUT (first 1000 chars) ===")
     print(raw_text[:1000])
 
-    # ── Parse ─────────────────────────────────────────────────────────────────
+    # ── Parse ──
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
         print(f"JSON parse error: {e}")
         return f"Error: Could not parse JSON. Raw: {raw_text[:300]}"
 
-    # ── Normalize (always runs — safety net for fallback path) ────────────────
+    # ── Normalize inconsistent model output ──
     parsed_data = _normalize_feedback(parsed_data)
 
-    # ── Persist ───────────────────────────────────────────────────────────────
+    # ── Save files (named by evaluation_id if provided) ──
     file_id   = evaluation_id if evaluation_id else "latest"
     json_path = OUTPUT_DIR / f"feedback_{file_id}.json"
     md_path   = OUTPUT_DIR / f"feedback_{file_id}.md"
@@ -434,4 +386,5 @@ Schema:
 
     print(f"✓ Saved → {json_path} | {md_path}")
 
+    # ── Return markdown directly (not JSON, not a dict) ──
     return md_content
