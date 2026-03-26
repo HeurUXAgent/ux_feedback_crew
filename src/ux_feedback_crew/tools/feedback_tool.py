@@ -59,6 +59,7 @@ def _normalize_feedback(data: dict) -> dict:
             "action_steps",
             "technical_steps",
             "steps",
+            "action_items"
         )
         if "what_to_do" not in item:
             for alias in STEP_KEY_ALIASES:
