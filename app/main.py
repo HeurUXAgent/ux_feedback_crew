@@ -49,28 +49,6 @@ def _load_feedback_json(evaluation_id: str) -> dict | None:
     except Exception as e:
         logger.error(f"[FEEDBACK JSON] Failed to read {json_path}: {e}")
         return None
-    
-def _parse_task_output(raw: str) -> tuple[dict | None, str]:
-    """
-    Tool now returns JSON string directly.
-    Try to parse it — if it fails fall back to saved file.
-    Returns: (feedback_json dict or None, feedback_markdown string)
-    """
-    from ux_feedback_crew.tools.generate_feedback import convert_feedback_to_markdown, _FeedbackReport
-
-    raw = (raw or "").strip()
-
-    try:
-        data = json.loads(raw)
-        if isinstance(data, dict) and "feedback_items" in data:
-            report = _FeedbackReport(**data)
-            md = convert_feedback_to_markdown(report)
-            return report.to_frontend_dict(), md
-    except Exception as e:
-        logger.warning(f"[PARSE] Direct JSON parse failed: {e}")
-
-    logger.warning("[PARSE] Could not extract structured JSON — returning raw as markdown only")
-    return None, raw
 
 
 # ─── Models ───────────────────────────────────────────────────────────────────
@@ -112,16 +90,8 @@ async def analyze_and_wireframe_s3(
         await manager.send_progress(client_id, "Pipeline Complete", 100)
 
         # tasks_output[2].raw is the markdown string returned directly by generate_feedback
-        # NEW — replace with these
-        raw_feedback = str(result.tasks_output[2].raw)
-        feedback_json, feedback_md = _parse_task_output(raw_feedback)
-
-        # last resort fallback
-        if feedback_json is None:
-            logger.warning("[PIPELINE] Falling back to saved JSON file")
-            feedback_json = _load_feedback_json(job_id)
-
-        logger.info(f"[PIPELINE] feedback_items count: {len(feedback_json.get('feedback_items', [])) if feedback_json else 0}")
+        feedback_md = str(result.tasks_output[2].raw)
+        feedback_json = _load_feedback_json(job_id)
 
         return {
             "evaluation_id": job_id,
