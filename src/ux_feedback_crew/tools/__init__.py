@@ -1,6 +1,6 @@
 from .vision_tool import analyze_ui_screenshot
 from .heuristic_tool import evaluate_heuristics
-from .feedback_tool import generate_feedback
+from .feedback_tool_fewshot import generate_feedback_fewshot as generate_feedback
 from .wireframe_tool import create_wireframe
 
 __all__ = [

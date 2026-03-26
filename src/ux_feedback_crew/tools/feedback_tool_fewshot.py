@@ -229,8 +229,7 @@ Rules:
 def generate_feedback_fewshot(
     vision_analysis: str,
     heuristic_evaluation: str,
-    evaluation_id: str = ""
-) -> str:
+    evaluation_id: str = "") -> str:
     """
     Generate developer-friendly UX feedback using few-shot prompting.
     Returns markdown, and saves both JSON and markdown files.
@@ -263,7 +262,7 @@ def generate_feedback_fewshot(
             break
         except Exception as e:
             last_error = e
-            print("⚠ Feedback parsing failed — retrying once...")
+            print("Feedback parsing failed — retrying once...")
     else:
         raise ValueError(f"Feedback model did not return valid JSON: {last_error}")
 
@@ -282,4 +281,4 @@ def generate_feedback_fewshot(
     print(f"✓ Few-shot feedback saved → {json_path}")
     print(f"✓ Few-shot markdown saved → {md_path}")
 
-    return md_content
+    return json.dumps(parsed)

@@ -50,23 +50,17 @@ def _load_feedback_json(evaluation_id: str) -> dict | None:
         logger.error(f"[FEEDBACK JSON] Failed to read {json_path}: {e}")
         return None
 
-
-# ─── Models ───────────────────────────────────────────────────────────────────
-
 class HITLFeedbackRequest(BaseModel):
     evaluation_id: str
-    agent_name: str                  # "feedback_specialist" | "wireframe_designer"
+    agent_name: str                  
     ai_suggestion: str = ""
-    user_action: str                 # "agree" | "disagree" | "modify"
+    user_action: str              
     user_modified_suggestion: str = ""
 
 
 class WireframeRegenRequest(BaseModel):
-    feedback_user_comment: str = ""   # what user said about feedback report
-    wireframe_user_comment: str = ""  # what user said about wireframe
-
-
-# ─── Full Pipeline ────────────────────────────────────────────────────────────
+    feedback_user_comment: str = ""  
+    wireframe_user_comment: str = ""  
 
 @app.post("/analyze-and-wireframe-s3/{client_id}")
 async def analyze_and_wireframe_s3(
