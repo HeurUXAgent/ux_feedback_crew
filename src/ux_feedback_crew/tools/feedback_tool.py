@@ -11,15 +11,12 @@ load_dotenv()
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-model_name = "projects/75094798515/locations/us-central1/endpoints/4869200987501363200"
+model_name =  os.getenv("GENERIC_FEEDBACK_MODEL")
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
 vertexai.init(project="heuruxagent", location="us-central1")
-
-
-# ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def _extract_json(text: str) -> dict:
     text = text.strip()
@@ -49,7 +46,7 @@ def _normalize_feedback(data: dict) -> dict:
       - missing priority → default to "low"
       - missing effort_estimate → default to "N/A"
     """
-    # ── Normalize feedback_items ──────────────────────────────────────────────
+    # Normalize feedback_items 
     for item in data.get("feedback_items", []):
 
         # Steps key normalization
@@ -88,9 +85,6 @@ def _normalize_feedback(data: dict) -> dict:
         if "wireframe_changes" not in item:
             item["wireframe_changes"] = None
 
-    # ── Normalize ux_score ────────────────────────────────────────────────────
-    # Model sometimes returns overall_ux_score as a flat int instead of the
-    # nested ux_score object we asked for.
     if "ux_score" not in data and "overall_ux_score" in data:
         raw_score = data.pop("overall_ux_score")
         score_int = int(raw_score) if isinstance(raw_score, (int, float)) else 0
@@ -120,12 +114,6 @@ def _normalize_feedback(data: dict) -> dict:
         if isinstance(s.get("score"), (int, float)) and s["score"] <= 10:
             s["score"] = int(s["score"]) * 10
 
-    # ── Normalize summary ─────────────────────────────────────────────────────
-    # If summary is a string that was produced by the model as a paragraph,
-    # wrap it so the frontend can use it as summaryText directly.
-    # (Frontend _ParseResult.tryParse already handles both string and Map.)
-
-    # ── Ensure summary counts match actual items ──────────────────────────────
     items = data.get("feedback_items", [])
     high   = sum(1 for i in items if i.get("priority") == "high")
     medium = sum(1 for i in items if i.get("priority") == "medium")
@@ -168,7 +156,6 @@ def _score_to_severity(score: int) -> str:
 def convert_feedback_to_markdown(feedback_data: dict) -> str:
     md = "# 📋 UX Feedback Report\n\n---\n\n"
 
-    # ── Summary ──
     if "summary" in feedback_data:
         s = feedback_data["summary"]
         if isinstance(s, dict):
@@ -185,7 +172,6 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
             md += "## 📊 Summary\n\n"
             md += f"{s}\n\n---\n\n"
 
-    # ── UX Score ──
     if "ux_score" in feedback_data:
         score_data = feedback_data["ux_score"]
         score     = score_data.get('score', 0)
@@ -246,9 +232,6 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
             md += f"\n**✏️ Wireframe Changes**\n\n{wf}\n\n---\n\n"
 
     return md
-
-
-# ─── Tool ─────────────────────────────────────────────────────────────────────
 
 @tool("generate_feedback")
 def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluation_id: str = "") -> str:
@@ -342,7 +325,6 @@ STRICT RULES:
 RETURN ONLY JSON.
 """
 
-    # ── Generate ──
     model = GenerativeModel(model_name)
     try:
         response = model.generate_content(
@@ -357,11 +339,6 @@ RETURN ONLY JSON.
 
     raw_text = (response.text or "").strip()
 
-    print("=== FEEDBACK MODEL ===", model_name)
-    print("=== RAW OUTPUT (first 1000 chars) ===")
-    print(raw_text[:1000])
-
-    # ── Parse ──
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
@@ -371,7 +348,6 @@ RETURN ONLY JSON.
     # ── Normalize inconsistent model output ──
     parsed_data = _normalize_feedback(parsed_data)
 
-    # ── Save files (named by evaluation_id if provided) ──
     file_id   = evaluation_id if evaluation_id else "latest"
     json_path = OUTPUT_DIR / f"feedback_{file_id}.json"
     md_path   = OUTPUT_DIR / f"feedback_{file_id}.md"
@@ -386,5 +362,4 @@ RETURN ONLY JSON.
 
     print(f"✓ Saved → {json_path} | {md_path}")
 
-    # ── Return markdown directly (not JSON, not a dict) ──
     return md_content
