@@ -25,7 +25,8 @@ class UxFeedbackCrew():
         self.llm_vision     = LLM(model=f"gemini/{os.getenv('GEMINI_VISION_MODEL')}")
         self.llm_heuristic  = LLM(model=f"gemini/{os.getenv('GEMINI_HEURISTIC_MODEL')}")
         # self.llm_feedback   = LLM(model=f"vertex_ai/projects/75094798515/locations/us-central1/models/178770695071727616@1")
-        self.llm_feedback = LLM(model=f"gemini/{os.getenv('GENERIC_FEEDBACK_MODEL')}")
+        # self.llm_feedback = LLM(model=f"gemini/{os.getenv('GENERIC_FEEDBACK_MODEL')}")
+        self.llm_feedback   = LLM(model=f"gemini/gemini-2.5-flash")  
         self.llm_wireframe  = LLM(model=f"gemini/{os.getenv('GEMINI_WIREFRAME_MODEL')}")
 
     def _progress(self, label: str, step: int):
