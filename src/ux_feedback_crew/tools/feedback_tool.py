@@ -11,7 +11,7 @@ load_dotenv()
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-model_name = "projects/75094798515/locations/us-central1/endpoints/4869200987501363200"
+model_name = os.getenv("FINETUNED_FEEDBACK_MODEL") or os.getenv("GENERIC_FEEDBACK_MODEL") or "gemini-2.5-flash"
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
@@ -349,7 +349,7 @@ RETURN ONLY JSON.
         response = model.generate_content(
             prompt,
             generation_config={
-                "max_output_tokens": 1024,  # reduce from 2048
+                # "max_output_tokens": 1024,  # reduce from 2048
                 "temperature": 0.1          # more deterministic
             }
         )

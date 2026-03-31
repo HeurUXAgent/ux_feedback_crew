@@ -25,7 +25,7 @@ class UxFeedbackCrew():
         self.llm_vision     = LLM(model=f"gemini/{os.getenv('GEMINI_VISION_MODEL')}")
         self.llm_heuristic  = LLM(model=f"gemini/{os.getenv('GEMINI_HEURISTIC_MODEL')}")
         # self.llm_feedback   = LLM(model=f"vertex_ai/projects/75094798515/locations/us-central1/models/178770695071727616@1")
-        self.llm_feedback = LLM(model=f"gemini/gemini-2.5-flash")
+        self.llm_feedback = LLM(model=f"gemini/{os.getenv('GENERIC_FEEDBACK_MODEL')}")
         self.llm_wireframe  = LLM(model=f"gemini/{os.getenv('GEMINI_WIREFRAME_MODEL')}")
 
     def _progress(self, label: str, step: int):
@@ -54,6 +54,7 @@ class UxFeedbackCrew():
                      llm=self.llm_feedback,
                         temperature=0.2,
                     max_tokens=2048,
+                    output_format="",
                      tools=[generate_feedback], verbose=True, allow_delegation=False)
 
     @agent
@@ -85,7 +86,7 @@ class UxFeedbackCrew():
         return Task(config=self.tasks_config['create_wireframe'],
                     callback=self._progress("Wireframe Creation", 90))
 
-    # ─── Crew 1: Full pipeline ─────────────────────────────────────────
+    # Full pipeline
 
     @crew
     def full_flow_crew(self) -> Crew:
@@ -97,11 +98,6 @@ class UxFeedbackCrew():
             process=Process.sequential,
             verbose=True,
         )
-
-    # ─── Crew 2: Wireframe-only regeneration ──────────────────────────
-    # Runs ONLY the wireframe agent.
-    # Context (vision, heuristics, feedback, user comments) is passed
-    # via the inputs dict so the agent has full context to improve.
 
     def wireframe_regen_crew(self) -> Crew:
         return Crew(
