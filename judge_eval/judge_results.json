@@ -1,0 +1,26 @@
+{
+  "vision_analyst": {
+    "component_accuracy": 10,
+    "layout_understanding": 10,
+    "completeness": 10,
+    "overall": 10
+  },
+  "heuristic_evaluator": {
+    "issue_accuracy": 10,
+    "heuristic_mapping": 10,
+    "severity_relevance": 10,
+    "overall": 10
+  },
+  "feedback_specialist": {
+    "accuracy": 10,
+    "actionability": 9,
+    "completeness": 10,
+    "overall": 9
+  },
+  "wireframe_designer": {
+    "improvement_implementation": 9.5,
+    "usability_enhancement": 9.5,
+    "completeness": 10,
+    "overall": 9.7
+  }
+}

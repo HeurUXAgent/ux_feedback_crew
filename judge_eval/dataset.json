@@ -1,0 +1,38 @@
+{
+  "ui_id": "UI1",
+  "screen_type": "Telecom Dashboard / Account Overview",
+  "ground_truth": {
+    "expected_ui_elements": [
+      "dashboard/account overview screen",
+      "status bar and header/navigation controls",
+      "horizontal service or category tabs",
+      "hero banner or branding section",
+      "summary cards for package/data information",
+      "billing or payment summary section",
+      "value-added services section with service icons",
+      "bottom navigation bar",
+      "vertical stacked mobile layout",
+      "clear card-based grouping of content",
+      "color-coded sections and actions",
+      "basic accessibility considerations such as readable labels and tap targets"
+    ],
+    "expected_issues": [
+      "lack of explicit system feedback for actions and loading states",
+      "limited efficiency features for expert users",
+      "insufficient error recognition and recovery support",
+      "lack of help and documentation"
+    ],
+    "expected_heuristics": [
+      "Visibility of system status",
+      "Flexibility and efficiency of use",
+      "Help users recognize, diagnose, and recover from errors",
+      "Help and documentation"
+    ],
+    "expected_improvements": [
+      "add loading indicators or processing states",
+      "improve active states for interactive controls",
+      "add clear error messages and recovery actions",
+      "add help or support entry points"
+    ]
+  }
+}

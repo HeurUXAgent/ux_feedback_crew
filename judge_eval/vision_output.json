@@ -1,0 +1,302 @@
+{
+  "screen_type": "Dashboard / Account Overview",
+  "components": [
+    {
+      "type": "Status Bar",
+      "elements": [
+        {
+          "type": "Text",
+          "content": "10:09"
+        },
+        {
+          "type": "Icon",
+          "name": "WiFi / Network Signal"
+        },
+        {
+          "type": "Icon",
+          "name": "Mobile Signal"
+        },
+        {
+          "type": "Text",
+          "content": "53%"
+        },
+        {
+          "type": "Icon",
+          "name": "Battery"
+        }
+      ]
+    },
+    {
+      "type": "Header Bar",
+      "elements": [
+        {
+          "type": "Icon",
+          "name": "App Logo / Menu",
+          "position": "Left"
+        },
+        {
+          "type": "Account Selector",
+          "content": "011XXXXXXX",
+          "icon": "Dropdown Arrow",
+          "position": "Center"
+        },
+        {
+          "type": "Icon",
+          "name": "Settings",
+          "position": "Right"
+        },
+        {
+          "type": "Icon",
+          "name": "Grid / Apps",
+          "position": "Far Right"
+        }
+      ]
+    },
+    {
+      "type": "Horizontal Scrollable Navigation Tabs",
+      "elements": [
+        {
+          "type": "Tab",
+          "label": "Internet",
+          "icon": "Router",
+          "state": "Selected",
+          "highlight_color": "Green",
+          "text_color": "Yellow"
+        },
+        {
+          "type": "Tab",
+          "label": "PEO TV",
+          "icon": "Monitor",
+          "state": "Default",
+          "highlight_color": "Green"
+        },
+        {
+          "type": "Tab",
+          "label": "Voice",
+          "icon": "Phone",
+          "state": "Default"
+        },
+        {
+          "type": "Tab",
+          "label": "Mobile",
+          "icon": "Mobile Phone",
+          "state": "Default"
+        },
+        {
+          "type": "Tab",
+          "label": "Promo",
+          "icon": "Megaphone",
+          "state": "Default"
+        }
+      ]
+    },
+    {
+      "type": "Hero Banner",
+      "content": "SLTMOBITEL logo with tagline 'The Connection'",
+      "background_color": "Blue"
+    },
+    {
+      "type": "Data / Package Summary Cards",
+      "layout": "Horizontal two-column",
+      "elements": [
+        {
+          "type": "Card",
+          "title": "WEB FAMILY XTRA",
+          "details": [
+            {
+              "label": "Status",
+              "value": "Normal"
+            },
+            {
+              "label": "Loyalty Data",
+              "value": "7.8GB"
+            }
+          ],
+          "action_button": {
+            "label": "Package Upgrade",
+            "icon": "Arrow Right",
+            "color": "Dark Purple"
+          }
+        },
+        {
+          "type": "Card",
+          "title": "DATA Remaining",
+          "details": [
+            {
+              "label": "Standard",
+              "value": "54.0GB"
+            },
+            {
+              "label": "Free",
+              "value": "95.00GB"
+            }
+          ],
+          "action_button": {
+            "label": "More",
+            "icon": "Arrow Right",
+            "color": "Dark Blue"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Filter / Selection Buttons",
+      "elements": [
+        {
+          "type": "Button",
+          "label": "SLT Go",
+          "accent_color": "Dark Blue",
+          "state": "Selected"
+        },
+        {
+          "type": "Button",
+          "label": "Data Add-on",
+          "accent_color": "Green",
+          "state": "Selected"
+        },
+        {
+          "type": "Button",
+          "label": "Extra GB",
+          "accent_color": "Cyan",
+          "state": "Selected"
+        }
+      ]
+    },
+    {
+      "type": "Billing Summary Section",
+      "elements": [
+        {
+          "type": "Text",
+          "content": "Total Payable"
+        },
+        {
+          "type": "Amount",
+          "value": "Rs. 6,977.25"
+        },
+        {
+          "type": "Icon",
+          "name": "Dropdown Arrow"
+        },
+        {
+          "type": "Button",
+          "label": "Pay",
+          "color": "Dark Blue"
+        }
+      ]
+    },
+    {
+      "type": "Section Header",
+      "content": "VALUE ADDED SERVICES"
+    },
+    {
+      "type": "Grid of Service Icons",
+      "layout": "Horizontal scrollable grid (4 items visible)",
+      "elements": [
+        {
+          "type": "Service Item",
+          "label": "Storage",
+          "icon": "Boxes"
+        },
+        {
+          "type": "Service Item",
+          "label": "slt go",
+          "icon": "SLT Go Logo"
+        },
+        {
+          "type": "Service Item",
+          "label": "PEO TV GO",
+          "icon": "PEO TV GO Logo"
+        },
+        {
+          "type": "Service Item",
+          "label": "Kaspersky",
+          "icon": "Kaspersky Bear"
+        }
+      ]
+    },
+    {
+      "type": "Bottom Navigation Bar",
+      "elements": [
+        {
+          "type": "Nav Item",
+          "label": "Digital Life",
+          "icon": "Mobile Hand Tap",
+          "state": "Selected"
+        },
+        {
+          "type": "Nav Item",
+          "label": "Hot Devices",
+          "icon": "Tablet/Phone",
+          "state": "Default"
+        },
+        {
+          "type": "Nav Item",
+          "label": "New",
+          "icon": "Document",
+          "state": "Default"
+        },
+        {
+          "type": "Nav Item",
+          "label": "Bill",
+          "icon": "Bill Document",
+          "state": "Default"
+        },
+        {
+          "type": "Nav Item",
+          "label": "Complaints",
+          "icon": "Exclamation Mark",
+          "state": "Default"
+        }
+      ]
+    }
+  ],
+  "layout_structure": "The screen uses a vertical stacking layout for major sections (header, tabs, banner, cards, billing, services, bottom nav). The header      and bottom navigation appear fixed. Service categories use a horizontal scrollable tab design. Data summaries are presented in a two-column card layout. Value Added Services are displayed in a horizontally        scrolling grid. Whitespace and card containers are used effectively to delineate different content blocks.",
+  "color_scheme": {
+    "primary_colors": {
+      "dark_blue": "#214389 (Header, Bottom Nav, 'Pay' button, 'More'     button, 'SLT Go' accent)",
+      "green": "#33cc33 (Active 'Internet' tab background, 'PEO TV' tab, 'Data Add-on' accent, Kaspersky icon)",
+      "purple": "#6A1A7F ('WEB FAMILY XTRA' & 'DATA Remaining' titles, 'Package      Upgrade' button, Loyalty data text)",
+      "cyan": "#00ffff ('Extra GB' accent, part of SLTMOBITEL logo)"
+    },
+    "secondary_colors": {
+      "light_gray": "#f5f5f5 (Card backgrounds, Toggle button backgrounds, general             background)",
+      "white": "#ffffff (Text on dark backgrounds, Icons, Main background for some sections)",
+      "yellow": "#ffff00 (Active 'Internet' tab text)"
+    }
+  },
+  "typography": {
+    "font_family": "Sans-serif (appears to     be a standard system font like Roboto or Open Sans)",
+    "font_weights": {
+      "bold": "Section titles ('VALUE ADDED SERVICES'), current data amounts, total payable amount, account number",
+      "medium_regular": "Most        other text (status bar, card details, button labels, service names)"
+    },
+    "font_sizes": {
+      "small": "Status bar, service tab labels, bottom nav labels, card details",
+      "medium": "Account number, button labels,          section titles",
+      "large": "Total payable amount, primary data amounts"
+    },
+    "text_colors": "White on dark blue/purple, Black on light gray, Purple for specific data/titles, Yellow for active tab text."
+  },
+  "spacing_and_density": {
+    "overall_density": "Moderate, with a good amount of information presented but generally well-segmented.",
+    "vertical_spacing": "Adequate vertical padding between major sections (e.g.,       header, tabs, banner, cards).",
+    "horizontal_spacing": "Consistent horizontal padding within content blocks and between elements like buttons/icons.",
+    "padding_and_margins": "Good use of internal padding           within cards and buttons, providing breathing room for text and elements.",
+    "tap_target_size": "Most interactive elements (buttons, navigation items, header icons) appear to have sufficient tap target sizes       for comfortable interaction."
+  },
+  "accessibility_observations": [
+    "Color contrast: Generally good for primary text on backgrounds. The yellow text on the light green 'Internet' tab background might be borderline     for some users, but appears acceptable.",
+    "Text legibility: Font sizes are mostly readable. Some smaller text elements (e.g., status bar, detailed card info) could be challenging for users with visual             impairments without zoom features.",
+    "Icon labels: All functional icons (navigation, services) are accompanied by clear text labels, improving discoverability and understanding.",
+    "Tap targets: Interactive        elements are sufficiently sized, reducing accidental taps."
+  ],
+  "notable_patterns": [
+    "Dashboard/Account Overview: Common structure for displaying key user-specific information and actions.",
+    "Card UI: Used for      grouping related data (data/package summaries) in visually distinct blocks.",
+    "Horizontal Scrollable Tabs: For organizing primary categories or services.",
+    "Bottom Navigation Bar: Standard pattern for primary     app navigation, always accessible.",
+    "Hero Banner: Prominent visual space for branding and key messaging.",
+    "Segmented Controls (with unique accent design): Used for selecting or filtering options.",
+    "Grid        Layout for Services: A common way to present a list of additional features or offerings."
+  ]
+}
