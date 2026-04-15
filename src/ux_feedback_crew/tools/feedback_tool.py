@@ -12,7 +12,8 @@ OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # model_name = os.getenv("FINETUNED_FEEDBACK_MODEL") or os.getenv("GENERIC_FEEDBACK_MODEL") or "gemini-2.5-flash"
-model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
+# model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
+model_name = "gemini-2.5-flash"
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
@@ -20,7 +21,7 @@ from vertexai.generative_models import GenerativeModel
 vertexai.init(project="heuruxagent", location="us-central1")
 
 
-# ─── Helpers ──────────────────────────────────────────────────────────────────
+# Helpers
 
 def _extract_json(text: str) -> dict:
     text = text.strip()
@@ -50,7 +51,7 @@ def _normalize_feedback(data: dict) -> dict:
       - missing priority → default to "low"
       - missing effort_estimate → default to "N/A"
     """
-    # ── Normalize feedback_items ──────────────────────────────────────────────
+    # Normalize feedback_items 
     for item in data.get("feedback_items", []):
 
         # Steps key normalization
@@ -251,7 +252,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
     return md
 
 
-# ─── Tool ─────────────────────────────────────────────────────────────────────
+# Tool
 
 @tool("generate_feedback")
 def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluation_id: str = "") -> str:
@@ -351,7 +352,7 @@ RETURN ONLY JSON.
         response = model.generate_content(
             prompt,
             generation_config={
-                "max_output_tokens": 1024,  # reduce from 2048
+                # "max_output_tokens": 1024,  # reduce from 2048
                 "temperature": 0.1          # more deterministic
             }
         )
