@@ -11,8 +11,8 @@ load_dotenv()
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# model_name = os.getenv("FINETUNED_FEEDBACK_MODEL") or os.getenv("GENERIC_FEEDBACK_MODEL") or "gemini-2.5-flash"
-model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
+model_name = "gemini-2.5-flash"
+# model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
