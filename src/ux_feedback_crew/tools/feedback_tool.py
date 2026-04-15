@@ -21,7 +21,6 @@ vertexai.init(project="heuruxagent", location="us-central1")
 
 
 # Helpers
-
 def _extract_json(text: str) -> dict:
     text = text.strip()
     text = re.sub(r"^```json\s*|^```\s*|```$", "", text, flags=re.IGNORECASE | re.MULTILINE).strip()
@@ -351,7 +350,7 @@ RETURN ONLY JSON.
         response = model.generate_content(
             prompt,
             generation_config={
-                # "max_output_tokens": 1024,  # reduce from 2048
+                "max_output_tokens": 2048,  # reduce from 2048
                 "temperature": 0.1          # more deterministic
             }
         )
