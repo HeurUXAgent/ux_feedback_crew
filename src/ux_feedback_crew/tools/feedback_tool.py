@@ -23,17 +23,26 @@ vertexai.init(project="heuruxagent", location="us-central1")
 # Helpers
 def _extract_json(text: str) -> dict:
     text = text.strip()
-    text = re.sub(r"^```json\s*|^```\s*|```$", "", text, flags=re.IGNORECASE | re.MULTILINE).strip()
+
+    # remove code fences anywhere
+    text = re.sub(r"```json\s*|```", "", text, flags=re.IGNORECASE).strip()
+
+    # try full text first
     try:
         return json.loads(text)
     except Exception:
         pass
-    match = re.search(r"\{[\s\S]*\}", text)
-    if match:
+
+    # try first {...} block
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        candidate = text[start:end + 1]
         try:
-            return json.loads(match.group(0))
+            return json.loads(candidate)
         except Exception:
             pass
+
     raise ValueError("No valid JSON found in model output")
 
 
@@ -90,9 +99,6 @@ def _normalize_feedback(data: dict) -> dict:
         if "wireframe_changes" not in item:
             item["wireframe_changes"] = None
 
-    # ── Normalize ux_score ────────────────────────────────────────────────────
-    # Model sometimes returns overall_ux_score as a flat int instead of the
-    # nested ux_score object we asked for.
     if "ux_score" not in data and "overall_ux_score" in data:
         raw_score = data.pop("overall_ux_score")
         score_int = int(raw_score) if isinstance(raw_score, (int, float)) else 0
@@ -106,7 +112,6 @@ def _normalize_feedback(data: dict) -> dict:
             "reasoning": data.get("summary", "") if isinstance(data.get("summary"), str) else "",
         }
     elif "ux_score" in data and isinstance(data["ux_score"], (int, float)):
-        # Edge case: ux_score was set as a bare number
         score_int = int(data["ux_score"])
         if score_int <= 10:
             score_int = score_int * 10
@@ -117,17 +122,11 @@ def _normalize_feedback(data: dict) -> dict:
             "reasoning": "",
         }
     elif "ux_score" in data and isinstance(data["ux_score"], dict):
-        # Normalize scale inside the object if needed
         s = data["ux_score"]
         if isinstance(s.get("score"), (int, float)) and s["score"] <= 10:
             s["score"] = int(s["score"]) * 10
 
-    # ── Normalize summary ─────────────────────────────────────────────────────
-    # If summary is a string that was produced by the model as a paragraph,
-    # wrap it so the frontend can use it as summaryText directly.
-    # (Frontend _ParseResult.tryParse already handles both string and Map.)
-
-    # ── Ensure summary counts match actual items ──────────────────────────────
+    #  Ensure summary counts match actual items 
     items = data.get("feedback_items", [])
     high   = sum(1 for i in items if i.get("priority") == "high")
     medium = sum(1 for i in items if i.get("priority") == "medium")
@@ -139,10 +138,9 @@ def _normalize_feedback(data: dict) -> dict:
         data["summary"]["medium"]       = medium
         data["summary"]["low"]          = low
     elif isinstance(data.get("summary"), str):
-        # Keep the string summary as-is; Flutter handles it fine.
         pass
     else:
-        # No summary at all — synthesize a minimal one
+        # If no summary at all synthesize a minimal one
         data["summary"] = {
             "total_issues": len(items),
             "high": high,
@@ -170,7 +168,7 @@ def _score_to_severity(score: int) -> str:
 def convert_feedback_to_markdown(feedback_data: dict) -> str:
     md = "# 📋 UX Feedback Report\n\n---\n\n"
 
-    # ── Summary ──
+    # Summary
     if "summary" in feedback_data:
         s = feedback_data["summary"]
         if isinstance(s, dict):
@@ -187,7 +185,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
             md += "## 📊 Summary\n\n"
             md += f"{s}\n\n---\n\n"
 
-    # ── UX Score ──
+    # UX Score
     if "ux_score" in feedback_data:
         score_data = feedback_data["ux_score"]
         score     = score_data.get('score', 0)
@@ -201,7 +199,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
         md += f"> **Severity:** {severity}\n\n"
         md += f"{reasoning}\n\n---\n\n"
 
-    # ── Quick Wins ──
+    # Quick Wins
     if feedback_data.get("quick_wins"):
         md += "## ⚡ Quick Wins\n\n"
         for w in feedback_data["quick_wins"]:
@@ -210,7 +208,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
             md += f"  - ⏱ Effort: `{w.get('effort', 'N/A')}`\n"
         md += "\n---\n\n"
 
-    # ── Recommendations grouped by priority ──
+    # Recommendations grouped by priority
     items = feedback_data.get("feedback_items", [])
     grouped = {"high": [], "medium": [], "low": []}
     for item in items:
@@ -233,7 +231,7 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
             title  = item.get('title', 'Recommendation')
             effort = item.get('effort_estimate', 'N/A')
             why    = item.get('why_it_matters', 'N/A')
-            steps  = item.get('what_to_do', [])   # already normalized
+            steps  = item.get('what_to_do', [])   
             wf     = item.get('wireframe_changes', 'N/A')
 
             md += f"#### `[{tag}]` {title}\n\n"
@@ -251,7 +249,6 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
 
 
 # Tool
-
 @tool("generate_feedback")
 def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluation_id: str = "") -> str:
     """
@@ -344,14 +341,13 @@ STRICT RULES:
 RETURN ONLY JSON.
 """
 
-    # ── Generate ──
     model = GenerativeModel(model_name)
     try:
         response = model.generate_content(
             prompt,
             generation_config={
-                "max_output_tokens": 2048,  # reduce from 2048
-                "temperature": 0.1          # more deterministic
+                "max_output_tokens": 2048,
+                "temperature": 0.1
             }
         )
     except Exception as e:
@@ -360,20 +356,26 @@ RETURN ONLY JSON.
     raw_text = (response.text or "").strip()
 
     print("=== FEEDBACK MODEL ===", model_name)
+    print("=== RAW OUTPUT LENGTH ===", len(raw_text))
     print("=== RAW OUTPUT (first 1000 chars) ===")
     print(raw_text[:1000])
+    print("=== RAW OUTPUT END (last 500 chars) ===")
+    print(raw_text[-500:])
 
-    # ── Parse ──
     try:
         parsed_data = _extract_json(raw_text)
     except Exception as e:
         print(f"JSON parse error: {e}")
-        return f"Error: Could not parse JSON. Raw: {raw_text[:300]}"
 
-    # ── Normalize inconsistent model output ──
+        file_id = evaluation_id if evaluation_id else "latest"
+        raw_path = OUTPUT_DIR / f"feedback_raw_{file_id}.txt"
+        with open(raw_path, "w", encoding="utf-8") as f:
+            f.write(raw_text)
+
+        return raw_text
+
     parsed_data = _normalize_feedback(parsed_data)
 
-    # ── Save files (named by evaluation_id if provided) ──
     file_id   = evaluation_id if evaluation_id else "latest"
     json_path = OUTPUT_DIR / f"feedback_{file_id}.json"
     md_path   = OUTPUT_DIR / f"feedback_{file_id}.md"
@@ -388,5 +390,4 @@ RETURN ONLY JSON.
 
     print(f"✓ Saved → {json_path} | {md_path}")
 
-    # ── Return markdown directly (not JSON, not a dict) ──
     return md_content
