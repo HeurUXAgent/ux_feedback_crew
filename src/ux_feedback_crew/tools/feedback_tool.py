@@ -390,4 +390,4 @@ RETURN ONLY JSON.
 
     print(f"✓ Saved → {json_path} | {md_path}")
 
-    return md_content
+    return json.dumps(parsed_data, ensure_ascii=False)
