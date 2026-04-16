@@ -14,17 +14,12 @@ DB_NAME = os.getenv("DB_NAME", "heuruxagent_db")
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 
-# ─── Collections ──────────────────────────────────────────────────────────────
 evaluations_collection = db["evaluations"]
 
-# ─── Indexes ──────────────────────────────────────────────────────────────────
 evaluations_collection.create_index([("user_id", DESCENDING)])
 evaluations_collection.create_index([("evaluation_id", DESCENDING)], unique=True)
 evaluations_collection.create_index([("timestamps.created_at", DESCENDING)])
 evaluations_collection.create_index([("status", DESCENDING)])
-
-
-# ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
@@ -68,7 +63,6 @@ def _parse_heuristic_scores(raw_text: str) -> dict:
 
     scores = {}
     for key, keywords in score_keys.items():
-        # Look for patterns like "Score: 7" or "7/10" near the keyword
         for keyword in keywords:
             pattern = rf"{keyword}.*?(\d+)\s*/?\s*10"
             match = re.search(pattern, raw_text.lower())
@@ -76,7 +70,7 @@ def _parse_heuristic_scores(raw_text: str) -> dict:
                 scores[key] = int(match.group(1))
                 break
         if key not in scores:
-            scores[key] = None  # Not found — don't guess
+            scores[key] = None  
 
     return scores
 
@@ -126,8 +120,6 @@ def _compute_ux_score(scores: dict) -> Optional[float]:
     return round(sum(valid) / len(valid), 2)
 
 
-# ─── Core Save Function ───────────────────────────────────────────────────────
-
 def create_evaluation_document(
     evaluation_id: str,
     user_id: str,
@@ -142,11 +134,11 @@ def create_evaluation_document(
         "user_id": user_id,
         "input": {
             "screenshot_url": screenshot_url,
-            "screen_type": "unknown",       # updated after vision analysis
+            "screen_type": "unknown",      
             "uploaded_at": _now(),
         },
         "status": "processing",
-        "ai_results": None,                 # populated when pipeline completes
+        "ai_results": None,                
         "hitl_feedback": {
             "review_status": "pending",
             "responses": [],
@@ -196,7 +188,7 @@ def complete_evaluation(
                 "feedback_report": feedback_parsed,
                 "improved_design": {
                     "html_code": wireframe_html,
-                    "preview_image_url": None,   # can be set if you render + upload to S3
+                    "preview_image_url": None,   
                 },
                 "ux_score": ux_score,
             },
@@ -219,14 +211,11 @@ def fail_evaluation(evaluation_id: str, error: str) -> bool:
     )
     return True
 
-
-# ─── HITL Feedback ────────────────────────────────────────────────────────────
-
 def save_hitl_response(
     evaluation_id: str,
     agent_name: str,
     ai_suggestion: str,
-    user_action: str,           # "agree" | "disagree" | "modify"
+    user_action: str,          
     user_modified_suggestion: str,
     reviewed_by: str,
 ) -> bool:
@@ -252,8 +241,6 @@ def save_hitl_response(
     )
     return True
 
-
-# ─── Fetch Functions ──────────────────────────────────────────────────────────
 
 def get_evaluation(evaluation_id: str) -> Optional[dict]:
     """Fetch single evaluation by ID. Excludes MongoDB _id."""
@@ -313,8 +300,6 @@ def update_wireframe(
     """
     from datetime import datetime, timezone
 
-    # Ensure we use the existing collection logic from your file
-    # If get_db() isn't defined in your helper section, use the global 'evaluations_collection'
     collection = evaluations_collection 
 
     # Prepare the update document

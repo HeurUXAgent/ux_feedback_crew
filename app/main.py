@@ -51,22 +51,22 @@ def _load_feedback_json(evaluation_id: str) -> dict | None:
         return None
 
 
-# ─── Models ───────────────────────────────────────────────────────────────────
+# Models
 
 class HITLFeedbackRequest(BaseModel):
     evaluation_id: str
-    agent_name: str                  # "feedback_specialist" | "wireframe_designer"
+    agent_name: str                 
     ai_suggestion: str = ""
-    user_action: str                 # "agree" | "disagree" | "modify"
+    user_action: str                 
     user_modified_suggestion: str = ""
 
 
 class WireframeRegenRequest(BaseModel):
-    feedback_user_comment: str = ""   # what user said about feedback report
-    wireframe_user_comment: str = ""  # what user said about wireframe
+    feedback_user_comment: str = ""   
+    wireframe_user_comment: str = ""  
 
 
-# ─── Full Pipeline ────────────────────────────────────────────────────────────
+# Full Pipeline
 
 @app.post("/analyze-and-wireframe-s3/{client_id}")
 async def analyze_and_wireframe_s3(
@@ -96,8 +96,8 @@ async def analyze_and_wireframe_s3(
         return {
             "evaluation_id": job_id,
             "image_url": image_url,
-            "feedback": feedback_md,          # readable markdown
-            "feedback_json": feedback_json,   # structured JSON for frontend
+            "feedback": feedback_md,         
+            "feedback_json": feedback_json,   
             "wireframe": str(result.tasks_output[3].raw),
         }
     
@@ -107,7 +107,7 @@ async def analyze_and_wireframe_s3(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ─── Wireframe Regeneration ───────────────────────────────────────────────────
+# Wireframe Regeneration 
 
 @app.post("/regenerate-wireframe/{evaluation_id}/{client_id}")
 async def regenerate_wireframe(
@@ -173,7 +173,7 @@ async def regenerate_wireframe(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ─── Save HITL Review ─────────────────────────────────────────────────────────
+# Save HITL Review 
 
 @app.post("/submit-feedback")
 async def submit_hitl_feedback(
@@ -195,7 +195,7 @@ async def submit_hitl_feedback(
     return {"message": "Feedback saved", "evaluation_id": body.evaluation_id}
 
 
-# ─── Fetch ────────────────────────────────────────────────────────────────────
+# Fetch 
 
 @app.get("/evaluation/{evaluation_id}")
 async def get_single_evaluation(evaluation_id: str):

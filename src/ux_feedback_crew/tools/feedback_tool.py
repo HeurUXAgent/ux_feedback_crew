@@ -11,8 +11,8 @@ load_dotenv()
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-model_name = "gemini-2.5-flash"
-# model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
+# model_name = os.getenv("FINETUNED_FEEDBACK_MODEL") or os.getenv("GENERIC_FEEDBACK_MODEL") or "gemini-2.5-flash"
+model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
@@ -33,7 +33,6 @@ def _extract_json(text: str) -> dict:
     except Exception:
         pass
 
-    # try first {...} block
     start = text.find("{")
     end = text.rfind("}")
     if start != -1 and end != -1 and end > start:
@@ -77,25 +76,21 @@ def _normalize_feedback(data: dict) -> dict:
                     item["what_to_do"] = item.pop(alias)
                     break
 
-        # Ensure what_to_do is always a list
+        # Ensuring what_to_do is always a list
         if "what_to_do" in item and isinstance(item["what_to_do"], str):
             item["what_to_do"] = [item["what_to_do"]]
 
-        # Priority default
         if "priority" not in item or not item["priority"]:
             item["priority"] = "low"
         else:
             item["priority"] = item["priority"].lower().strip()
 
-        # Effort default
         if "effort_estimate" not in item or not item["effort_estimate"]:
             item["effort_estimate"] = "N/A"
 
-        # why_it_matters default
         if "why_it_matters" not in item:
             item["why_it_matters"] = item.pop("why", "") or ""
 
-        # wireframe_changes default
         if "wireframe_changes" not in item:
             item["wireframe_changes"] = None
 
@@ -346,7 +341,7 @@ RETURN ONLY JSON.
         response = model.generate_content(
             prompt,
             generation_config={
-                "max_output_tokens": 2048,
+                # "max_output_tokens": 2048,
                 "temperature": 0.1
             }
         )
@@ -354,13 +349,6 @@ RETURN ONLY JSON.
         return f"Error calling model: {e}"
 
     raw_text = (response.text or "").strip()
-
-    print("=== FEEDBACK MODEL ===", model_name)
-    print("=== RAW OUTPUT LENGTH ===", len(raw_text))
-    print("=== RAW OUTPUT (first 1000 chars) ===")
-    print(raw_text[:1000])
-    print("=== RAW OUTPUT END (last 500 chars) ===")
-    print(raw_text[-500:])
 
     try:
         parsed_data = _extract_json(raw_text)

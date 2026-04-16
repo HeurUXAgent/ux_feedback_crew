@@ -5,10 +5,8 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Add project root to path so it can find app/src if needed
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Load environment variables from .env
 load_dotenv()
 
 def map_severity(sev):
@@ -25,18 +23,17 @@ def calculate_ux_score(group):
     return round(score, 2)
 
 def migrate_dataset():
-    # 1. Paths
     csv_path = Path("data/ux_expert_evaluation_dataset.csv")
     
     if not csv_path.exists():
         print(f"❌ Error: File not found at {csv_path}")
         return
 
-    # 2. Load Data
+    # Load Data
     print(f"📂 Loading dataset from {csv_path}...")
     df = pd.read_csv(csv_path)
     
-    # 3. Connect to MongoDB
+    # Connect to MongoDB
     uri = os.getenv("MONGO_URI") 
     if not uri:
         print("❌ Error: MONGO_URI not found in .env file")
@@ -48,7 +45,7 @@ def migrate_dataset():
 
     documents = []
 
-    # 4. Group by ui_id and perform Mapping
+    # Group by ui_id and perform Mapping
     print("🧠 Mapping expert evaluations to Agent JSON format...")
     for ui_id, group in df.groupby('ui_id'):
         first_row = group.iloc[0]
@@ -89,10 +86,9 @@ def migrate_dataset():
         }
         documents.append(doc)
 
-    # 5. Insert into MongoDB
+    # Insert into MongoDB
     if documents:
         print(f"🚀 Uploading {len(documents)} documents to MongoDB...")
-        # collection.delete_many({}) # Uncomment if you want to clear old data first
         collection.insert_many(documents)
         print("✅ Migration Successful!")
     else:

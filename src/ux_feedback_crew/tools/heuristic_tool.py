@@ -17,16 +17,13 @@ model_name = os.getenv("GEMINI_HEURISTIC_MODEL")
 def _extract_json(text: str) -> dict:
     text = text.strip()
 
-    # Remove markdown code fences safely
     text = re.sub(r"^```json\s*|^```\s*|```$", "", text.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
 
-    # Try direct parse
     try:
         return json.loads(text)
     except Exception:
         pass
 
-    # Fallback: extract first JSON object
     match = re.search(r"\{[\s\S]*\}", text)
     if match:
         try:

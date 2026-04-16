@@ -1,11 +1,6 @@
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Union
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Feedback Item
-# ─────────────────────────────────────────────────────────────────────────────
-
 class FeedbackItem(BaseModel):
     title: str = "Untitled Recommendation"
     priority: str = "low"
@@ -46,10 +41,6 @@ class FeedbackItem(BaseModel):
         return str(v).strip()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# UX Score
-# ─────────────────────────────────────────────────────────────────────────────
-
 class UXScore(BaseModel):
     score: float = 0.0
     grade: str = "N/A"
@@ -69,11 +60,6 @@ class UXScore(BaseModel):
     def normalize_grade(cls, v):
         return str(v).strip() if v else "N/A"
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Summary
-# ─────────────────────────────────────────────────────────────────────────────
-
 class FeedbackSummary(BaseModel):
     total_issues: int = 0
     high: int = 0
@@ -86,11 +72,6 @@ class FeedbackSummary(BaseModel):
             return int(v)
         except (TypeError, ValueError):
             return 0
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Full Report
-# ─────────────────────────────────────────────────────────────────────────────
 
 class FeedbackReport(BaseModel):
     feedback_items: List[FeedbackItem] = []

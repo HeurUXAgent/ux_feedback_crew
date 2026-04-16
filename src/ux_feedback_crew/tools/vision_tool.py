@@ -22,17 +22,14 @@ def _extract_json(text: str) -> dict:
     """
     text = text.strip()
 
-    # Removing the code fences if present
     if "```" in text:
         text = re.split(r"```(?:json)?", text)[1].strip()
 
-    # Try direct parse
     try:
         return json.loads(text)
     except Exception:
         pass
 
-    # Try to find JSON substring
     match = re.search(r"\{[\s\S]*\}", text)
     if match:
         try:
@@ -60,10 +57,6 @@ def analyze_ui_screenshot(image_path: str) -> str:
 
     client = genai.Client(api_key=api_key)
 
-    # img = Image.open(image_path)
-    # img_bytes = io.BytesIO()
-    # img.save(img_bytes, format=img.format or "PNG")
-    # 🔹 Support both local path and S3 URL
     if image_path.startswith("http"):
         response = requests.get(image_path)
         response.raise_for_status()
@@ -93,7 +86,7 @@ Return ONLY valid JSON in this structure:
 
     last_error = None
 
-    for attempt in range(2):  # 🔒 one retry for stability
+    for attempt in range(2): 
         response = client.models.generate_content(
             model=model_name,
             contents=[prompt, img]

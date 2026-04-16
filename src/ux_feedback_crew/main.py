@@ -44,7 +44,6 @@ os.makedirs("outputs", exist_ok=True)
 
 
 # Models 
-
 class HITLFeedbackRequest(BaseModel):
     evaluation_id: str
     agent_name: str                   
