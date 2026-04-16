@@ -2,219 +2,32 @@ import os
 import json
 import re
 from pathlib import Path
-from typing import List, Optional, Literal
-
 from dotenv import load_dotenv
 from crewai.tools import tool
 from src.utils.context_guard import truncate_text
-from pydantic import BaseModel, validator
-
-# Vertex structured output is best used through google-genai.
-from google import genai
-from google.genai.types import GenerateContentConfig
 
 load_dotenv()
 
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Tuned endpoint
+# model_name = os.getenv("FINETUNED_FEEDBACK_MODEL") or os.getenv("GENERIC_FEEDBACK_MODEL") or "gemini-2.5-flash"
 model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
 
-# Gen AI client for Vertex
-client = genai.Client(
-    vertexai=True,
-    project="heuruxagent",
-    location="us-central1",
-)
+import vertexai
+from vertexai.generative_models import GenerativeModel
 
-# -----------------------------------------------------------------------------
-# Response schema
-# Keep this compact. Vertex structured output supports a subset of schema fields.
-# -----------------------------------------------------------------------------
-RESPONSE_SCHEMA = {
-    "type": "OBJECT",
-    "properties": {
-        "feedback_items": {
-            "type": "ARRAY",
-            "items": {
-                "type": "OBJECT",
-                "properties": {
-                    "title": {"type": "STRING"},
-                    "priority": {
-                        "type": "STRING",
-                        "enum": ["high", "medium", "low"],
-                    },
-                    "effort_estimate": {
-                        "type": "STRING",
-                        "enum": ["low", "medium", "high"],
-                    },
-                    "why_it_matters": {"type": "STRING"},
-                    "what_to_do": {
-                        "type": "ARRAY",
-                        "items": {"type": "STRING"},
-                    },
-                    "wireframe_changes": {
-                        "type": "STRING",
-                        "nullable": True,
-                    },
-                },
-                "required": [
-                    "title",
-                    "priority",
-                    "effort_estimate",
-                    "why_it_matters",
-                    "what_to_do",
-                    "wireframe_changes",
-                ],
-            },
-        },
-        "ux_score": {
-            "type": "OBJECT",
-            "properties": {
-                "score": {"type": "NUMBER"},
-                "grade": {
-                    "type": "STRING",
-                    "enum": ["A", "B", "C", "D", "F"],
-                },
-            },
-            "required": ["score", "grade"],
-        },
-        "summary": {
-            "type": "OBJECT",
-            "properties": {
-                "total_issues": {"type": "INTEGER"},
-                "high": {"type": "INTEGER"},
-                "medium": {"type": "INTEGER"},
-                "low": {"type": "INTEGER"},
-            },
-            "required": ["total_issues", "high", "medium", "low"],
-        },
-    },
-    "required": ["feedback_items", "ux_score", "summary"],
-}
+vertexai.init(project="heuruxagent", location="us-central1")
 
 
-# -----------------------------------------------------------------------------
-# Pydantic safety net
-# IMPORTANT:
-# - Keep score in 0-10 internally.
-# - Do not silently convert enum-like fields to "N/A" values outside schema.
-# -----------------------------------------------------------------------------
-class _FeedbackItem(BaseModel):
-    title: str
-    priority: Literal["high", "medium", "low"]
-    effort_estimate: Literal["low", "medium", "high"]
-    why_it_matters: str
-    what_to_do: List[str]
-    wireframe_changes: Optional[str] = None
-
-    @validator("title", "why_it_matters", pre=True, always=True)
-    def _clean_required_strings(cls, v):
-        return str(v).strip() if v is not None else ""
-
-    @validator("what_to_do", pre=True, always=True)
-    def _clean_steps(cls, v):
-        if v is None:
-            return []
-        if isinstance(v, str):
-            v = [v]
-        if isinstance(v, list):
-            return [str(s).strip() for s in v if str(s).strip()]
-        return []
-
-    @validator("wireframe_changes", pre=True, always=True)
-    def _clean_wireframe_changes(cls, v):
-        if v is None:
-            return None
-        s = str(v).strip()
-        return s if s else None
-
-
-class _UXScore(BaseModel):
-    score: float
-    grade: Literal["A", "B", "C", "D", "F"]
-
-    @validator("score", pre=True, always=True)
-    def _clean_score(cls, v):
-        try:
-            score = float(v)
-        except (TypeError, ValueError):
-            score = 0.0
-
-        # Keep backend JSON in 0-10 scale
-        if score < 0:
-            score = 0.0
-        if score > 10:
-            score = 10.0
-        return round(score, 1)
-
-
-class _Summary(BaseModel):
-    total_issues: int
-    high: int
-    medium: int
-    low: int
-
-    @validator("total_issues", "high", "medium", "low", pre=True, always=True)
-    def _clean_ints(cls, v):
-        try:
-            value = int(v)
-        except (TypeError, ValueError):
-            value = 0
-        return max(0, value)
-
-
-class _FeedbackReport(BaseModel):
-    feedback_items: List[_FeedbackItem]
-    ux_score: _UXScore
-    summary: _Summary
-
-    def to_frontend_dict(self) -> dict:
-        # Recompute summary from actual items so counts always match
-        items = self.feedback_items
-        high = sum(1 for i in items if i.priority == "high")
-        medium = sum(1 for i in items if i.priority == "medium")
-        low = sum(1 for i in items if i.priority == "low")
-
-        return {
-            "feedback_items": [
-                {
-                    "title": i.title,
-                    "priority": i.priority,
-                    "effort_estimate": i.effort_estimate,
-                    "why_it_matters": i.why_it_matters,
-                    "what_to_do": i.what_to_do,
-                    "wireframe_changes": i.wireframe_changes,
-                }
-                for i in items
-            ],
-            "ux_score": {
-                # keep 0-10 in backend JSON
-                "score": self.ux_score.score,
-                "grade": self.ux_score.grade,
-            },
-            "summary": {
-                "total_issues": len(items),
-                "high": high,
-                "medium": medium,
-                "low": low,
-            },
-        }
-
-
-def _validate_report(raw: dict) -> _FeedbackReport:
-    return _FeedbackReport(**raw)
-
-
-def _extract_json_loose(text: str) -> dict:
-    """
-    Fallback parser only for endpoint/schema fallback mode.
-    Tries hard to recover JSON if the model adds code fences or extra text.
-    """
+# Helpers
+def _extract_json(text: str) -> dict:
     text = text.strip()
+
+    # remove code fences anywhere
     text = re.sub(r"```json\s*|```", "", text, flags=re.IGNORECASE).strip()
 
+    # try full text first
     try:
         return json.loads(text)
     except Exception:
@@ -224,39 +37,173 @@ def _extract_json_loose(text: str) -> dict:
     end = text.rfind("}")
     if start != -1 and end != -1 and end > start:
         candidate = text[start:end + 1]
-        return json.loads(candidate)
+        try:
+            return json.loads(candidate)
+        except Exception:
+            pass
 
-    raise ValueError("No valid JSON found in model output.")
+    raise ValueError("No valid JSON found in model output")
+
+
+def _normalize_feedback(data: dict) -> dict:
+    """
+    Normalize inconsistent keys that the model sometimes returns
+    instead of the schema we defined in the prompt.
+
+    Handles:
+      - actionable_steps / how_to_fix / action_steps / technical_steps → what_to_do
+      - overall_ux_score (flat int) → ux_score { score, grade, severity, reasoning }
+      - summary as a plain string → leave as-is (frontend handles both)
+      - missing priority → default to "low"
+      - missing effort_estimate → default to "N/A"
+    """
+    # Normalize feedback_items 
+    for item in data.get("feedback_items", []):
+
+        # Steps key normalization
+        STEP_KEY_ALIASES = (
+            "actionable_steps",
+            "how_to_fix",
+            "action_steps",
+            "technical_steps",
+            "steps",
+            "action_items",
+            "recommendation",
+        )
+        if "what_to_do" not in item:
+            for alias in STEP_KEY_ALIASES:
+                if alias in item:
+                    item["what_to_do"] = item.pop(alias)
+                    break
+
+        # Ensuring what_to_do is always a list
+        if "what_to_do" in item and isinstance(item["what_to_do"], str):
+            item["what_to_do"] = [item["what_to_do"]]
+
+        if "priority" not in item or not item["priority"]:
+            item["priority"] = "low"
+        else:
+            item["priority"] = item["priority"].lower().strip()
+
+        if "effort_estimate" not in item or not item["effort_estimate"]:
+            item["effort_estimate"] = "N/A"
+
+        if "why_it_matters" not in item:
+            item["why_it_matters"] = item.pop("why", "") or ""
+
+        if "wireframe_changes" not in item:
+            item["wireframe_changes"] = None
+
+    if "ux_score" not in data and "overall_ux_score" in data:
+        raw_score = data.pop("overall_ux_score")
+        score_int = int(raw_score) if isinstance(raw_score, (int, float)) else 0
+        # Normalize 0-10 scale to 0-100
+        if score_int <= 10:
+            score_int = score_int * 10
+        data["ux_score"] = {
+            "score": score_int,
+            "grade": _score_to_grade(score_int),
+            "severity": _score_to_severity(score_int),
+            "reasoning": data.get("summary", "") if isinstance(data.get("summary"), str) else "",
+        }
+    elif "ux_score" in data and isinstance(data["ux_score"], (int, float)):
+        score_int = int(data["ux_score"])
+        if score_int <= 10:
+            score_int = score_int * 10
+        data["ux_score"] = {
+            "score": score_int,
+            "grade": _score_to_grade(score_int),
+            "severity": _score_to_severity(score_int),
+            "reasoning": "",
+        }
+    elif "ux_score" in data and isinstance(data["ux_score"], dict):
+        s = data["ux_score"]
+        if isinstance(s.get("score"), (int, float)) and s["score"] <= 10:
+            s["score"] = int(s["score"]) * 10
+
+    #  Ensure summary counts match actual items 
+    items = data.get("feedback_items", [])
+    high   = sum(1 for i in items if i.get("priority") == "high")
+    medium = sum(1 for i in items if i.get("priority") == "medium")
+    low    = sum(1 for i in items if i.get("priority") == "low")
+
+    if isinstance(data.get("summary"), dict):
+        data["summary"]["total_issues"] = len(items)
+        data["summary"]["high"]         = high
+        data["summary"]["medium"]       = medium
+        data["summary"]["low"]          = low
+    elif isinstance(data.get("summary"), str):
+        pass
+    else:
+        # If no summary at all synthesize a minimal one
+        data["summary"] = {
+            "total_issues": len(items),
+            "high": high,
+            "medium": medium,
+            "low": low,
+            "estimated_total_effort": "N/A",
+        }
+
+    return data
+
+
+def _score_to_grade(score: int) -> str:
+    if score >= 85: return "excellent"
+    if score >= 70: return "good"
+    if score >= 50: return "average"
+    return "poor"
+
+
+def _score_to_severity(score: int) -> str:
+    if score >= 75: return "low"
+    if score >= 50: return "moderate"
+    return "high"
 
 
 def convert_feedback_to_markdown(feedback_data: dict) -> str:
     md = "# 📋 UX Feedback Report\n\n---\n\n"
 
+    # Summary
     if "summary" in feedback_data:
         s = feedback_data["summary"]
         if isinstance(s, dict):
-            total = s.get("total_issues", 0)
-            high = s.get("high", 0)
-            med = s.get("medium", 0)
-            low = s.get("low", 0)
+            total  = s.get('total_issues', 0)
+            high   = s.get('high', 0)
+            med    = s.get('medium', 0)
+            low    = s.get('low', 0)
+            effort = s.get('estimated_total_effort', 'N/A')
             md += "## 📊 Summary\n\n"
             md += f"> 🔢 **{total} issues found** — "
-            md += f"🔴 {high} High · 🟡 {med} Medium · 🟢 {low} Low\n\n---\n\n"
+            md += f"🔴 {high} High · 🟡 {med} Medium · 🟢 {low} Low\n"
+            md += f"> ⏱ Estimated Effort: **{effort}**\n\n---\n\n"
+        elif isinstance(s, str) and s.strip():
+            md += "## 📊 Summary\n\n"
+            md += f"{s}\n\n---\n\n"
 
+    # UX Score
     if "ux_score" in feedback_data:
         score_data = feedback_data["ux_score"]
-        score = score_data.get("score", 0)
-        grade = str(score_data.get("grade", "N/A")).upper()
-
-        # Convert only for display
-        if isinstance(score, (int, float)):
-            display_score = int(round(score * 10)) if score <= 10 else int(round(score))
-        else:
-            display_score = 0
-
+        score     = score_data.get('score', 0)
+        grade     = str(score_data.get('grade', 'N/A')).upper()
+        severity  = score_data.get('severity', 'N/A')
+        reasoning = score_data.get('reasoning', 'N/A')
+        if isinstance(score, (int, float)) and score <= 10:
+            score = int(score * 10)
         md += "## 🎯 Overall UX Score\n\n"
-        md += f"> ### {display_score} / 100 — {grade}\n\n---\n\n"
+        md += f"> ### {score} / 100 — {grade}\n"
+        md += f"> **Severity:** {severity}\n\n"
+        md += f"{reasoning}\n\n---\n\n"
 
+    # Quick Wins
+    if feedback_data.get("quick_wins"):
+        md += "## ⚡ Quick Wins\n\n"
+        for w in feedback_data["quick_wins"]:
+            md += f"- ✅ **{w.get('change', 'N/A')}**\n"
+            md += f"  - 💡 {w.get('impact', 'N/A')}\n"
+            md += f"  - ⏱ Effort: `{w.get('effort', 'N/A')}`\n"
+        md += "\n---\n\n"
+
+    # Recommendations grouped by priority
     items = feedback_data.get("feedback_items", [])
     grouped = {"high": [], "medium": [], "low": []}
     for item in items:
@@ -264,9 +211,9 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
         grouped.setdefault(p, []).append(item)
 
     priority_config = [
-        ("high", "🔴 High Priority", "HIGH"),
+        ("high",   "🔴 High Priority",   "HIGH"),
         ("medium", "🟡 Medium Priority", "MEDIUM"),
-        ("low", "🟢 Low Priority", "LOW"),
+        ("low",    "🟢 Low Priority",    "LOW"),
     ]
 
     md += "## 🔧 Detailed Recommendations\n\n"
@@ -274,45 +221,45 @@ def convert_feedback_to_markdown(feedback_data: dict) -> str:
         bucket = grouped.get(key, [])
         if not bucket:
             continue
-
         md += f"### {section_title}\n\n"
         for item in bucket:
-            title = item.get("title", "Recommendation")
-            effort = item.get("effort_estimate", "N/A")
-            why = item.get("why_it_matters", "N/A")
-            steps = item.get("what_to_do", [])
-            wf = item.get("wireframe_changes") or "N/A"
+            title  = item.get('title', 'Recommendation')
+            effort = item.get('effort_estimate', 'N/A')
+            why    = item.get('why_it_matters', 'N/A')
+            steps  = item.get('what_to_do', [])   
+            wf     = item.get('wireframe_changes', 'N/A')
 
             md += f"#### `[{tag}]` {title}\n\n"
             md += f"> ⏱ Effort: **{effort}**\n\n"
             md += f"**💬 Why it matters**\n\n{why}\n\n"
             md += "**🛠 Implementation Steps**\n\n"
-
             if isinstance(steps, list):
                 for i, step in enumerate(steps, 1):
                     md += f"{i}. {step}\n"
             else:
                 md += f"1. {steps}\n"
-
             md += f"\n**✏️ Wireframe Changes**\n\n{wf}\n\n---\n\n"
 
     return md
 
 
+# Tool
 @tool("generate_feedback")
-def generate_feedback(
-    vision_analysis: str,
-    heuristic_evaluation: str,
-    evaluation_id: str = "",
-) -> str:
+def generate_feedback(vision_analysis: str, heuristic_evaluation: str, evaluation_id: str = "") -> str:
     """
     Convert UX violations into developer-friendly feedback JSON and save report.
+    Also estimate an overall UX score from 0-100 based on the severity and number of usability issues.
+
+    Args:
+        vision_analysis: JSON string from vision tool.
+        heuristic_evaluation: JSON string from heuristic tool.
+        evaluation_id: Optional ID used to name the saved files.
 
     Returns:
-        JSON string of the validated feedback report.
+        Markdown string of the feedback report.
     """
-    vision_analysis = truncate_text(vision_analysis, 6000)
-    heuristic_evaluation = truncate_text(heuristic_evaluation, 6000)
+    vision_analysis      = truncate_text(vision_analysis, 4000)
+    heuristic_evaluation = truncate_text(heuristic_evaluation, 4000)
 
     prompt = f"""
 TASK: Convert UX violations into structured UX feedback.
@@ -325,150 +272,110 @@ VISION ANALYSIS:
 HEURISTIC EVALUATION:
 {heuristic_evaluation}
 
-Rules:
-- Keep recommendations practical and UI-specific.
-- Avoid generic phrases like "apply best practices".
-- UX score must be between 0.0 and 10.0.
-- Grade mapping:
-  - 8.5–10 → A
-  - 7–8.4 → B
-  - 5–6.9 → C
-  - 3–4.9 → D
-  - <3 → F
-- Summary counts must match feedback_items exactly.
-- what_to_do must always be a list of specific action steps.
+Return ONLY valid JSON. No explanations. No markdown. No extra text.
+
+Use EXACTLY this structure:
+
+{{
+  "feedback_items": [
+    {{
+      "title": "...",
+      "priority": "high|medium|low",
+      "effort_estimate": "low|medium|high",
+      "why_it_matters": "...",
+      "what_to_do": ["step 1", "step 2"],
+      "wireframe_changes": "..."
+    }}
+  ],
+  "ux_score": {{
+    "score": 7.5,
+    "grade": "A|B|C|D|F"
+  }},
+  "summary": {{
+    "total_issues": 10,
+    "high": 2,
+    "medium": 5,
+    "low": 3
+  }}
+}}
+
+STRICT RULES:
+
+1. Do NOT include any fields other than:
+   - feedback_items
+   - ux_score
+   - summary
+
+2. Each feedback item MUST include:
+   - title
+   - priority
+   - effort_estimate
+   - why_it_matters
+   - what_to_do (array of strings)
+   - wireframe_changes
+
+3. "what_to_do" MUST always be a list of strings.
+
+4. Keep recommendations practical and UI-specific.
+
+5. Avoid generic phrases like "apply best practices".
+
+6. UX score MUST be between 0–10 (can include decimals).
+
+7. Grade mapping:
+   - 8.5–10 → A
+   - 7–8.4 → B
+   - 5–6.9 → C
+   - 3–4.9 → D
+   - <3 → F
+
+8. Summary counts MUST match feedback_items exactly.
+
+9. DO NOT wrap JSON in ``` or add any explanation.
+
+RETURN ONLY JSON.
 """
 
-    print("=== FEEDBACK MODEL ===", model_name)
-
-    raw_text = ""
-    used_schema = True
-
+    model = GenerativeModel(model_name)
     try:
-        response = client.models.generate_content(
-            model=model_name,
-            contents=prompt,
-            config=GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=RESPONSE_SCHEMA,
-                max_output_tokens=2048,
-                temperature=0.1,
-            ),
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                # "max_output_tokens": 2048,
+                "temperature": 0.1
+            }
         )
-        raw_text = (response.text or "").strip()
-
     except Exception as e:
-        error_msg = str(e)
-        used_schema = False
-        print(f"[ERROR] Structured-output call failed: {error_msg}")
+        return f"Error calling model: {e}"
 
-        # Fallback for tuned endpoints that may reject response_schema
-        if any(k in error_msg.lower() for k in ("400", "invalid", "response_schema", "unsupported")):
-            print("[FALLBACK] Retrying without response_schema...")
-            try:
-                fallback_prompt = prompt + """
-
-Return ONLY valid JSON.
-Do not use markdown code fences.
-Do not add explanation text.
-Use exactly these top-level fields only:
-- feedback_items
-- ux_score
-- summary
-"""
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=fallback_prompt,
-                    config=GenerateContentConfig(
-                        response_mime_type="application/json",
-                        max_output_tokens=2048,
-                        temperature=0.1,
-                    ),
-                )
-                raw_text = (response.text or "").strip()
-            except Exception as e2:
-                print(f"[FALLBACK ERROR] {e2}")
-                return json.dumps(
-                    {
-                        "error": f"Model call failed: {e2}",
-                        "feedback_items": [],
-                        "ux_score": {"score": 0.0, "grade": "F"},
-                        "summary": {
-                            "total_issues": 0,
-                            "high": 0,
-                            "medium": 0,
-                            "low": 0,
-                        },
-                    },
-                    ensure_ascii=False,
-                )
-        else:
-            return json.dumps(
-                {
-                    "error": f"Model call failed: {error_msg}",
-                    "feedback_items": [],
-                    "ux_score": {"score": 0.0, "grade": "F"},
-                    "summary": {
-                        "total_issues": 0,
-                        "high": 0,
-                        "medium": 0,
-                        "low": 0,
-                    },
-                },
-                ensure_ascii=False,
-            )
-
-    print("=== USED RESPONSE SCHEMA ===", used_schema)
-    print("=== RAW OUTPUT LENGTH ===", len(raw_text))
-    print("=== RAW OUTPUT START ===")
-    print(raw_text[:1000])
-    print("=== RAW OUTPUT END ===")
-    print(raw_text[-500:])
+    raw_text = (response.text or "").strip()
 
     try:
-        if used_schema:
-            raw_dict = json.loads(raw_text)
-        else:
-            raw_dict = _extract_json_loose(raw_text)
-
-        report = _validate_report(raw_dict)
-        frontend_dict = report.to_frontend_dict()
-
+        parsed_data = _extract_json(raw_text)
     except Exception as e:
-        print(f"[VALIDATION ERROR] {e}")
+        print(f"JSON parse error: {e}")
 
         file_id = evaluation_id if evaluation_id else "latest"
         raw_path = OUTPUT_DIR / f"feedback_raw_{file_id}.txt"
         with open(raw_path, "w", encoding="utf-8") as f:
             f.write(raw_text)
 
-        return json.dumps(
-            {
-                "error": "Could not parse or validate model output",
-                "feedback_items": [],
-                "ux_score": {"score": 0.0, "grade": "F"},
-                "summary": {
-                    "total_issues": 0,
-                    "high": 0,
-                    "medium": 0,
-                    "low": 0,
-                },
-            },
-            ensure_ascii=False,
-        )
+        return raw_text
 
-    file_id = evaluation_id if evaluation_id else "latest"
+    parsed_data = _normalize_feedback(parsed_data)
+
+    file_id   = evaluation_id if evaluation_id else "latest"
     json_path = OUTPUT_DIR / f"feedback_{file_id}.json"
-    md_path = OUTPUT_DIR / f"feedback_{file_id}.md"
+    md_path   = OUTPUT_DIR / f"feedback_{file_id}.md"
 
     with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(frontend_dict, f, indent=2, ensure_ascii=False)
+        json.dump(parsed_data, f, indent=2, ensure_ascii=False)
 
-    md_content = convert_feedback_to_markdown(frontend_dict)
+    md_content = convert_feedback_to_markdown(parsed_data)
+
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(md_content)
 
     print(f"✓ Saved → {json_path} | {md_path}")
 
-    # IMPORTANT: return JSON, not markdown
-    return json.dumps(frontend_dict, ensure_ascii=False)
+    return json.dumps(parsed_data, ensure_ascii=False)
