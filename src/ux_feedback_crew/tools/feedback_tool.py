@@ -141,7 +141,6 @@ def _normalize_feedback(data: dict) -> dict:
             "high": high,
             "medium": medium,
             "low": low,
-            "estimated_total_effort": "N/A",
         }
 
     return data

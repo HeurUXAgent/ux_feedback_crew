@@ -26,7 +26,7 @@ def migrate_dataset():
     csv_path = Path("data/ux_expert_evaluation_dataset.csv")
     
     if not csv_path.exists():
-        print(f"❌ Error: File not found at {csv_path}")
+        print(f"Error: File not found at {csv_path}")
         return
 
     # Load Data
@@ -36,7 +36,7 @@ def migrate_dataset():
     # Connect to MongoDB
     uri = os.getenv("MONGO_URI") 
     if not uri:
-        print("❌ Error: MONGO_URI not found in .env file")
+        print("Error: MONGO_URI not found in .env file")
         return
 
     client = MongoClient(uri)
@@ -46,7 +46,7 @@ def migrate_dataset():
     documents = []
 
     # Group by ui_id and perform Mapping
-    print("🧠 Mapping expert evaluations to Agent JSON format...")
+    print("Mapping expert evaluations to Agent JSON format...")
     for ui_id, group in df.groupby('ui_id'):
         first_row = group.iloc[0]
         
@@ -88,11 +88,11 @@ def migrate_dataset():
 
     # Insert into MongoDB
     if documents:
-        print(f"🚀 Uploading {len(documents)} documents to MongoDB...")
+        print(f"Uploading {len(documents)} documents to MongoDB...")
         collection.insert_many(documents)
-        print("✅ Migration Successful!")
+        print("Migration Successful!")
     else:
-        print("⚠️ No data found to migrate.")
+        print("No data found to migrate.")
 
 if __name__ == "__main__":
     migrate_dataset()
