@@ -11,8 +11,8 @@ load_dotenv()
 OUTPUT_DIR = Path("data/outputs")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# model_name = os.getenv("FINETUNED_FEEDBACK_MODEL") or os.getenv("GENERIC_FEEDBACK_MODEL") or "gemini-2.5-flash"
-model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
+model_name = os.getenv("FINETUNED_FEEDBACK_MODEL") or os.getenv("GENERIC_FEEDBACK_MODEL") or "gemini-2.5-flash"
+# model_name = "projects/75094798515/locations/us-central1/endpoints/1191994299567308800"
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
@@ -51,11 +51,11 @@ def _normalize_feedback(data: dict) -> dict:
     instead of the schema we defined in the prompt.
 
     Handles:
-      - actionable_steps / how_to_fix / action_steps / technical_steps → what_to_do
-      - overall_ux_score (flat int) → ux_score { score, grade, severity, reasoning }
-      - summary as a plain string → leave as-is (frontend handles both)
-      - missing priority → default to "low"
-      - missing effort_estimate → default to "N/A"
+      - actionable_steps / how_to_fix / action_steps / technical_steps -> what_to_do
+      - overall_ux_score (flat int) -> ux_score { score, grade, severity, reasoning }
+      - summary as a plain string -> leave as-is (frontend handles both)
+      - missing priority -> default to "low"
+      - missing effort_estimate -> default to "N/A"
     """
     # Normalize feedback_items 
     for item in data.get("feedback_items", []):

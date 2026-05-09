@@ -23,7 +23,7 @@ def calculate_ux_score(group):
     return round(score, 2)
 
 def migrate_dataset():
-    csv_path = Path("data/ux_expert_evaluation_dataset.csv")
+    csv_path = Path("data/ux_expert_evaluation_dataset_v2.csv")
     
     if not csv_path.exists():
         print(f"Error: File not found at {csv_path}")
@@ -41,7 +41,7 @@ def migrate_dataset():
 
     client = MongoClient(uri)
     db = client['heuruxagent_db']
-    collection = db['expert_validation_dataset']
+    collection = db['expert_validation_dataset_v2']
 
     documents = []
 

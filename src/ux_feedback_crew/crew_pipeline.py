@@ -1,6 +1,5 @@
 from ux_feedback_crew.crew import UxFeedbackCrew
 
-
 def run_full_ux_pipeline_raw(image_path: str, client_id: str, evaluation_id: str = ""):
     """Full pipeline: Vision → Heuristics → Feedback → Wireframe."""
     crew_instance = UxFeedbackCrew(client_id=client_id, evaluation_id=evaluation_id)
