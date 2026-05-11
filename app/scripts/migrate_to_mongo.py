@@ -30,7 +30,7 @@ def migrate_dataset():
         return
 
     # Load Data
-    print(f"📂 Loading dataset from {csv_path}...")
+    print(f" Loading dataset from {csv_path}...")
     df = pd.read_csv(csv_path)
     
     # Connect to MongoDB
